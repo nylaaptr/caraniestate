@@ -655,23 +655,85 @@
                 <div class="logo-icon">
                     <i class="fas fa-home"></i>
                 </div>
-                <div class="logo-text">PropertiHarmoni</div>
+                <div class="logo-text">Carani Estate</div>
             </div>
-            
-            <nav class="nav-menu">
-                <a href="#" class="nav-item">Beranda</a>
-                <a href="#" class="nav-item">Katalog</a>
-                <a href="#" class="nav-item">ChatBot</a>
-                <a href="#" class="nav-item active">Pembayaran</a>
+
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <nav class="nav-menu" id="navMenu">
+                <a href="{{ route('welcome') }}"
+                class="nav-item {{ request()->routeIs('welcome') ? 'active' : '' }}">
+                    Beranda
+                </a>
+                <a href="{{ route('tentang-kami') }}"
+                class="nav-item {{ request()->routeIs('tentang-kami') ? 'active' : '' }}">
+                    Tentang Kami
+                </a>
+                <a href="{{ route('halaman-katalog') }}"
+                class="nav-item {{ request()->routeIs('halaman-katalog') ? 'active' : '' }}">
+                    Katalog
+                </a>
+                <a href="{{ route('halaman-chatbot') }}"
+                class="nav-item {{ request()->routeIs('halaman-chatbot') ? 'active' : '' }}">
+                    ChatBot
+                </a>
+                @auth
+                <a href="{{ route('riwayat-pemesanan') }}" class="nav-item {{ request()->routeIs('riwayat-pemesanan') ? 'active' : '' }}">
+                    Riwayat Pemesanan
+                </a>
+                @endauth
+                <a href="{{ route('halaman-kontak') }}"
+                class="nav-item {{ request()->routeIs('kontak') ? 'active' : '' }}">
+                    Kontak
+                </a>
             </nav>
             
             <div class="user-actions">
-                <div class="notification-icon">
+                {{-- Notifikasi hanya muncul kalau sudah login --}}
+                @auth
+                <a href="{{ route('halaman-notifikasi') }}" class="notification-icon" style="position:relative;">
                     <i class="fas fa-bell"></i>
-                </div>
-                <div class="profile-icon">
-                    <i class="fas fa-user"></i>
-                </div>
+                    @php
+                        $jumlahBelumBaca = \App\Models\Notifikasi::where('id_user', Auth::id())
+                            ->where('status_baca', 0)->count();
+                    @endphp
+                    @if($jumlahBelumBaca > 0)
+                        <span style="position:absolute; top:-5px; right:-5px; 
+                                    background:#ef4444; color:white; border-radius:50%; 
+                                    width:18px; height:18px; font-size:0.65rem; 
+                                    display:flex; align-items:center; justify-content:center;
+                                    font-weight:700;">
+                            {{ $jumlahBelumBaca > 9 ? '9+' : $jumlahBelumBaca }}
+                        </span>
+                    @endif
+                </a>
+                @endauth
+
+                {{-- Conditional: Guest vs Authenticated --}}
+                @guest
+                    <a href="{{ route('login') }}" class="nav-item login-link">
+                        <i class="fas fa-sign-in-alt me-1"></i> Login
+                    </a>
+                @else
+                    <div class="profile-dropdown">
+                        <div class="profile-icon" onclick="toggleDropdown()">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="{{ route('halaman-profil') }}">
+                                <i class="fas fa-user-circle"></i> Lihat Profil
+                            </a>
+                            <hr>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endguest
             </div>
         </div>
     </header>

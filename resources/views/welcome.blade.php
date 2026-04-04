@@ -748,6 +748,249 @@
         .slide-btn:hover {
             background: #284b7a;
         }
+
+        /* ===============================
+           FAQ SECTION STYLES
+        ================================ */
+        .faq-section {
+            padding: 80px 30px;
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+        }
+
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .faq-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .faq-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary-blue);
+            border-radius: 2px;
+        }
+
+        .faq-subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-top: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* FAQ Accordion */
+        .faq-accordion {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 25px 30px;
+            background: white;
+            border: none;
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: var(--light-blue);
+            color: var(--dark-blue);
+        }
+
+        .faq-question.active {
+            background: var(--light-blue);
+            color: var(--dark-blue);
+        }
+
+        .faq-question i {
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-question.active i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            background: #fafbfc;
+        }
+
+        .faq-answer-content {
+            padding: 0 30px 25px 30px;
+            color: #4a5568;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .faq-answer-content ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .faq-answer-content li {
+            margin-bottom: 8px;
+        }
+
+        .faq-answer-content a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .faq-answer-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* FAQ Categories */
+        .faq-categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .faq-category-btn {
+            padding: 10px 25px;
+            border: 2px solid var(--primary-blue);
+            border-radius: 25px;
+            background: white;
+            color: var(--dark-blue);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .faq-category-btn:hover,
+        .faq-category-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* Contact CTA */
+        .faq-contact {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, #2a4a6f 100%);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 50px;
+            color: white;
+        }
+
+        .faq-contact h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .faq-contact p {
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .faq-contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 35px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .faq-contact-btn:hover {
+            background: #6aa5c6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(122, 178, 211, 0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .faq-section {
+                padding: 60px 20px;
+            }
+
+            .faq-title {
+                font-size: 2rem;
+            }
+
+            .faq-question {
+                padding: 20px;
+                font-size: 1rem;
+            }
+
+            .faq-answer-content {
+                padding: 0 20px 20px 20px;
+            }
+
+            .faq-categories {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .faq-category-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .faq-contact {
+                padding: 30px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .faq-title {
+                font-size: 1.75rem;
+            }
+
+            .faq-question {
+                padding: 18px;
+            }
+        }
                 
         /* Footer */
         .footer {
@@ -1032,6 +1275,37 @@
             .features-grid {
                 grid-template-columns: 1fr;
             }
+
+            .faq-section {
+                padding: 60px 20px;
+            }
+
+            .faq-title {
+                font-size: 2rem;
+            }
+
+            .faq-question {
+                padding: 20px;
+                font-size: 1rem;
+            }
+
+            .faq-answer-content {
+                padding: 0 20px 20px 20px;
+            }
+
+            .faq-categories {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .faq-category-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .faq-contact {
+                padding: 30px 20px;
+            }
         }
 
         @media (max-width: 576px) {
@@ -1192,23 +1466,37 @@
             </nav>
             
             <div class="user-actions">
-                <a href="{{ route('halaman-notifikasi') }}" class="notification-icon">
+    
+                {{-- Notifikasi hanya muncul kalau sudah login --}}
+                @auth
+                <a href="{{ route('halaman-notifikasi') }}" class="notification-icon" style="position:relative;">
                     <i class="fas fa-bell"></i>
+                    @php
+                        $jumlahBelumBaca = \App\Models\Notifikasi::where('id_user', Auth::id())
+                            ->where('status_baca', 0)->count();
+                    @endphp
+                    @if($jumlahBelumBaca > 0)
+                        <span style="position:absolute; top:-5px; right:-5px; 
+                                    background:#ef4444; color:white; border-radius:50%; 
+                                    width:18px; height:18px; font-size:0.65rem; 
+                                    display:flex; align-items:center; justify-content:center;
+                                    font-weight:700;">
+                            {{ $jumlahBelumBaca > 9 ? '9+' : $jumlahBelumBaca }}
+                        </span>
+                    @endif
                 </a>
-                
+                @endauth
+
                 {{-- Conditional: Guest vs Authenticated --}}
                 @guest
-                    {{-- BELUM login: Tampilkan tombol Login sederhana --}}
                     <a href="{{ route('login') }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
-                    {{-- SUDAH login: Tampilkan dropdown Profil --}}
                     <div class="profile-dropdown">
                         <div class="profile-icon" onclick="toggleDropdown()">
                             <i class="fas fa-user"></i>
                         </div>
-                        
                         <div class="dropdown-menu" id="dropdownMenu">
                             <a href="{{ route('halaman-profil') }}">
                                 <i class="fas fa-user-circle"></i> Lihat Profil
@@ -1486,6 +1774,251 @@
     </div>
 </section>
 
+<!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="faq-container">
+            
+            <!-- Header -->
+            <div class="faq-header">
+                <h2 class="faq-title">Pertanyaan yang Sering Diajukan</h2>
+                <p class="faq-subtitle">
+                    Temukan jawaban untuk pertanyaan umum seputar pembelian properti, KPR, dan layanan Carani Estate.
+                </p>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="faq-categories">
+                <button class="faq-category-btn active" data-category="all">
+                    <i class="fas fa-th-large me-2"></i>Semua
+                </button>
+                <button class="faq-category-btn" data-category="pembelian">
+                    <i class="fas fa-home me-2"></i>Pembelian
+                </button>
+                <button class="faq-category-btn" data-category="kpr">
+                    <i class="fas fa-university me-2"></i>KPR
+                </button>
+                <button class="faq-category-btn" data-category="umum">
+                    <i class="fas fa-info-circle me-2"></i>Umum
+                </button>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <div class="faq-accordion">
+                
+                <!-- FAQ Item 1 -->
+                <div class="faq-item" data-category="pembelian">
+                    <button class="faq-question">
+                        <span>🏠 Bagaimana cara membeli properti di Carani Estate?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Proses pembelian properti di Carani Estate sangat mudah:</p>
+                            <ul>
+                                <li><strong>Pilih Properti:</strong> Browse katalog properti di website kami</li>
+                                <li><strong>Booking:</strong> Isi form pemesanan dan bayar DP minimal 10%</li>
+                                <li><strong>Pilih Pembayaran:</strong> Cash, KPR, atau cicilan ke developer</li>
+                                <li><strong>Tanda Tangan:</strong> PPJB dengan developer</li>
+                                <li><strong>Serah Terima:</strong> Terima kunci setelah pembayaran lunas</li>
+                            </ul>
+                            <p>Timbangan kami akan memandu Anda di setiap langkah proses.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="faq-item" data-category="kpr">
+                    <button class="faq-question">
+                        <span>🏦 Apa syarat mengajukan KPR di Carani Estate?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Syarat umum pengajuan KPR:</p>
+                            <ul>
+                                <li><strong>KTP:</strong> Suami & Istri (jika sudah menikah)</li>
+                                <li><strong>Kartu Keluarga:</strong> Fotokopi KK</li>
+                                <li><strong>Penghasilan:</strong> Slip gaji 3 bulan terakhir / rekening koran</li>
+                                <li><strong>NPWP:</strong> Fotokopi NPWP pemohon</li>
+                                <li><strong>Foto:</strong> Foto 3x4 & selfie 4R</li>
+                                <li><strong>Dokumen Usaha:</strong> SIUP / surat keterangan usaha (untuk wiraswasta)</li>
+                            </ul>
+                            <p>Proses verifikasi KPR biasanya memakan waktu <strong>7-14 hari kerja</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="faq-item" data-category="pembelian">
+                    <button class="faq-question">
+                        <span>💰 Berapa minimal DP untuk membeli properti?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Minimal DP tergantung metode pembayaran:</p>
+                            <ul>
+                                <li><strong>KPR Bank:</strong> 10% dari harga properti</li>
+                                <li><strong>Cicilan Developer:</strong> 20% dari harga properti</li>
+                                <li><strong>Cash Bertahap:</strong> 30% di awal, sisa dicicil 12x</li>
+                                <li><strong>Hard Cash:</strong> 100% lunas (dapat diskon hingga 5%)</li>
+                            </ul>
+                            <p>Booking fee Rp 2-5 juta akan dikembalikan jika KPR disetujui bank.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="faq-item" data-category="kpr">
+                    <button class="faq-question">
+                        <span>📊 Bank apa saja yang bekerja sama dengan Carani Estate?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Kami bekerja sama dengan berbagai bank terpercaya:</p>
+                            <ul>
+                                <li>🏦 <strong>BTN</strong> - Spesialis KPR dengan bunga kompetitif</li>
+                                <li>🏦 <strong>Mandiri</strong> - Proses cepat dan fleksibel</li>
+                                <li>🏦 <strong>BCA</strong> - Suku bunga menarik untuk karyawan</li>
+                                <li>🏦 <strong>BRI</strong> - Pilihan tenor hingga 20 tahun</li>
+                                <li>🏦 <strong>BNI</strong> - Paket KPR syariah tersedia</li>
+                            </ul>
+                            <p>Tim kami akan membantu Anda memilih bank dengan penawaran terbaik.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 5 -->
+                <div class="faq-item" data-category="umum">
+                    <button class="faq-question">
+                        <span>📄 Apakah sertifikat properti sudah SHM?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Ya, semua properti di Carani Estate memiliki:</p>
+                            <ul>
+                                <li>✅ <strong>Sertifikat Hak Milik (SHM)</strong> - Untuk rumah tapak</li>
+                                <li>✅ <strong>Sertifikat Strata Title</strong> - Untuk apartemen</li>
+                                <li>✅ <strong>IMB (Izin Mendirikan Bangunan)</strong> lengkap</li>
+                                <li>✅ <strong>BPHTB & Pajak</strong> sudah termasuk (untuk promo tertentu)</li>
+                            </ul>
+                            <p>Sertifikat akan diproses setelah pembayaran lunas dan dapat diambil di notaris.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 6 -->
+                <div class="faq-item" data-category="pembelian">
+                    <button class="faq-question">
+                        <span>⏱️ Berapa lama proses sampai serah terima kunci?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Timeline bervariasi tergantung kondisi properti:</p>
+                            <ul>
+                                <li><strong>Properti Ready Stock:</strong> 1-2 bulan setelah pembayaran lunas</li>
+                                <li><strong>Properti Inden:</strong> 6-12 bulan dari waktu booking</li>
+                                <li><strong>KPR:</strong> Tambah 2-3 minggu untuk proses akad & pencairan</li>
+                            </ul>
+                            <p>Kami akan memberikan update progres pembangunan secara berkala via WhatsApp/email.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 7 -->
+                <div class="faq-item" data-category="umum">
+                    <button class="faq-question">
+                        <span>🔧 Apakah ada garansi untuk properti yang dibeli?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Ya, kami memberikan garansi:</p>
+                            <ul>
+                                <li>🔹 <strong>Garansi Struktur:</strong> 5 tahun untuk kerusakan struktur utama</li>
+                                <li>🔹 <strong>Garansi Atap & Dinding:</strong> 2 tahun untuk kebocoran/retak</li>
+                                <li>🔹 <strong>Garansi Instalasi:</strong> 1 tahun untuk listrik & plumbing</li>
+                            </ul>
+                            <p>Layanan purna jual kami siap membantu jika ada kendala setelah serah terima.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 8 -->
+                <div class="faq-item" data-category="kpr">
+                    <button class="faq-question">
+                        <span>📉 Berapa bunga KPR yang ditawarkan?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Suku bunga KPR bervariasi:</p>
+                            <ul>
+                                <li><strong>Fixed Rate:</strong> 6.5% - 8.5% (3 tahun pertama)</li>
+                                <li><strong>Floating Rate:</strong> Sesuai BI Rate + spread (setelah periode fixed)</li>
+                                <li><strong>KPR Syariah:</strong> Margin 7% - 9% flat hingga lunas</li>
+                            </ul>
+                            <p>Bunga dapat berubah sesuai kebijakan bank. Kami akan berikan simulasi cicilan detail sebelum pengajuan.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 9 -->
+                <div class="faq-item" data-category="pembelian">
+                    <button class="faq-question">
+                        <span>🔄 Apakah bisa membatalkan pemesanan?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Pembatalan dapat dilakukan dengan ketentuan:</p>
+                            <ul>
+                                <li><strong>Sebelum PPJB:</strong> Booking fee dikembalikan 100%</li>
+                                <li><strong>Setelah PPJB:</strong> DP dikembalikan 50-80% (sesuai perjanjian)</li>
+                                <li><strong>KPR Ditolak:</strong> DP dikembalikan penuh (jika syarat lengkap)</li>
+                            </ul>
+                            <p>Silakan hubungi tim kami untuk proses pembatalan.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 10 -->
+                <div class="faq-item" data-category="umum">
+                    <button class="faq-question">
+                        <span>📞 Bagaimana cara menghubungi tim Carani Estate?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Anda dapat menghubungi kami melalui:</p>
+                            <ul>
+                                <li>📱 <strong>WhatsApp:</strong> 0812-3456-7890 (24/7)</li>
+                                <li>📧 <strong>Email:</strong> info@caraniestate.com</li>
+                                <li>🏢 <strong>Kantor:</strong> Jl. Melati No. 45, Bondowoso, Jawa Timur</li>
+                                <li>💬 <strong>Live Chat:</strong> Tersedia di website (08:00 - 17:00 WIB)</li>
+                            </ul>
+                            <p>Tim marketing kami siap membantu konsultasi gratis!</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Contact CTA -->
+            <div class="faq-contact">
+                <h3>❓ Masih Punya Pertanyaan?</h3>
+                <p>Tim kami siap membantu Anda 24/7. Jangan ragu untuk menghubungi kami!</p>
+                <a href="https://wa.me/6281234567890" class="faq-contact-btn" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Hubungi via WhatsApp
+                </a>
+            </div>
+
+        </div>
+    </section>
+
 
     
     <!-- Footer -->
@@ -1681,6 +2214,60 @@ function toggleDropdown() {
             document.getElementById('navMenu').classList.toggle('show');
         }
 </script>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // FAQ Accordion Functionality
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    const isActive = this.classList.contains('active');
+                    
+                    // Close all other FAQs
+                    faqQuestions.forEach(q => {
+                        q.classList.remove('active');
+                        q.nextElementSibling.style.maxHeight = '0';
+                        q.nextElementSibling.style.padding = '0 30px 0 30px';
+                    });
+                    
+                    // Toggle current FAQ
+                    if (!isActive) {
+                        this.classList.add('active');
+                        answer.style.maxHeight = answer.scrollHeight + 'px';
+                        answer.style.padding = '0 30px 25px 30px';
+                    }
+                });
+            });
+            
+            // Category Filter
+            const categoryBtns = document.querySelectorAll('.faq-category-btn');
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Update active button
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const category = this.dataset.category;
+                    
+                    // Filter FAQs
+                    faqItems.forEach(item => {
+                        if (category === 'all' || item.dataset.category === category) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Auto-expand first FAQ (optional)
+            // faqQuestions[0].click();
+        });
+    </script>
 
 </body>
 </html>

@@ -1197,23 +1197,36 @@
             </nav>
             
             <div class="user-actions">
-                <a href="{{ route('halaman-notifikasi') }}" class="notification-icon">
+                {{-- Notifikasi hanya muncul kalau sudah login --}}
+                @auth
+                <a href="{{ route('halaman-notifikasi') }}" class="notification-icon" style="position:relative;">
                     <i class="fas fa-bell"></i>
+                    @php
+                        $jumlahBelumBaca = \App\Models\Notifikasi::where('id_user', Auth::id())
+                            ->where('status_baca', 0)->count();
+                    @endphp
+                    @if($jumlahBelumBaca > 0)
+                        <span style="position:absolute; top:-5px; right:-5px; 
+                                    background:#ef4444; color:white; border-radius:50%; 
+                                    width:18px; height:18px; font-size:0.65rem; 
+                                    display:flex; align-items:center; justify-content:center;
+                                    font-weight:700;">
+                            {{ $jumlahBelumBaca > 9 ? '9+' : $jumlahBelumBaca }}
+                        </span>
+                    @endif
                 </a>
-                
+                @endauth
+
                 {{-- Conditional: Guest vs Authenticated --}}
                 @guest
-                    {{-- BELUM login: Tampilkan tombol Login sederhana --}}
                     <a href="{{ route('login') }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
-                    {{-- SUDAH login: Tampilkan dropdown Profil --}}
                     <div class="profile-dropdown">
                         <div class="profile-icon" onclick="toggleDropdown()">
                             <i class="fas fa-user"></i>
                         </div>
-                        
                         <div class="dropdown-menu" id="dropdownMenu">
                             <a href="{{ route('halaman-profil') }}">
                                 <i class="fas fa-user-circle"></i> Lihat Profil
