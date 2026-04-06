@@ -155,7 +155,11 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 
     Route::get('/', function () {
         return view('admin.welcome');
-    })->name('admin.dashboard');
+    })->name('admin.welcome');
+
+    Route::get('/halaman_chatbot', function () {
+    return view('admin.halaman_chatbot');
+})->name('admin.halaman_chatbot');
 
     // ========================
     // DATA RUMAH
@@ -258,6 +262,13 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 
         return redirect()->route('admin.data_user')->with('success', 'User berhasil diupdate.');
     })->name('admin.edit_user.update');
+
+    Route::delete('/hapus_user/{id}', function ($id) {
+    \App\Models\User::where('id_user', $id)->delete();
+
+    return redirect()->route('admin.data_user')
+        ->with('success', 'User berhasil dihapus.');
+})->name('admin.hapus_user');
 
     // ========================
     // VERIFIKASI

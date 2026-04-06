@@ -695,40 +695,40 @@
         </div>
         
         <div class="nav-menu" id="navMenu">
-            <a href="{{ route('welcome') }}"
-                class="nav-item {{ request()->routeIs('welcome') ? 'active' : '' }}">
+            <a href="{{ route('admin.welcome') }}"
+                class="nav-item {{ request()->routeIs('admin.welcome') ? 'active' : '' }}">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="{{ route('data_user') }}"
-                class="nav-item {{ request()->routeIs('data_user') ? 'active' : '' }}">
+            <a href="{{ route('admin.data_user') }}"
+                class="nav-item {{ request()->routeIs('admin.data_user') ? 'active' : '' }}">
                 <i class="fas fa-users"></i>
                 <span>Data User</span>
             </a>
 
-            <a href="{{ route('data_rumah') }}"
-                class="nav-item {{ request()->routeIs('data_rumah') ? 'active' : '' }}">
+            <a href="{{ route('admin.data_rumah') }}"
+                class="nav-item {{ request()->routeIs('admin.data_rumah') ? 'active' : '' }}">
                 <i class="fas fa-house"></i>
                 <span>Data Rumah</span>
             </a>
 
-            <a href="{{ route('halaman_verifikasi') }}"
-                class="nav-item {{ request()->routeIs('halaman_verifikasi') ? 'active' : '' }}">
+            <a href="{{ route('admin.halaman_verifikasi') }}"
+                class="nav-item {{ request()->routeIs('admin.halaman_verifikasi') ? 'active' : '' }}">
                 <i class="fas fa-check-circle"></i>
                 <span>Verifikasi Data</span>
             </a>
 
-            <a href="{{ route('halaman_chatbot') }}"
-                class="nav-item {{ request()->routeIs('halaman_chatbot') ? 'active' : '' }}">
+            <a href="{{ route('admin.halaman_chatbot') }}"
+                class="nav-item {{ request()->routeIs('admin.halaman_chatbot') ? 'active' : '' }}">
                 <i class="fas fa-comments"></i>
                 <span>Chatbot</span>
             </a>
         
-        <div class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </div>
+            <div class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
         </div>
     </div>
     
@@ -747,7 +747,7 @@
             </div>
         </div>
 
-        <form method="GET" action="{{ route('data_rumah') }}" id="searchForm">
+        <form method="GET" action="{{ route('admin.data_rumah') }}" id="searchForm">
             <div class="search-bar">
                 <i class="fas fa-search"></i>
                 <input type="text" name="search" 
@@ -762,7 +762,7 @@
             <div class="table-header">
                 <div class="table-title">Daftar Properti Tersedia</div>
                 <div class="table-actions">
-                    <a href="{{ route('tambah-rumah') }}" class="btn-action btn-primary">
+                    <a href="{{ route('admin.tambah-rumah') }}" class="btn-action btn-primary">
                         <i class="fas fa-plus"></i> Tambah Properti
                     </a>
                 </div>
@@ -847,12 +847,12 @@
                             </td>
                             <td>
                                 <div class="action-group">
-                                    <a href="{{ route('edit_rumah', $p->id_properti) }}" 
+                                    <a href="{{ route('admin.edit_rumah', $p->id_properti) }}" 
                                     class="action-btn btn-edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form method="POST" 
-                                        action="{{ route('hapus_rumah', $p->id_properti) }}" 
+                                        action="{{ route('admin.hapus_rumah', $p->id_properti) }}" 
                                         style="display:inline;"
                                         onsubmit="return confirm('Yakin hapus properti ini?')">
                                         @csrf

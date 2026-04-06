@@ -580,40 +580,40 @@
         </div>
         
         <div class="nav-menu" id="navMenu">
-            <a href="{{ route('welcome') }}"
-                class="nav-item {{ request()->routeIs('welcome') ? 'active' : '' }}">
+            <a href="{{ route('admin.welcome') }}"
+                class="nav-item {{ request()->routeIs('admin.welcome') ? 'active' : '' }}">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="{{ route('data_user') }}"
-                class="nav-item {{ request()->routeIs('data_user') ? 'active' : '' }}">
+            <a href="{{ route('admin.data_user') }}"
+                class="nav-item {{ request()->routeIs('admin.data_user') ? 'active' : '' }}">
                 <i class="fas fa-users"></i>
                 <span>Data User</span>
             </a>
 
-            <a href="{{ route('data_rumah') }}"
-                class="nav-item {{ request()->routeIs('data_rumah') ? 'active' : '' }}">
+            <a href="{{ route('admin.data_rumah') }}"
+                class="nav-item {{ request()->routeIs('admin.data_rumah') ? 'active' : '' }}">
                 <i class="fas fa-house"></i>
                 <span>Data Rumah</span>
             </a>
 
-            <a href="{{ route('halaman_verifikasi') }}"
-                class="nav-item {{ request()->routeIs('halaman_verifikasi') ? 'active' : '' }}">
+            <a href="{{ route('admin.halaman_verifikasi') }}"
+                class="nav-item {{ request()->routeIs('admin.halaman_verifikasi') ? 'active' : '' }}">
                 <i class="fas fa-check-circle"></i>
                 <span>Verifikasi Data</span>
             </a>
 
-            <a href="{{ route('halaman_chatbot') }}"
-                class="nav-item {{ request()->routeIs('halaman_chatbot') ? 'active' : '' }}">
+            <a href="{{ route('admin.halaman_chatbot') }}"
+                class="nav-item {{ request()->routeIs('admin.halaman_chatbot') ? 'active' : '' }}">
                 <i class="fas fa-comments"></i>
                 <span>Chatbot</span>
             </a>
         
-        <div class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </div>
+            <div class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
         </div>
     </div>
     
@@ -631,7 +631,7 @@
             </div>
         </div>
 
-        <form method="GET" action="{{ route('data_user') }}" id="searchForm">
+        <form method="GET" action="{{ route('admin.data_user') }}" id="searchForm">
             <div class="search-bar">
                 <i class="fas fa-search"></i>
                 <input type="text" name="search" 
@@ -646,7 +646,7 @@
             <div class="table-header">
                 <div class="table-title">Daftar Pengguna Sistem</div>
                 <div class="table-actions">
-                    <a href="{{ route('tambah-datauser') }}" class="btn-action btn-primary">
+                    <a href="{{ route('admin.tambah-datauser') }}" class="btn-action btn-primary">
                         <i class="fas fa-plus"></i> Tambah User
                     </a>
                 </div>
@@ -692,12 +692,12 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('edit_user', $user->id_user) }}" class="action-btn btn-edit">
+                                <a href="{{ route('admin.edit_user', $user->id_user) }}" class="action-btn btn-edit">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
 
                                 <form method="POST" 
-                                    action="{{ route('admin.user.hapus', $user->id_user) }}" 
+                                    action="{{ route('admin.hapus_user', $user->id_user) }}" 
                                     style="display:inline;"
                                     onsubmit="return confirm('Yakin hapus user {{ $user->nama_user }}?')">
                                     @csrf

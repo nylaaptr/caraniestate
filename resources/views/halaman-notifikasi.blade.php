@@ -165,10 +165,66 @@
         .menu-toggle:hover{
             background: rgba(255,255,255,0.15);
         }
+
+        /* PROFILE DROPDOWN */
+        .profile-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 999;
+        }
+
+        .dropdown-menu a,
+        .dropdown-menu button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            color: #333;
+            text-decoration: none;
+            width: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .dropdown-menu a:hover,
+        .dropdown-menu button:hover {
+            background: #f5f5f5;
+        }
+
+        .dropdown-menu hr {
+            margin: 4px 0;
+            border: none;
+            border-top: 1px solid #eee;
+        }
+
+        /* Tampilkan dropdown */
+        .dropdown-menu.show {
+            display: block;
+        }
         
         /* Main Content */
         .main-content {
-            margin: 80px auto 30px;
+            margin: 100px auto 30px;
             max-width: 600px;
             padding: 0 20px;
         }
@@ -356,11 +412,6 @@
                 font-size: 1rem;
             }
             
-            .nav-menu {
-                display: none;
-                margin-bottom: 20px;
-            }
-            
             .user-actions {
                 margin-left: auto;   /* ← dorong ke kanan */
                 display: flex;
@@ -423,7 +474,6 @@
 </head>
 <body>
     <!-- Header -->
-    <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="logo">
@@ -453,17 +503,19 @@
                 class="nav-item {{ request()->routeIs('halaman-chatbot') ? 'active' : '' }}">
                     ChatBot
                 </a>
-                <a href="{{ route('riwayat-pemesanan') }}"
-                class="nav-item {{ request()->routeIs('riwayat-pemesanan') ? 'active' : '' }}">
+                @auth
+                <a href="{{ route('riwayat-pemesanan') }}" class="nav-item {{ request()->routeIs('riwayat-pemesanan') ? 'active' : '' }}">
                     Riwayat Pemesanan
                 </a>
+                @endauth
                 <a href="{{ route('halaman-kontak') }}"
-                class="nav-item {{ request()->routeIs('halaman-kontak') ? 'active' : '' }}">
+                class="nav-item {{ request()->routeIs('kontak') ? 'active' : '' }}">
                     Kontak
                 </a>
             </nav>
             
             <div class="user-actions">
+    
                 {{-- Notifikasi hanya muncul kalau sudah login --}}
                 @auth
                 <a href="{{ route('halaman-notifikasi') }}" class="notification-icon" style="position:relative;">

@@ -40,7 +40,7 @@ class AuthController extends Controller
             // Redirect berdasarkan role
             if ($user->role_user === 'admin') {
                 // ✅ Lebih baik pakai route name daripada hardcoded URL
-                return redirect()->route('admin.dashboard'); 
+                return redirect()->route('admin.welcome'); 
                 // Jika admin di project terpisah, gunakan:
                 // return redirect('http://127.0.0.1:8001/admin');
             }
@@ -89,11 +89,17 @@ class AuthController extends Controller
     // Logout
     public function logout(Request $request)
     {
-        Auth::logout();
+        $role = Auth::user()->role_user; // ← cek role sebelum logout
         
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
-        return redirect()->route('welcome'); // Redirect ke halaman utama setelah logout
+        // Redirect berdasarkan role
+        if ($role === 'admin') {
+            return redirect()->route('login'); // ← admin ke login
+        }
+        
+        return redirect()->route('welcome'); // ← pengguna ke welcome
     }
 }

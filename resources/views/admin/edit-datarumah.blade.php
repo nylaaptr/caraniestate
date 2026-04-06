@@ -574,40 +574,40 @@
         </div>
         
         <div class="nav-menu" id="navMenu">
-            <a href="{{ route('welcome') }}"
-                class="nav-item {{ request()->routeIs('welcome') ? 'active' : '' }}">
+            <a href="{{ route('admin.welcome') }}"
+                class="nav-item {{ request()->routeIs('admin.welcome') ? 'active' : '' }}">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="{{ route('data_user') }}"
-                class="nav-item {{ request()->routeIs('data_user') ? 'active' : '' }}">
+            <a href="{{ route('admin.data_user') }}"
+                class="nav-item {{ request()->routeIs('admin.data_user') ? 'active' : '' }}">
                 <i class="fas fa-users"></i>
                 <span>Data User</span>
             </a>
 
-            <a href="{{ route('data_rumah') }}"
-                class="nav-item {{ request()->routeIs('data_rumah') ? 'active' : '' }}">
+            <a href="{{ route('admin.data_rumah') }}"
+                class="nav-item {{ request()->routeIs('admin.data_rumah') ? 'active' : '' }}">
                 <i class="fas fa-house"></i>
                 <span>Data Rumah</span>
             </a>
 
-            <a href="{{ route('halaman_verifikasi') }}"
-                class="nav-item {{ request()->routeIs('halaman_verifikasi') ? 'active' : '' }}">
+            <a href="{{ route('admin.halaman_verifikasi') }}"
+                class="nav-item {{ request()->routeIs('admin.halaman_verifikasi') ? 'active' : '' }}">
                 <i class="fas fa-check-circle"></i>
                 <span>Verifikasi Data</span>
             </a>
 
-            <a href="{{ route('halaman_chatbot') }}"
-                class="nav-item {{ request()->routeIs('halaman_chatbot') ? 'active' : '' }}">
+            <a href="{{ route('admin.halaman_chatbot') }}"
+                class="nav-item {{ request()->routeIs('admin.halaman_chatbot') ? 'active' : '' }}">
                 <i class="fas fa-comments"></i>
                 <span>Chatbot</span>
             </a>
         
-        <div class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </div>
+            <div class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
         </div>
     </div>
     

@@ -484,55 +484,395 @@
             object-fit: cover;
         }
         
-        /* Features Section */
-        .features-section {
-            padding: 80px 30px;
-            background: #f8fafc;
+        /* ===============================
+        SERVICES SECTION - 4 Grid
+        =============================== */
+        .services-section {
+            padding: 100px 30px;
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .feature-card {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-        
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--primary-blue);
+
+        /* Background decorative elements */
+        .services-section::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(122, 178, 211, 0.1) 0%, transparent 70%);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            color: white;
-            font-size: 24px;
+            pointer-events: none;
         }
-        
-        .feature-title {
-            font-size: 1.3rem;
+
+        .services-section::after {
+            content: '';
+            position: absolute;
+            bottom: -150px;
+            left: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(30, 58, 95, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .services-section .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Section Header */
+        .services-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        .services-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: var(--light-blue);
+            color: var(--dark-blue);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border: 1px solid rgba(122, 178, 211, 0.3);
+        }
+
+        .services-title {
+            font-size: 2.2rem;
             font-weight: 700;
             color: var(--dark-blue);
             margin-bottom: 15px;
+            line-height: 1.3;
         }
-        
-        .feature-description {
+
+        .services-subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        /* Services Grid - 4 Columns */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        /* Service Card */
+        .service-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--dark-blue));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(30, 58, 95, 0.12);
+            border-color: rgba(122, 178, 211, 0.4);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* Icon Wrapper with Glow Effect */
+        .service-icon-wrapper {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            margin-bottom: 25px;
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
+
+        .service-card:hover .service-icon {
+            transform: scale(1.05) rotate(-3deg);
+        }
+
+        .service-icon i {
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .service-icon-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(122, 178, 211, 0.4) 0%, transparent 70%);
+            border-radius: 16px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        .service-card:hover .service-icon-glow {
+            opacity: 1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.2; }
+        }
+
+        /* Service Title & Description */
+        .service-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .service-description {
             font-size: 0.95rem;
             color: #4a5568;
             line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        /* Service List */
+        .service-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px 0;
+        }
+
+        .service-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .service-list li i {
+            color: var(--primary-blue);
+            font-size: 0.85rem;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        /* Service Link */
+        .service-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--dark-blue);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            padding: 10px 0;
+            transition: all 0.3s ease;
+            position: relative;
+            margin-top: auto;
+        }
+
+        .service-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-blue);
+            transition: width 0.3s ease;
+        }
+
+        .service-link:hover {
+            color: var(--primary-blue);
+            gap: 12px;
+        }
+
+        .service-link:hover::after {
+            width: 100%;
+        }
+
+        .service-link i {
+            font-size: 0.85rem;
+            transition: transform 0.3s ease;
+        }
+
+        .service-link:hover i {
+            transform: translateX(4px);
+        }
+
+        /* Bottom CTA */
+        .services-cta {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .services-cta p {
+            font-size: 1.1rem;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .btn-services-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 35px;
+            background: linear-gradient(135deg, var(--dark-blue), #2a4a6f);
+            color: white;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-services-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(30, 58, 95, 0.3);
+            background: linear-gradient(135deg, #2a4a6f, var(--dark-blue));
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .services-section {
+                padding: 80px 20px;
+            }
+            
+            .services-title {
+                font-size: 1.9rem;
+            }
+            
+            .service-card {
+                padding: 30px 25px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .services-section {
+                padding: 60px 15px;
+            }
+            
+            .services-header {
+                margin-bottom: 45px;
+            }
+            
+            .services-title {
+                font-size: 1.7rem;
+            }
+            
+            .services-subtitle {
+                font-size: 1rem;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .service-icon-wrapper {
+                width: 60px;
+                height: 60px;
+                margin: 0 auto 20px;
+            }
+            
+            .service-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 14px;
+            }
+            
+            .service-icon i {
+                font-size: 1.5rem;
+            }
+            
+            .service-card {
+                text-align: center;
+            }
+            
+            .service-list {
+                text-align: left;
+                display: inline-block;
+            }
+            
+            .service-link {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .services-title {
+                font-size: 1.5rem;
+            }
+            
+            .service-card {
+                padding: 25px 20px;
+            }
+            
+            .service-title {
+                font-size: 1.2rem;
+            }
+            
+            .btn-services-cta {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         /* Properti Unggulan */
@@ -1537,28 +1877,40 @@
 
     <!-- ✅ FORM PENCARIAN DI SINI -->
     <div class="hero-search">
-        <form class="property-search-card" action="properti.html" method="GET">
+        <form class="property-search-card" 
+            action="{{ route('halaman-katalog') }}" 
+            method="GET">
             <h3 class="search-title">Cari Properti</h3>
-
-            <label>Lokasi</label>
-            <input type="text" name="lokasi" placeholder="Masukkan lokasi">
 
             <div class="search-row">
                 <div>
-                    <label>Tipe</label>
-                    <select name="tipe">
-                        <option value="">Pilih Tipe</option>
-                        <option value="rumah">Rumah</option>
-                        <option value="apartemen">Apartemen</option>
+                    <label>Kategori</label>
+                    <select name="kategori">
+                        <option value="">Semua Kategori</option>
+                        <option value="subsidi" {{ request('kategori') == 'subsidi' ? 'selected' : '' }}>Subsidi</option>
+                        <option value="komersial" {{ request('kategori') == 'komersial' ? 'selected' : '' }}>Komersial</option>
                     </select>
                 </div>
 
                 <div>
+                    <label>Tipe</label>
+                    <select name="jenis">
+                        <option value="">Pilih Tipe</option>
+                        <option value="rumah" {{ request('jenis') == 'rumah' ? 'selected' : '' }}>Rumah</option>
+                        <option value="ruko" {{ request('jenis') == 'ruko' ? 'selected' : '' }}>Ruko</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="search-row">
+                <div>
                     <label>Harga</label>
                     <select name="harga">
                         <option value="">Rentang Harga</option>
-                        <option value="0-300">≤ 300 Juta</option>
-                        <option value="300-600">300 – 600 Juta</option>
+                        <option value="0-200" {{ request('harga') == '0-200' ? 'selected' : '' }}>≤ 200 Juta</option>
+                        <option value="200-300" {{ request('harga') == '200-300' ? 'selected' : '' }}>200 - 300 Juta</option>
+                        <option value="300-500" {{ request('harga') == '300-500' ? 'selected' : '' }}>300 - 500 Juta</option>
+                        <option value="500+" {{ request('harga') == '500+' ? 'selected' : '' }}>≥ 500 Juta</option>
                     </select>
                 </div>
             </div>
@@ -1596,61 +1948,120 @@
         </div>
     </section>
     
-    <!-- Features Section -->
-    <section class="features-section">
+    <!-- Services Section -->
+    <section class="services-section">
         <div class="container">
-            <h2 class="section-title">Fitur Unggulan Kami</h2>
-            <p class="section-subtitle">Kami menyediakan berbagai fitur untuk mempermudah Anda dalam mencari properti impian.</p>
             
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <h3 class="feature-title">Pencarian Mudah</h3>
-                    <p class="feature-description">Cari properti sesuai kriteria Anda dengan filter lengkap dan sistem pencarian cerdas.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </div>
-                    <h3 class="feature-title">Lokasi Strategis</h3>
-                    <p class="feature-description">Temukan properti di lokasi strategis dengan akses mudah ke fasilitas umum.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-handshake"></i>
-                    </div>
-                    <h3 class="feature-title">Transaksi Aman</h3>
-                    <p class="feature-description">Proses transaksi yang aman dan terjamin dengan notaris profesional.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3 class="feature-title">Analisis Harga</h3>
-                    <p class="feature-description">Dapatkan analisis harga pasar untuk membantu Anda membuat keputusan tepat.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <h3 class="feature-title">ChatBot 24/7</h3>
-                    <p class="feature-description">Dapatkan bantuan instan melalui ChatBot kami yang tersedia 24 jam.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3 class="feature-title">Tim Ahli</h3>
-                    <p class="feature-description">Konsultasi langsung dengan agen properti profesional kami.</p>
-                </div>
+            <!-- Section Header -->
+            <div class="services-header">
+                <span class="services-badge">Layanan Kami</span>
+                <h2 class="services-title">Solusi Properti Terlengkap untuk Anda</h2>
+                <p class="services-subtitle">
+                    Kami menyediakan layanan end-to-end untuk membantu Anda menemukan, membeli, dan mengelola properti impian dengan mudah dan aman.
+                </p>
             </div>
+
+            <!-- Services Grid (4 Cards) -->
+            <div class="services-grid">
+                
+                <!-- Service 1: Konsultasi via ChatBot -->
+                <div class="service-card">
+                    <div class="service-icon-wrapper">
+                        <div class="service-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="service-icon-glow"></div>
+                    </div>
+                    <h3 class="service-title">Konsultasi via ChatBot</h3>
+                    <p class="service-description">
+                        Tanya jawab instan seputar properti, KPR, dan layanan kami melalui ChatBot AI yang siap membantu 24/7.
+                    </p>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Jawaban instan 24 jam</li>
+                        <li><i class="fas fa-check"></i> Panduan langkah demi langkah</li>
+                        <li><i class="fas fa-check"></i> Rekomendasi properti personal</li>
+                    </ul>
+                    <a href="{{ route('halaman-chatbot') }}" class="service-link">
+                        Open chatbot <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Service 2: Pencarian Properti -->
+                <div class="service-card">
+                    <div class="service-icon-wrapper">
+                        <div class="service-icon">
+                            <i class="fas fa-search-location"></i>
+                        </div>
+                        <div class="service-icon-glow"></div>
+                    </div>
+                    <h3 class="service-title">Pencarian Properti Cerdas</h3>
+                    <p class="service-description">
+                        Temukan properti impian dengan filter canggih: lokasi, harga, tipe, fasilitas, dan masih banyak lagi.
+                    </p>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Filter multi-kriteria</li>
+                        <li><i class="fas fa-check"></i> Peta interaktif lokasi</li>
+                        <li><i class="fas fa-check"></i> Notifikasi properti baru</li>
+                    </ul>
+                    <a href="{{ route('halaman-katalog') }}" class="service-link">
+                        Mulai Cari <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Service 3: Bantuan KPR -->
+                <div class="service-card">
+                    <div class="service-icon-wrapper">
+                        <div class="service-icon">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </div>
+                        <div class="service-icon-glow"></div>
+                    </div>
+                    <h3 class="service-title">Pendampingan KPR</h3>
+                    <p class="service-description">
+                        Kami bantu proses pengajuan KPR Anda dari awal hingga cair, dengan bank partner terpercaya.
+                    </p>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Simulasi cicilan gratis</li>
+                        <li><i class="fas fa-check"></i> Bantuan dokumen lengkap</li>
+                        <li><i class="fas fa-check"></i> Proses cepat 7-14 hari</li>
+                    </ul>
+                    <a href="{{ route('login') }}" class="service-link">
+                        Ajukan KPR <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Service 4: Verifikasi & After-Sales -->
+                <div class="service-card">
+                    <div class="service-icon-wrapper">
+                        <div class="service-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="service-icon-glow"></div>
+                    </div>
+                    <h3 class="service-title">Verifikasi & Garansi</h3>
+                    <p class="service-description">
+                        Semua properti telah diverifikasi legalitasnya, plus garansi bangunan dan layanan purna jual terbaik.
+                    </p>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Cek sertifikat & IMB</li>
+                        <li><i class="fas fa-check"></i> Garansi struktur 5 tahun</li>
+                        <li><i class="fas fa-check"></i> Tim maintenance responsif</li>
+                    </ul>
+                    <a href="{{ route('halaman-kontak') }}" class="service-link">
+                        Pelajari Lebih Lanjut <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- CTA Bottom -->
+            <div class="services-cta">
+                <p>Butuh bantuan lebih lanjut? Tim kami siap membantu Anda!</p>
+                <a href="{{ route('halaman-chatbot') }}" class="btn-services-cta">
+                    <i class="fas fa-comments me-2"></i>Chat dengan Kami
+                </a>
+            </div>
+
         </div>
     </section>
 
@@ -1788,17 +2199,14 @@
 
             <!-- Category Filter -->
             <div class="faq-categories">
-                <button class="faq-category-btn active" data-category="all">
-                    <i class="fas fa-th-large me-2"></i>Semua
+                <button class="faq-category-btn" data-category="umum">
+                    <i class="fas fa-info-circle me-2"></i>Umum
                 </button>
                 <button class="faq-category-btn" data-category="pembelian">
                     <i class="fas fa-home me-2"></i>Pembelian
                 </button>
                 <button class="faq-category-btn" data-category="kpr">
                     <i class="fas fa-university me-2"></i>KPR
-                </button>
-                <button class="faq-category-btn" data-category="umum">
-                    <i class="fas fa-info-circle me-2"></i>Umum
                 </button>
             </div>
 
@@ -1808,7 +2216,7 @@
                 <!-- FAQ Item 1 -->
                 <div class="faq-item" data-category="pembelian">
                     <button class="faq-question">
-                        <span>🏠 Bagaimana cara membeli properti di Carani Estate?</span>
+                        <span>Bagaimana cara membeli properti di Carani Estate?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
@@ -1829,7 +2237,7 @@
                 <!-- FAQ Item 2 -->
                 <div class="faq-item" data-category="kpr">
                     <button class="faq-question">
-                        <span>🏦 Apa syarat mengajukan KPR di Carani Estate?</span>
+                        <span>Apa syarat mengajukan KPR di Carani Estate?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
@@ -1851,7 +2259,7 @@
                 <!-- FAQ Item 3 -->
                 <div class="faq-item" data-category="pembelian">
                     <button class="faq-question">
-                        <span>💰 Berapa minimal DP untuk membeli properti?</span>
+                        <span>Berapa minimal DP untuk membeli properti?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
@@ -1871,18 +2279,18 @@
                 <!-- FAQ Item 4 -->
                 <div class="faq-item" data-category="kpr">
                     <button class="faq-question">
-                        <span>📊 Bank apa saja yang bekerja sama dengan Carani Estate?</span>
+                        <span>Bank apa saja yang bekerja sama dengan Carani Estate?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Kami bekerja sama dengan berbagai bank terpercaya:</p>
                             <ul>
-                                <li>🏦 <strong>BTN</strong> - Spesialis KPR dengan bunga kompetitif</li>
-                                <li>🏦 <strong>Mandiri</strong> - Proses cepat dan fleksibel</li>
-                                <li>🏦 <strong>BCA</strong> - Suku bunga menarik untuk karyawan</li>
-                                <li>🏦 <strong>BRI</strong> - Pilihan tenor hingga 20 tahun</li>
-                                <li>🏦 <strong>BNI</strong> - Paket KPR syariah tersedia</li>
+                                <li><strong>BTN</strong> - Spesialis KPR dengan bunga kompetitif</li>
+                                <li><strong>Mandiri</strong> - Proses cepat dan fleksibel</li>
+                                <li><strong>BCA</strong> - Suku bunga menarik untuk karyawan</li>
+                                <li><strong>BRI</strong> - Pilihan tenor hingga 20 tahun</li>
+                                <li><strong>BNI</strong> - Paket KPR syariah tersedia</li>
                             </ul>
                             <p>Tim kami akan membantu Anda memilih bank dengan penawaran terbaik.</p>
                         </div>
@@ -1892,17 +2300,17 @@
                 <!-- FAQ Item 5 -->
                 <div class="faq-item" data-category="umum">
                     <button class="faq-question">
-                        <span>📄 Apakah sertifikat properti sudah SHM?</span>
+                        <span>Apakah sertifikat properti sudah SHM?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Ya, semua properti di Carani Estate memiliki:</p>
                             <ul>
-                                <li>✅ <strong>Sertifikat Hak Milik (SHM)</strong> - Untuk rumah tapak</li>
-                                <li>✅ <strong>Sertifikat Strata Title</strong> - Untuk apartemen</li>
-                                <li>✅ <strong>IMB (Izin Mendirikan Bangunan)</strong> lengkap</li>
-                                <li>✅ <strong>BPHTB & Pajak</strong> sudah termasuk (untuk promo tertentu)</li>
+                                <li><strong>Sertifikat Hak Milik (SHM)</strong> - Untuk rumah tapak</li>
+                                <li><strong>Sertifikat Strata Title</strong> - Untuk apartemen</li>
+                                <li><strong>IMB (Izin Mendirikan Bangunan)</strong> lengkap</li>
+                                <li><strong>BPHTB & Pajak</strong> sudah termasuk (untuk promo tertentu)</li>
                             </ul>
                             <p>Sertifikat akan diproses setelah pembayaran lunas dan dapat diambil di notaris.</p>
                         </div>
@@ -1912,7 +2320,7 @@
                 <!-- FAQ Item 6 -->
                 <div class="faq-item" data-category="pembelian">
                     <button class="faq-question">
-                        <span>⏱️ Berapa lama proses sampai serah terima kunci?</span>
+                        <span>Berapa lama proses sampai serah terima kunci?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
@@ -1931,16 +2339,16 @@
                 <!-- FAQ Item 7 -->
                 <div class="faq-item" data-category="umum">
                     <button class="faq-question">
-                        <span>🔧 Apakah ada garansi untuk properti yang dibeli?</span>
+                        <span>Apakah ada garansi untuk properti yang dibeli?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Ya, kami memberikan garansi:</p>
                             <ul>
-                                <li>🔹 <strong>Garansi Struktur:</strong> 5 tahun untuk kerusakan struktur utama</li>
-                                <li>🔹 <strong>Garansi Atap & Dinding:</strong> 2 tahun untuk kebocoran/retak</li>
-                                <li>🔹 <strong>Garansi Instalasi:</strong> 1 tahun untuk listrik & plumbing</li>
+                                <li><strong>Garansi Struktur:</strong> 5 tahun untuk kerusakan struktur utama</li>
+                                <li><strong>Garansi Atap & Dinding:</strong> 2 tahun untuk kebocoran/retak</li>
+                                <li><strong>Garansi Instalasi:</strong> 1 tahun untuk listrik & plumbing</li>
                             </ul>
                             <p>Layanan purna jual kami siap membantu jika ada kendala setelah serah terima.</p>
                         </div>
@@ -1950,7 +2358,7 @@
                 <!-- FAQ Item 8 -->
                 <div class="faq-item" data-category="kpr">
                     <button class="faq-question">
-                        <span>📉 Berapa bunga KPR yang ditawarkan?</span>
+                        <span>Berapa bunga KPR yang ditawarkan?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
@@ -1969,7 +2377,7 @@
                 <!-- FAQ Item 9 -->
                 <div class="faq-item" data-category="pembelian">
                     <button class="faq-question">
-                        <span>🔄 Apakah bisa membatalkan pemesanan?</span>
+                        <span>Apakah bisa membatalkan pemesanan?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
@@ -1988,17 +2396,17 @@
                 <!-- FAQ Item 10 -->
                 <div class="faq-item" data-category="umum">
                     <button class="faq-question">
-                        <span>📞 Bagaimana cara menghubungi tim Carani Estate?</span>
+                        <span>Bagaimana cara menghubungi tim Carani Estate?</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Anda dapat menghubungi kami melalui:</p>
                             <ul>
-                                <li>📱 <strong>WhatsApp:</strong> 0812-3456-7890 (24/7)</li>
-                                <li>📧 <strong>Email:</strong> info@caraniestate.com</li>
-                                <li>🏢 <strong>Kantor:</strong> Jl. Melati No. 45, Bondowoso, Jawa Timur</li>
-                                <li>💬 <strong>Live Chat:</strong> Tersedia di website (08:00 - 17:00 WIB)</li>
+                                <li><strong>WhatsApp:</strong> 0812-3456-7890 (24/7)</li>
+                                <li><strong>Email:</strong> info@caraniestate.com</li>
+                                <li><strong>Kantor:</strong> Jl. Melati No. 45, Bondowoso, Jawa Timur</li>
+                                <li><strong>Live Chat:</strong> Tersedia di website (08:00 - 17:00 WIB)</li>
                             </ul>
                             <p>Tim marketing kami siap membantu konsultasi gratis!</p>
                         </div>
@@ -2009,7 +2417,7 @@
 
             <!-- Contact CTA -->
             <div class="faq-contact">
-                <h3>❓ Masih Punya Pertanyaan?</h3>
+                <h3>Masih Punya Pertanyaan?</h3>
                 <p>Tim kami siap membantu Anda 24/7. Jangan ragu untuk menghubungi kami!</p>
                 <a href="https://wa.me/6281234567890" class="faq-contact-btn" target="_blank">
                     <i class="fab fa-whatsapp"></i> Hubungi via WhatsApp

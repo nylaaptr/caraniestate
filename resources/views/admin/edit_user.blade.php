@@ -553,40 +553,41 @@
             <div class="company-name">PT. Carani Bhanu Balakosa</div>
         </div>
         
-        <div class="nav-menu">
-            <a href="data_user.html">
-                <div class="nav-item">
-                    <i class="fas fa-users"></i>
-                    <span>Data User</span>
-                </div>
+        <div class="nav-menu" id="navMenu">
+            <a href="{{ route('admin.welcome') }}"
+                class="nav-item {{ request()->routeIs('admin.welcome') ? 'active' : '' }}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
             </a>
 
-            <a href="data_rumah.html">
-                <div class="nav-item active">
-                    <i class="fas fa-house"></i>
-                    <span>Data Rumah</span>
-                </div>
+            <a href="{{ route('admin.data_user') }}"
+                class="nav-item {{ request()->routeIs('admin.data_user') ? 'active' : '' }}">
+                <i class="fas fa-users"></i>
+                <span>Data User</span>
             </a>
 
-            <a href="verfikasi_data.html">
-                <div class="nav-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Verifikasi Data</span>
-                </div>
+            <a href="{{ route('admin.data_rumah') }}"
+                class="nav-item {{ request()->routeIs('admin.data_rumah') ? 'active' : '' }}">
+                <i class="fas fa-house"></i>
+                <span>Data Rumah</span>
             </a>
 
-            <a href="halaman_chatbot.html">
-                <div class="nav-item">
-                    <i class="fas fa-comments"></i>
-                    <span>ChatBot</span>
-                </div>
+            <a href="{{ route('admin.halaman_verifikasi') }}"
+                class="nav-item {{ request()->routeIs('admin.halaman_verifikasi') ? 'active' : '' }}">
+                <i class="fas fa-check-circle"></i>
+                <span>Verifikasi Data</span>
             </a>
-        </div>
 
+            <a href="{{ route('admin.halaman_chatbot') }}"
+                class="nav-item {{ request()->routeIs('admin.halaman_chatbot') ? 'active' : '' }}">
+                <i class="fas fa-comments"></i>
+                <span>Chatbot</span>
+            </a>
         
-        <div class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
+            <div class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
         </div>
     </div>
     

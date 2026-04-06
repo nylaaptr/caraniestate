@@ -418,6 +418,7 @@
             line-height: 1.6;
         }
 
+        /* STATISTIK */
         .stats-section {
             padding: 60px 30px;
             background: linear-gradient(135deg, var(--dark-blue) 0%, #1a365d 100%);
@@ -1004,6 +1005,86 @@
             .send-btn, .attachment-btn {
                 width: 45px;
                 height: 45px;
+            }
+
+            /* TENTANG KAMI VISI DAN MISI */
+            .vision-mission-section {
+                padding: 50px 15px;
+            }
+
+            .section-title {
+                font-size: 1.6rem;
+                text-align: center;
+            }
+
+            .section-subtitle {
+                font-size: 0.9rem;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .vision-mission-grid {
+                grid-template-columns: 1fr; /* jadi 1 kolom */
+                gap: 20px;
+            }
+
+            .vision-card, .mission-card {
+                padding: 20px;
+            }
+
+            .card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .card-title {
+                font-size: 1.1rem;
+            }
+
+            .card-description {
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+
+            /* TENTANG KAMI TEAM */
+            .team-section {
+                padding: 50px 15px;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr; /* jadi 1 kolom */
+                gap: 20px;
+            }
+
+            .team-member {
+                padding: 18px;
+            }
+
+            .member-photo {
+                width: 90px;
+                height: 90px;
+                font-size: 32px;
+                margin-bottom: 12px;
+            }
+
+            .member-name {
+                font-size: 1rem;
+            }
+
+            .member-position {
+                font-size: 0.85rem;
+            }
+
+            .member-social {
+                gap: 8px;
+            }
+
+            .social-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
             }
         }
         
@@ -1727,6 +1808,23 @@
                 alert(`Menampilkan halaman ${this.textContent}`);
             });
         });
+</script>
+
+<script>
+function toggleMenu() {
+    document.getElementById('navMenu').classList.toggle('show');
+}
+
+function toggleDropdown() {
+    document.getElementById('dropdownMenu').classList.toggle('show');
+}
+
+// Tutup dropdown kalau klik luar
+window.addEventListener('click', function(e) {
+    if (!e.target.closest('.profile-dropdown')) {
+        document.getElementById('dropdownMenu').classList.remove('show');
+    }
+});
 </script>
 </body>
 </html>

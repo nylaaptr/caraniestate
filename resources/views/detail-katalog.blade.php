@@ -1567,6 +1567,18 @@
         function toggleMenu(){
             document.getElementById('navMenu').classList.toggle('show');
         }
+
+        // PROFILE DROPDOWN
+        function toggleDropdown() {
+            document.getElementById('dropdownMenu').classList.toggle('show');
+        }
+
+        // Tutup dropdown kalau klik di luar
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('.profile-dropdown')) {
+                document.getElementById('dropdownMenu').classList.remove('show');
+            }
+        });
     </script>
 
     <!-- JavaScript untuk Thumbnail & Tabs -->
