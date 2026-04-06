@@ -215,6 +215,75 @@
             color: #64748b;
             font-size: 1.1rem;
         }
+
+        /* PP */
+        .avatar-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: auto;
+        }
+
+        .profile-avatar,
+        .profile-avatar-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+
+        .profile-avatar {
+            background: #7AB2D3;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-avatar-img {
+            object-fit: cover;
+        }
+
+        /* tombol + */
+        .edit-avatar {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #1E3A5F;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #7AB2D3;
+        }
+
+        .btn-save {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #16a34a;
+        }
         
         /* Personal Information Section */
         .personal-info {
@@ -547,25 +616,29 @@
                 class="nav-item {{ request()->routeIs('halaman-chatbot') ? 'active' : '' }}">
                     ChatBot
                 </a>
-                <a href="{{ route('riwayat-pemesanan') }}"
-                class="nav-item {{ request()->routeIs('riwayat-pemesanan') ? 'active' : '' }}">
+                @auth
+                <a href="{{ route('riwayat-pemesanan') }}" class="nav-item {{ request()->routeIs('riwayat-pemesanan') ? 'active' : '' }}">
                     Riwayat Pemesanan
                 </a>
+                @endauth
                 <a href="{{ route('halaman-kontak') }}"
-                class="nav-item {{ request()->routeIs('halaman-kontak') ? 'active' : '' }}">
+                class="nav-item {{ request()->routeIs('kontak') ? 'active' : '' }}">
                     Kontak
                 </a>
             </nav>
             
             <div class="user-actions">
-                {{-- Notifikasi hanya muncul kalau sudah login --}}
+
+                {{-- Notifikasi hanya kalau login --}}
                 @auth
                 <a href="{{ route('halaman-notifikasi') }}" class="notification-icon" style="position:relative;">
                     <i class="fas fa-bell"></i>
+
                     @php
                         $jumlahBelumBaca = \App\Models\Notifikasi::where('id_user', Auth::id())
                             ->where('status_baca', 0)->count();
                     @endphp
+
                     @if($jumlahBelumBaca > 0)
                         <span style="position:absolute; top:-5px; right:-5px; 
                                     background:#ef4444; color:white; border-radius:50%; 
@@ -578,29 +651,19 @@
                 </a>
                 @endauth
 
-                {{-- Conditional: Guest vs Authenticated --}}
+                {{-- Guest --}}
                 @guest
                     <a href="{{ route('login') }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
-                    <div class="profile-dropdown">
-                        <div class="profile-icon" onclick="toggleDropdown()">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="dropdown-menu" id="dropdownMenu">
-                            <a href="{{ route('halaman-profil') }}">
-                                <i class="fas fa-user-circle"></i> Lihat Profil
-                            </a>
-                            <hr>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit">
-                                    <i class="fas fa-sign-out-alt"></i> Logout
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    {{-- HANYA ICON PROFILE --}}
+                    <a href="{{ route('halaman-profil') }}" class="profile-icon">
+                        <img src="{{ Auth::user()->profile_photo 
+                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
+                            : asset('default-avatar.png') }}" 
+                            alt="Profile" class="profile-img">
+                    </a>
                 @endguest
             </div>
         </div>
@@ -609,58 +672,110 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="profile-container">
+
+            @php
+                $user = Auth::user();
+                $inisial = strtoupper(substr($user->name, 0, 1));
+            @endphp
+
             <!-- Profile Header -->
             <div class="profile-header">
-                <div class="profile-avatar">N</div>
-                <h2 class="profile-name">Nayla Putri Wijaya</h2>
-                <p class="profile-email">nayla.pw@gmail.com</p>
+                @php
+                    $user = Auth::user();
+                    $inisial = strtoupper(substr($user->name, 0, 1));
+                @endphp
+
+                <div class="avatar-wrapper">
+                    @if($user->profile_photo)
+                        <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}" 
+                            class="profile-avatar-img">
+                    @else
+                        <div class="profile-avatar">{{ $inisial }}</div>
+                    @endif
+
+                    <!-- tombol upload -->
+                    <label for="upload-photo" class="edit-avatar">
+                        <i class="fas fa-plus"></i>
+                    </label>
+
+                    <form action="{{ route('upload.pp') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="file" id="upload-photo" name="photo" hidden onchange="this.form.submit()">
+                    </form>
+                </div>
+
+                <h2 class="profile-name">{{ $user->name }}</h2>
+                <p class="profile-email">{{ $user->email }}</p>
             </div>
             
             <!-- Personal Information -->
-            <div class="personal-info">
-                <h3 class="section-title">Informasi Pribadi</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label">Nama Lengkap</span>
-                        <span class="info-value">Nayla Putri Wijaya</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Nomor HP</span>
-                        <span class="info-value">0813-4567-8901</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Email</span>
-                        <span class="info-value">nayla.pw@gmail.com</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Nomor KTP</span>
-                        <span class="info-value">3171012345678901</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Alamat</span>
-                        <span class="info-value">Jl. Melati No. 45, RT 05/RW 03, Kelurahan Menteng, Kecamatan Menteng, Jakarta Pusat</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Pekerjaan</span>
-                        <span class="info-value">PNS - Marketing Staff</span>
+            <form action="{{ route('profile.update') }}" method="POST">
+                @csrf
+
+                <div class="personal-info">
+                    <h3 class="section-title">Informasi Pribadi</h3>
+
+                    <div class="info-grid">
+
+                        <div class="info-item">
+                            <span class="info-label">Nama Lengkap</span>
+                            <input type="text" name="nama_user" 
+                                value="{{ $user->nama_user }}" class="form-input">
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Nomor HP</span>
+                            <input type="text" name="no_hp" 
+                                value="{{ $user->no_hp }}" class="form-input">
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Email</span>
+                            <input type="email" name="email_user" 
+                                value="{{ $user->email_user }}" class="form-input">
+                        </div>
+
+                        <div class="info-item full">
+                            <span class="info-label">Alamat</span>
+                            <textarea name="alamat" class="form-input">{{ $user->alamat }}</textarea>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Pekerjaan</span>
+                            <input type="text" name="pekerjaan" 
+                                value="{{ $user->pekerjaan }}" class="form-input">
+                        </div>
+
                     </div>
                 </div>
-            </div>
-            
-            <!-- Security Settings -->
-            <div class="security-section">
-                <h4 class="security-title">Pengaturan Keamanan</h4>
-                <div class="security-actions">
-                    <button class="security-btn btn-change-password">
-                        <i class="fas fa-lock"></i> Ganti Password
-                    </button>
-                    <button class="security-btn btn-logout">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
+
+                <!-- Security Settings -->
+                <div class="security-section">
+                    <h4 class="security-title">Pengaturan Keamanan</h4>
+
+                    <div class="security-actions">
+                        <button type="button" class="security-btn btn-change-password">
+                            <i class="fas fa-lock"></i> Ganti Password
+                        </button>
+
+                        <button type="submit" class="security-btn btn-save">
+                            <i class="fas fa-save"></i> Simpan Perubahan
+                        </button>
+
+                        <button type="button" class="security-btn btn-logout"
+                                onclick="document.getElementById('logout-form').submit();">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </form>
+
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
+                @csrf
+            </form>
         </div>
     </div>
+    
 
     <script>
     document.addEventListener("DOMContentLoaded", function () {

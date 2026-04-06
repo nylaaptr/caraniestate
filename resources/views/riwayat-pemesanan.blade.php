@@ -723,25 +723,29 @@
                 class="nav-item {{ request()->routeIs('halaman-chatbot') ? 'active' : '' }}">
                     ChatBot
                 </a>
-                <a href="{{ route('riwayat-pemesanan') }}"
-                class="nav-item {{ request()->routeIs('riwayat-pemesanan') ? 'active' : '' }}">
+                @auth
+                <a href="{{ route('riwayat-pemesanan') }}" class="nav-item {{ request()->routeIs('riwayat-pemesanan') ? 'active' : '' }}">
                     Riwayat Pemesanan
                 </a>
+                @endauth
                 <a href="{{ route('halaman-kontak') }}"
-                class="nav-item {{ request()->routeIs('halaman-kontak') ? 'active' : '' }}">
+                class="nav-item {{ request()->routeIs('kontak') ? 'active' : '' }}">
                     Kontak
                 </a>
             </nav>
             
             <div class="user-actions">
-                {{-- Notifikasi hanya muncul kalau sudah login --}}
+
+                {{-- Notifikasi hanya kalau login --}}
                 @auth
                 <a href="{{ route('halaman-notifikasi') }}" class="notification-icon" style="position:relative;">
                     <i class="fas fa-bell"></i>
+
                     @php
                         $jumlahBelumBaca = \App\Models\Notifikasi::where('id_user', Auth::id())
                             ->where('status_baca', 0)->count();
                     @endphp
+
                     @if($jumlahBelumBaca > 0)
                         <span style="position:absolute; top:-5px; right:-5px; 
                                     background:#ef4444; color:white; border-radius:50%; 
@@ -754,29 +758,19 @@
                 </a>
                 @endauth
 
-                {{-- Conditional: Guest vs Authenticated --}}
+                {{-- Guest --}}
                 @guest
                     <a href="{{ route('login') }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
-                    <div class="profile-dropdown">
-                        <div class="profile-icon" onclick="toggleDropdown()">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="dropdown-menu" id="dropdownMenu">
-                            <a href="{{ route('halaman-profil') }}">
-                                <i class="fas fa-user-circle"></i> Lihat Profil
-                            </a>
-                            <hr>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit">
-                                    <i class="fas fa-sign-out-alt"></i> Logout
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    {{-- HANYA ICON PROFILE --}}
+                    <a href="{{ route('halaman-profil') }}" class="profile-icon">
+                        <img src="{{ Auth::user()->profile_photo 
+                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
+                            : asset('default-avatar.png') }}" 
+                            alt="Profile" class="profile-img">
+                    </a>
                 @endguest
             </div>
         </div>

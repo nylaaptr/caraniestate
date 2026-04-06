@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -142,7 +143,12 @@ Route::middleware(['auth'])->group(function () {
         return view('halaman-profil');
     })->name('halaman-profil');
 
+    // 🔥 TAMBAHAN INI
+    Route::post('/upload-pp', [UserController::class, 'uploadPP'])->name('upload.pp');
+    Route::post('/update-profile', [UserController::class, 'updateProfile'])->name('profile.update');
+
 });
+
 
 
 /*
