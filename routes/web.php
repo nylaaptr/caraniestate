@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VisitorController;
+use Illuminate\Support\Facades\Http;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +34,9 @@ Route::get('/halaman-kontak', function () {
 Route::get('/halaman-chatbot', function () {
         return view('halaman-chatbot');
     })->name('halaman-chatbot');
+
+Route::post('/save-email-visitor', [VisitorController::class, 'store'])
+    ->name('save-email-visitor');
 
 // Katalog Properti (PUBLIC - Bisa dilihat tanpa login)
 Route::get('/halaman-katalog', function () {
@@ -74,10 +79,35 @@ Route::get('/detail-katalog/{id}', function ($id) {
     return view('detail-katalog', compact('properti'));
 })->name('detail-katalog');
 
+// -- NOTIFIKASI --
 // Notifikasi (Opsional: bisa public atau protected)
 Route::get('/halaman-notifikasi', function () {
-    return view('halaman-notifikasi');
-})->name('halaman-notifikasi');
+    $notifikasi = \App\Models\Notifikasi::where('id_user', Auth::id())
+        ->latest()
+        ->get()
+        ->unique('referensi_id'); // 🔥 biar tidak numpuk
+
+    return view('halaman-notifikasi', compact('notifikasi'));
+})->name('halaman-notifikasi')->middleware('auth');
+
+// Mark notifikasi sebagai sudah dibaca
+Route::post('/notifikasi/{id}/read', function ($id) {
+    $notif = \App\Models\Notifikasi::where('id_user', Auth::id())
+        ->findOrFail($id);
+    $notif->update(['status_baca' => 1]);
+    return response()->json(['success' => true]);
+})->name('notifikasi.read')->middleware('auth');
+
+Route::delete('/notifikasi-massal', function () {
+
+    $ids = explode(',', request('ids'));
+
+    \App\Models\Notifikasi::whereIn('id_notifikasi', $ids)
+        ->where('id_user', auth()->id())
+        ->delete();
+
+    return back()->with('success', 'Notifikasi berhasil dihapus');
+})->name('notifikasi.hapus.massal')->middleware('auth');
 
 
 /*
@@ -93,6 +123,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/gantipass', [AuthController::class, 'formGantiPassword'])->name('ganti-password');
 Route::post('/gantipass', [AuthController::class, 'updatePassword'])->name('ganti-password.proses');
 
+// Route untuk halaman register
+Route::get('/register', function () {
+    return view('register'); // Pastikan file register.blade.php ada
+})->name('register');
+
+// Route untuk memproses register
+Route::post('/register', [AuthController::class, 'register'])->name('register.proses');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -105,17 +143,13 @@ Route::middleware(['auth'])->group(function () {
     // --- FORM PEMESANAN ---
     // Halaman form booking (Hanya bisa diakses jika sudah login)
     Route::get('/form-pemesanan/{id}', function ($id) {
-        $properti = \App\Models\Properti::with('blok')->findOrFail($id);
+        $properti = \App\Models\Properti::where('id_properti', $id)->firstOrFail();
         return view('form-pemesanan', compact('properti'));
     })->name('form-pemesanan');
 
     // Proses submit pemesanan
-    Route::post('/pemesanan/proses', function (\Illuminate\Http\Request $request) {
-        // TODO: Validasi & simpan ke tabel Transaksi
-        // \App\Models\Transaksi::create([...]);
-        
-        return redirect()->route('riwayat-pemesanan')->with('success', 'Pemesanan berhasil diajukan!');
-    })->name('pemesanan.proses');
+    Route::post('/pemesanan/proses', [App\Http\Controllers\PemesananController::class, 'proses'])
+        ->name('pemesanan.proses');
 
 
     // --- RIWAYAT & DETAIL PEMESANAN ---
@@ -135,9 +169,28 @@ Route::middleware(['auth'])->group(function () {
         return view('detail-pemesanan', compact('transaksi'));
     })->name('detail-pemesanan');
 
+    // ✅ Detail Properti (Hanya bisa diakses jika login)
+    Route::get('/detail-katalog/{id}', function ($id) {
+        $properti = \App\Models\Properti::with('blok')->findOrFail($id);
+        return view('detail-katalog', compact('properti'));
+    })->name('detail-katalog');
+
+    // --- HALAMAN TERIMS PEMESANAN ---
+    // Halaman terima kasih setelah pemesanan
+    Route::get('/pemesanan/terima-kasih/{id}', function ($id) {
+        $transaksi = \App\Models\Transaksi::with('properti')
+            ->where('id_transaksi', $id)
+            ->where('id_user', Auth::id())
+            ->firstOrFail();
+        return view('terima-kasih', compact('transaksi'));
+    })->name('pemesanan.terima-kasih');
+
 
     // --- CHATBOT & PROFIL ---
     // 💡 Chatbot saya letakkan di sini agar bisa akses data user
+
+    // CHATBOT
+    Route::post('/chat/send', [ChatBotController::class, 'sendMessage'])->name('chat.send');
 
     Route::get('/halaman-profil', function () {
         return view('halaman-profil');
@@ -211,6 +264,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         return view('admin.tambah-rumah');
     })->name('admin.tambah-rumah');
 
+
+
     // ========================
     // DATA USER
     // ========================
@@ -274,7 +329,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 
     return redirect()->route('admin.data_user')
         ->with('success', 'User berhasil dihapus.');
-})->name('admin.hapus_user');
+    })->name('admin.hapus_user');
+
 
     // ========================
     // VERIFIKASI
@@ -282,15 +338,24 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/halaman_verifikasi', function () {
         $status = request('status');
 
-        $query = \App\Models\Dokumen::with('user');
+        $queryTransaksi = \App\Models\Transaksi::with(['user', 'properti']);
+        $queryDokumen = \App\Models\Dokumen::with('user');
 
-        if ($status && $status != 'semua') {
-            $query->where('status_verifikasi', $status);
+        if ($status == 'pending') {
+            $queryTransaksi->where('status_transaksi', 'menunggu_verifikasi');
+            $queryDokumen->where('status_verifikasi', 'pending');
+        } elseif ($status == 'diterima') {
+            $queryTransaksi->where('status_transaksi', 'menunggu_pembayaran');
+            $queryDokumen->where('status_verifikasi', 'diterima');
+        } elseif ($status == 'ditolak') {
+            $queryTransaksi->where('status_transaksi', 'ditolak');
+            $queryDokumen->where('status_verifikasi', 'ditolak');
         }
 
-        $dokumen = $query->orderBy('uploaded_at', 'desc')->get();
+        $transaksi = $queryTransaksi->orderBy('tanggal_transaksi', 'desc')->get();
+        $user = \App\Models\User::with('dokumen')->get();
 
-        return view('admin.halaman_verifikasi', compact('dokumen'));
+        return view('admin.halaman_verifikasi', compact('transaksi', 'user'));
     })->name('admin.halaman_verifikasi');
 
     Route::post('/verifikasi/{id}/approve', function ($id) {
@@ -324,4 +389,58 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         return back()->with('success', 'Dokumen ditolak');
     })->name('admin.verifikasi.tolak');
 
+    // MELIHAT DOKUMEN
+    Route::get('/verifikasi/{id}', function ($id) {
+    $user = \App\Models\User::with('dokumen')->findOrFail($id);
+
+    return view('admin.verifikasi_dokumen', compact('user'));
+    })->name('admin.verifikasi_dokumen');
+
+    Route::post('/verifikasi/{id}/selesai', function ($id) {
+    $user = \App\Models\User::with('dokumen')->findOrFail($id);
+
+    // contoh: cek apakah semua dokumen sudah diterima
+    $allApproved = $user->dokumen->every(function ($d) {
+        return $d->status_verifikasi === 'diterima';
+    });
+
+    // kirim notifikasi ke user
+    \App\Models\Notifikasi::create([
+        'id_user' => $user->id_user,
+        'judul' => 'Verifikasi Selesai',
+        'pesan' => $allApproved 
+            ? 'Semua dokumen kamu telah diverifikasi.'
+            : 'Verifikasi selesai, tapi masih ada dokumen yang perlu diperbaiki.',
+        'tipe' => 'dokumen',
+        'status_baca' => 0,
+        'status_kirim' => 'terkirim',
+        'channel' => 'in_app',
+        'referensi_id' => $user->id_user,
+        'referensi_tipe' => 'user',
+    ]);
+
+    return redirect()->route('admin.halaman_verifikasi')
+        ->with('success', 'Verifikasi selesai');
+    })->name('admin.verifikasi.selesai');
+
+});
+
+// TEST
+Route::get('/test-gemini', function () {
+    $apiKey = env('GOOGLE_GEMINI_API_KEY');
+    $model = env('GOOGLE_GEMINI_MODEL', 'gemini-2.0-flash');
+    $url = "https://generativelanguage.googleapis.com/v1/models/{$model}:generateContent?key={$apiKey}";
+    
+    $response = Http::post($url, [
+        'contents' => [[
+            'parts' => [['text' => 'Halo, apakah API key Gemini saya berfungsi?']]
+        ]]
+    ]);
+    
+    if ($response->successful()) {
+        $text = $response->json('candidates.0.content.parts.0.text') ?? 'No response';
+        return '✅ API Key Gemini Berhasil! Response: ' . $text;
+    }
+    
+    return '❌ Error ' . $response->status() . ': ' . $response->body();
 });

@@ -49,4 +49,9 @@ class User extends Authenticatable
     {
         return 'password_user';
     }
+
+    public function dokumen()
+    {
+        return $this->hasMany(\App\Models\Dokumen::class, 'id_user', 'id_user');
+    }
 }

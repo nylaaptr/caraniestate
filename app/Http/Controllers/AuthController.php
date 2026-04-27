@@ -16,6 +16,8 @@ class AuthController extends Controller
     }
 
     // Proses login
+    // AuthController.php
+
     public function login(Request $request)
     {
         $request->validate([
@@ -27,29 +29,30 @@ class AuthController extends Controller
             'password.required' => 'Password wajib diisi',
         ]);
 
-        // Cari user berdasarkan email_user (kolom kustom)
         $user = User::where('email_user', $request->email)->first();
 
-        // Verifikasi password
+        // AuthController.php - method login()
+
         if ($user && Hash::check($request->password, $user->password_user)) {
             
-            // Login user
             Auth::login($user);
             $request->session()->regenerate();
 
-            // Redirect berdasarkan role
-            if ($user->role_user === 'admin') {
-                // ✅ Lebih baik pakai route name daripada hardcoded URL
-                return redirect()->route('admin.welcome'); 
-                // Jika admin di project terpisah, gunakan:
-                // return redirect('http://127.0.0.1:8001/admin');
+            // 🔥 AMBIL PARAMETER 'redirect' (pakai input() lebih reliable)
+            $redirectUrl = $request->input('redirect');
+
+            if ($redirectUrl && str_starts_with($redirectUrl, '/')) {
+                return redirect($redirectUrl);
             }
 
-            // Redirect user biasa
-            return redirect()->intended(route('halaman-katalog'));
+            // Fallback jika redirect tidak valid / tidak ada
+            if ($user->role_user === 'admin') {
+                return redirect()->route('admin.welcome');
+            }
+
+            return redirect()->route('halaman-katalog');
         }
 
-        // Jika gagal
         return back()->withErrors([
             'email' => 'Email atau password yang Anda masukkan salah.',
         ])->withInput($request->except('password'));
@@ -101,5 +104,42 @@ class AuthController extends Controller
         }
         
         return redirect()->route('welcome'); // ← pengguna ke welcome
+    }
+
+    // REGISTER
+    public function register(Request $request)
+    {
+        // 🔥 1. VALIDASI INPUT
+        $validated = $request->validate([
+            'nama_lengkap' => 'required|string|max:255',
+            'email_user' => 'required|email|unique:users,email_user',
+            'no_hp' => 'required|string|max:20',
+            'pekerjaan' => 'nullable|string|max:100',
+            'password_user' => 'required|min:8|confirmed',
+        ], [
+            // Custom error messages (opsional tapi disarankan)
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi',
+            'email_user.required' => 'Email wajib diisi',
+            'email_user.email' => 'Format email tidak valid',
+            'email_user.unique' => 'Email sudah terdaftar',
+            'no_hp.required' => 'Nomor HP wajib diisi',
+            'password_user.required' => 'Password wajib diisi',
+            'password_user.min' => 'Password minimal 8 karakter',
+            'password_user.confirmed' => 'Konfirmasi password tidak cocok',
+        ]);
+
+        // 🔥 2. SIMPAN USER KE DATABASE
+        $user = User::create([
+            'nama_user' => $validated['nama_lengkap'],
+            'email_user' => $validated['email_user'],
+            'no_hp' => $validated['no_hp'],
+            'pekerjaan' => $validated['pekerjaan'] ?? null,
+            'password_user' => Hash::make($validated['password_user']),
+            'role_user' => 'user', // default role
+        ]);
+
+        // 🔥 3. REDIRECT KE WELCOME DENGAN PESAN SUKSES
+        return redirect()->route('welcome')
+            ->with('success', 'Akun berhasil dibuat! Silakan login.');
     }
 }

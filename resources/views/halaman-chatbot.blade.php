@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatBot - PropertiHarmoni</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}"> 
+    <title>ChatBot - Carani Estate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -751,100 +752,32 @@
         
         <!-- Messages Area -->
         <div class="messages-area" id="messagesArea">
-            <!-- Bot Welcome Message -->
+            <!-- Bot Welcome Message (Satu-satunya pesan awal) -->
             <div class="message bot-message">
                 <div class="message-header">
-                    <div class="bot-avatar">PH</div>
+                    <div class="bot-avatar" style="width:30px; height:30px; font-size:14px;">PH</div>
                     <div>PropertiBot</div>
                 </div>
                 <div class="message-content">
-                    Halo! Saya PropertiBot, asisten virtual dari PropertiHarmoni. Ada yang bisa saya bantu hari ini? 😊
+                    Halo! Saya PropertiBot. Ada yang bisa dibantu hari ini? 😊<br>
+                    Silakan tanya tentang harga, lokasi, atau KPR.
                 </div>
-                <div class="message-time">10:24 AM</div>
-            </div>
-            
-            <!-- Bot Message -->
-            <div class="message bot-message">
-                <div class="message-header">
-                    <div class="bot-avatar">PH</div>
-                    <div>PropertiBot</div>
-                </div>
-                <div class="message-content">
-                    Saya bisa membantu Anda dengan:
-                    <ul style="padding-left: 20px; margin-top: 8px;">
-                        <li>Mencari properti sesuai kebutuhan</li>
-                        <li>Informasi detail properti</li>
-                        <li>Proses pemesanan dan pembayaran</li>
-                        <li>Verifikasi dokumen</li>
-                        <li>Dan masih banyak lagi!</li>
-                    </ul>
-                </div>
-                <div class="message-time">10:24 AM</div>
+                <div class="message-time">{{ date('H:i') }}</div>
                 
+                <!-- Opsi Awal -->
                 <div class="quick-actions">
-                    <button class="quick-btn">Cari Properti</button>
-                    <button class="quick-btn">Info Harga</button>
-                    <button class="quick-btn">Proses Pemesanan</button>
-                    <button class="quick-btn">Bantuan Dokumen</button>
+                    <button class="quick-btn" onclick="handleQuickReply('Cari Properti')">Cari Properti</button>
+                    <button class="quick-btn" onclick="handleQuickReply('Info Harga')">Info Harga</button>
+                    <button class="quick-btn" onclick="handleQuickReply('Simulasi KPR')">Simulasi KPR</button>
                 </div>
             </div>
-            
-            <!-- User Message -->
-            <div class="message user-message">
-                <div class="message-content">
-                    Saya tertarik dengan Apartemen Begawan Malang. Bisa kasih info detailnya?
-                </div>
-                <div class="message-time">10:26 AM</div>
-            </div>
-            
-            <!-- Bot Response -->
-            <div class="message bot-message">
-                <div class="message-header">
-                    <div class="bot-avatar">PH</div>
-                    <div>PropertiBot</div>
-                </div>
-                <div class="message-content">
-                    Tentu! Apartemen Begawan Malang adalah hunian modern di pusat kota Malang dengan fasilitas lengkap:
-                    <br><br>
-                    <strong>Spesifikasi:</strong>
-                    • Lokasi: Kota Malang, Kecamatan Klojen
-                    • Harga: Rp 3.500.000.000
-                    • Luas Bangunan: 150 m²
-                    • Kamar Tidur: 3
-                    • Kamar Mandi: 2
-                    • Garasi: 1 mobil
-                    • Lantai: 30
-                    <br>
-                    <strong>Fasilitas:</strong>
-                    • Kolam renang infinity
-                    • Gym & fitness center
-                    • Keamanan 24 jam
-                    • Parkir bawah tanah
-                    • Co-working space
-                </div>
-                <div class="message-time">10:27 AM</div>
-                
-                <div class="quick-actions">
-                    <button class="quick-btn">Lihat Gambar</button>
-                    <button class="quick-btn">Cek Ketersediaan</button>
-                    <button class="quick-btn">Simulasi Kredit</button>
-                </div>
-            </div>
-            
-            <!-- User Message -->
-            <div class="message user-message">
-                <div class="message-content">
-                    Bagaimana simulasi kredit untuk apartemen ini?
-                </div>
-                <div class="message-time">10:29 AM</div>
-            </div>
-            
-            <!-- Bot Response with Typing Indicator -->
-            <div class="typing-indicator">
+
+            <!-- Typing Indicator (Tersembunyi) -->
+            <!-- <div class="typing-indicator" id="typingIndicator">
                 <div class="typing-dot"></div>
                 <div class="typing-dot"></div>
                 <div class="typing-dot"></div>
-            </div>
+            </div> -->
         </div>
         
         <!-- Input Area -->
@@ -857,174 +790,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageInput = document.getElementById('messageInput');
-            const sendBtn = document.getElementById('sendBtn');
-            const typingIndicator = document.querySelector('.typing-indicator');
-            
-            // Quick action buttons
-            document.querySelectorAll('.quick-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const message = this.textContent;
-                    addMessage(message, 'user');
-                    simulateBotResponse(message);
-                });
-            });
-            
-            // Send message on button click
-            sendBtn.addEventListener('click', sendMessage);
-            
-            // Send message on Enter key
-            messageInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && messageInput.value.trim() !== '') {
-                    sendMessage();
-                }
-            });
-            
-            // Auto-resize textarea (not needed since we're using input, but keeping for future)
-            messageInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = (this.scrollHeight) + 'px';
-            });
-            
-            function sendMessage() {
-                const message = messageInput.value.trim();
-                if (message) {
-                    addMessage(message, 'user');
-                    messageInput.value = '';
-                    messageInput.style.height = 'auto';
-                    
-                    // Show typing indicator
-                    typingIndicator.style.display = 'flex';
-                    
-                    // Simulate bot response after delay
-                    setTimeout(() => {
-                        typingIndicator.style.display = 'none';
-                        simulateBotResponse(message);
-                    }, 1500);
-                }
-            }
-            
-            function addMessage(text, sender) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${sender}-message`;
-                
-                const now = new Date();
-                const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                
-                if (sender === 'bot') {
-                    messageDiv.innerHTML = `
-                        <div class="message-header">
-                            <div class="bot-avatar">PH</div>
-                            <div>PropertiBot</div>
-                        </div>
-                        <div class="message-content">${text}</div>
-                        <div class="message-time">${timeString}</div>
-                    `;
-                } else {
-                    messageDiv.innerHTML = `
-                        <div class="message-content">${text}</div>
-                        <div class="message-time">${timeString}</div>
-                    `;
-                }
-                
-                messagesArea.appendChild(messageDiv);
-                
-                // Scroll to bottom
-                messagesArea.scrollTop = messagesArea.scrollHeight;
-            }
-            
-            function simulateBotResponse(userMessage) {
-                // Simple response logic based on user message
-                let botResponse = '';
-                
-                const lowerMessage = userMessage.toLowerCase();
-                
-                if (lowerMessage.includes('halo') || lowerMessage.includes('hai') || lowerMessage.includes('hello')) {
-                    botResponse = 'Halo! Ada yang bisa saya bantu hari ini? 😊';
-                } else if (lowerMessage.includes('terima kasih') || lowerMessage.includes('makasih')) {
-                    botResponse = 'Sama-sama! Jangan ragu untuk bertanya lagi jika ada yang ingin Anda ketahui. 😊';
-                } else if (lowerMessage.includes('harga') || lowerMessage.includes('biaya')) {
-                    botResponse = 'Untuk informasi harga yang lebih detail, silakan berikan kriteria properti yang Anda cari (lokasi, tipe, budget) atau lihat katalog properti kami di halaman Katalog.';
-                } else if (lowerMessage.includes('kredit') || lowerMessage.includes('cicilan')) {
-                    botResponse = 'Kami menyediakan opsi KPR dengan tenor hingga 25 tahun. Untuk simulasi kredit yang akurat, silakan lengkapi data diri Anda di halaman Simulasi Kredit atau hubungi agen kami.';
-                } else if (lowerMessage.includes('properti') || lowerMessage.includes('rumah') || lowerMessage.includes('apartemen')) {
-                    botResponse = 'Kami memiliki berbagai pilihan properti di Malang dan sekitarnya. Untuk pencarian yang lebih spesifik, silakan gunakan filter di halaman Katalog atau beri tahu saya kriteria properti yang Anda inginkan.';
-                } else if (lowerMessage.includes('dokumen') || lowerMessage.includes('syarat')) {
-                    botResponse = 'Untuk pembelian properti, dokumen yang diperlukan antara lain: KTP, KK, NPWP, Slip Gaji 3 bulan terakhir, dan Rekening Koran. Untuk info lebih lengkap, silakan kunjungi halaman Panduan Dokumen.';
-                } else {
-                    botResponse = 'Terima kasih atas pertanyaan Anda! Tim kami akan segera memproses permintaan Anda. Untuk informasi lebih detail, silakan hubungi agen kami atau kunjungi halaman Bantuan.';
-                }
-                
-                addMessage(botResponse, 'bot');
-                
-                // Add quick actions for common queries
-                if (lowerMessage.includes('properti') || lowerMessage.includes('rumah') || lowerMessage.includes('apartemen')) {
-                    const lastMessage = document.querySelectorAll('.message.bot-message').item(-1);
-                    const quickActions = document.createElement('div');
-                    quickActions.className = 'quick-actions';
-                    quickActions.innerHTML = `
-                        <button class="quick-btn">Lihat Katalog</button>
-                        <button class="quick-btn">Filter Lokasi</button>
-                        <button class="quick-btn">Budget di Bawah 1M</button>
-                        <button class="quick-btn">Hubungi Agen</button>
-                    `;
-                    lastMessage.appendChild(quickActions);
-                    
-                    // Add event listeners to new quick buttons
-                    quickActions.querySelectorAll('.quick-btn').forEach(button => {
-                        button.addEventListener('click', function() {
-                            const message = this.textContent;
-                            addMessage(message, 'user');
-                            simulateBotResponse(message);
-                        });
-                    });
-                }
-            }
-            
-            // Initialize with welcome message after a short delay
-            setTimeout(() => {
-                typingIndicator.style.display = 'none';
-            }, 1000);
-            
-            // Focus input on load
-            messageInput.focus();
-        });
-
-        function toggleDropdown() {
-            document.getElementById('dropdownMenu').classList.toggle('show');
-        }
-
-        // Tutup dropdown kalau klik di luar
-        window.addEventListener('click', function(e) {
-            if (!e.target.closest('.profile-dropdown')) {
-                document.getElementById('dropdownMenu').classList.remove('show');
-            }
-        });
-
-        // Add interactivity to search button
-        document.querySelector('.search-btn').addEventListener('click', function() {
-            alert('Mencari riwayat pemesanan dengan kriteria yang dipilih...');
-        });
-        
-        // Add interactivity to action buttons
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const action = this.querySelector('i').className;
-                const bookingId = this.closest('tr').querySelector('td:first-child').textContent;
-                
-                if (action.includes('fa-eye')) {
-                    alert(`Menampilkan detail pemesanan: ${bookingId}`);
-                } else if (action.includes('fa-times')) {
-                    if (confirm(`Apakah Anda yakin ingin membatalkan pemesanan ${bookingId}?`)) {
-                        alert(`Pemesanan ${bookingId} berhasil dibatalkan.`);
-                        // In a real application, you would update the status in the database
-                    }
-                }
-            });
-        });
-        
+        // BAGIAN NAV
         // Add hover effect to table rows
         document.querySelectorAll('tbody tr').forEach(row => {
             row.addEventListener('mouseenter', function() {
@@ -1049,6 +815,261 @@
         function toggleMenu(){
             document.getElementById('navMenu').classList.toggle('show');
         }
+
+        // SCRIPT CHAT
+
+        document.addEventListener('DOMContentLoaded', function() {
+    // --- KONFIGURASI ELEMENT ---
+    const messagesArea = document.getElementById('messagesArea');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.querySelector('.typing-indicator');
+    
+    // Kunci penyimpanan di browser
+    const STORAGE_KEY = 'properti_chat_history';
+
+    // Token CSRF Laravel
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                      document.querySelector('input[name="_token"]')?.value;
+
+    // --- 1. FUNGSI LOAD CHAT SAAT HALAMAN DIBUKA ---
+    function loadChatHistory() {
+        const savedChat = sessionStorage.getItem(STORAGE_KEY);
+        if (savedChat) {
+            const history = JSON.parse(savedChat);
+            
+            history.forEach(msg => {
+                // Render ulang pesan tanpa memicu logika kirim ke server
+                renderMessageOnly(msg.text, msg.sender, msg.options);
+            });
+            scrollToBottom();
+        } 
+    }
+
+    // --- 2. FUNGSI SIMPAN CHAT ---
+    function saveChatToHistory(text, sender, options = null) {
+        let history = [];
+        const savedChat = sessionStorage.getItem(STORAGE_KEY);
+        
+        if (savedChat) {
+            history = JSON.parse(savedChat);
+        }
+
+        // Simpan data sederhana (text, sender, dan label opsi jika ada)
+        const optionsLabels = options ? options.map(opt => typeof opt === 'object' ? opt.label : opt) : null;
+
+        history.push({
+            text: text,
+            sender: sender,
+            options: optionsLabels
+        });
+
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    }
+
+    // --- 3. FUNGSI UTAMA KIRIM PESAN ---
+    async function sendMessage() {
+        const text = messageInput.value.trim();
+        if (!text) return;
+
+        // Tampilkan pesan user & Simpan
+        addMessage(text, 'user');
+        saveChatToHistory(text, 'user');
+        messageInput.value = '';
+        
+        showTyping();
+
+        try {
+            // Kirim ke Backend Laravel
+            const response = await fetch('/api/chat/send', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await response.json();
+
+            hideTyping();
+            
+            // Tampilkan balasan bot & Simpan
+            sendBotReply(data.reply, data.options, true); 
+
+        } catch (error) {
+            console.error('Error:', error);
+            hideTyping();
+            const errorMsg = "Maaf, terjadi kesalahan koneksi ke server.";
+            addMessage(errorMsg, 'bot');
+            saveChatToHistory(errorMsg, 'bot');
+        }
+    }
+
+    // --- 4. FUNGSI RENDER PESAN KE LAYAR ---
+    
+    // Fungsi untuk menambah pesan baru (Interaktif + Simpan)
+    function addMessage(text, sender) {
+        const msgElement = createMessageElement(text, sender);
+        messagesArea.appendChild(msgElement);
+        scrollToBottom();
+        return msgElement;
+    }
+
+    // Fungsi khusus untuk render ulang dari History
+    function renderMessageOnly(text, sender, savedOptions) {
+        const msgElement = createMessageElement(text, sender);
+        
+        // Jika ada opsi yang tersimpan, buat tombolnya kembali
+        if (sender === 'bot' && savedOptions && savedOptions.length > 0) {
+            const actionsContainer = msgElement.querySelector('.quick-actions-container');
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'quick-actions';
+            
+            savedOptions.forEach(optLabel => {
+                const btn = document.createElement('button');
+                btn.className = 'quick-btn';
+                btn.textContent = optLabel;
+                btn.onclick = () => handleQuickReplyClick(optLabel);
+                actionsDiv.appendChild(btn);
+            });
+            actionsContainer.appendChild(actionsDiv);
+        }
+
+        messagesArea.appendChild(msgElement);
+    }
+
+    // Helper membuat elemen HTML pesan
+    function createMessageElement(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+        
+        const now = new Date();
+        const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        
+        if (sender === 'bot') {
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <div class="bot-avatar">PH</div>
+                    <div>PropertiBot</div>
+                </div>
+                <div class="message-content">${text}</div>
+                <div class="message-time">${timeString}</div>
+                <div class="quick-actions-container"></div> 
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="message-content">${text}</div>
+                <div class="message-time">${timeString}</div>
+            `;
+        }
+        return messageDiv;
+    }
+
+    // Fungsi kirim balasan bot (dengan opsi simpan)
+    function sendBotReply(text, options = [], shouldSave = false) {
+        const msgElement = addMessage(text, 'bot');
+        const actionsContainer = msgElement.querySelector('.quick-actions-container');
+        
+        if (options && options.length > 0) {
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'quick-actions';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'quick-btn';
+                const label = typeof opt === 'object' ? opt.label : opt;
+                btn.textContent = label;
+                
+                btn.onclick = () => handleQuickReplyClick(label);
+                actionsDiv.appendChild(btn);
+            });
+            
+            actionsContainer.appendChild(actionsDiv);
+            scrollToBottom();
+        }
+
+        if (shouldSave) {
+            const optionsLabels = options.map(opt => typeof opt === 'object' ? opt.label : opt);
+            saveChatToHistory(text, 'bot', optionsLabels);
+        }
+    }
+
+    // Handler khusus untuk klik tombol quick reply
+    function handleQuickReplyClick(text) {
+        addMessage(text, 'user');
+        saveChatToHistory(text, 'user');
+        processLocalResponse(text);
+    }
+
+    // Helper untuk handle klik tombol (kirim ke backend lagi)
+    function processLocalResponse(text) {
+        showTyping();
+        setTimeout(async () => {
+            try {
+                const response = await fetch('/api/chat/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await response.json();
+                hideTyping();
+                sendBotReply(data.reply, data.options, true);
+            } catch (e) {
+                hideTyping();
+                console.error(e);
+            }
+        }, 600);
+    }
+
+    // --- UTILITIES ---
+    // --- UTILITIES (DIPERBARUI) ---
+    
+    let typingElement = null; // Variabel untuk menyimpan elemen typing
+
+    function showTyping() { 
+        // Jika sudah ada, hapus dulu biar tidak duplikat
+        if (typingElement) typingElement.remove();
+
+        // Buat elemen typing baru secara dinamis
+        typingElement = document.createElement('div');
+        typingElement.className = 'typing-indicator';
+        typingElement.innerHTML = `
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        `;
+        
+        messagesArea.appendChild(typingElement);
+        scrollToBottom(); 
+    }
+
+    function hideTyping() { 
+        if (typingElement) {
+            typingElement.remove(); // Hapus elemen dari layar
+            typingElement = null;   // Reset variabel
+        }
+    }
+
+    function scrollToBottom() { 
+        messagesArea.scrollTop = messagesArea.scrollHeight; 
+    }
+
+
+    // --- EVENT LISTENERS ---
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // Jalankan load history saat DOM siap
+    loadChatHistory();
+});
     </script>
 </body>
 </html>

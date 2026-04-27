@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalog Properti - PropertiHarmoni</title>
+    <title>Katalog Properti - Carani Estate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -1527,7 +1527,7 @@
     <section class="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1 class="hero-title">Tentang PropertiHarmoni</h1>
+            <h1 class="hero-title">Tentang Carani Estate</h1>
             <p class="hero-subtitle">Mewujudkan impian memiliki rumah yang nyaman dan berkualitas sejak 2015</p>
         </div>
     </section>
@@ -1733,16 +1733,16 @@
                 <div class="footer-column">
                     <h3>Kontak Kami</h3>
                     <div class="footer-contact">
-                        <p><i class="fas fa-map-marker-alt"></i> Jl. Melati No. 45, Jakarta Selatan</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Jl. Raya Pakisan, Bunduh, Bataan, Kec. Tenggarang, Kabupaten Bondowoso, Jawa Timur 68271</p>
                         <p><i class="fas fa-phone"></i> 0812-3456-7890</p>
-                        <p><i class="fas fa-envelope"></i> info@propertiharmoni.com</p>
+                        <p><i class="fas fa-envelope"></i> caranibhanubalakosa@gmail.com</p>
                         <p><i class="fas fa-clock"></i> Senin - Sabtu: 08:00 - 17:00</p>
                     </div>
                 </div>
             </div>
             
             <div class="copyright">
-                &copy; 2025 PropertiHarmoni. Semua hak dilindungi.
+                &copy; 2025 CaraniEstate. Semua hak dilindungi.
             </div>
         </div>
     </footer>

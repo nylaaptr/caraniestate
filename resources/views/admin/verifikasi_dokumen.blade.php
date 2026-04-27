@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Dokumen - PropertiHarmoni</title>
+    <title>Verifikasi Dokumen - Carani Estate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -914,159 +914,106 @@
         <!-- Verification Container -->
         <div class="verification-container">
             <div class="verification-header">
-                <h2 class="verification-title">Verifikasi Dokumen - Nayla Putri Wijaya</h2>
+                <h2 class="verification-title">
+                    Verifikasi Dokumen - {{ $user->nama_user }}
+                </h2>
             </div>
             
             <div class="user-info-card">
                 <div class="user-avatar">N</div>
                 <div class="user-details">
-                    <div class="user-name-large">Nayla Putri Wijaya</div>
-                    <div class="user-id">ID: USER-2025-001</div>
+                    <div class="user-name-large">{{ $user->nama_user }}</div>
+                    <!-- <div class="user-id">ID: {{ $user->id_user }}</div> -->
                     <div class="user-status pending">Status: Belum Diverifikasi</div>
                 </div>
             </div>
             
             <div class="document-list">
+                @foreach ($user->dokumen as $dok)
                 <div class="document-item">
                     <div class="doc-info">
-                        <div class="doc-icon complete">
-                            <i class="fas fa-id-card"></i>
+                        <div class="doc-icon 
+                            {{ $dok->status_verifikasi == 'diterima' ? 'complete' : ($dok->status_verifikasi == 'ditolak' ? 'rejected' : 'pending') }}">
+                            <i class="fas fa-file"></i>
                         </div>
-                        <div class="doc-name">Kartu Tanda Penduduk (KTP)</div>
-                        <div class="doc-status complete">Lengkap & Valid</div>
+
+                        <div class="doc-name">
+                            {{ ucfirst(str_replace('_', ' ', $dok->jenis_dokumen)) }}
+                        </div>
+
+                        <div class="doc-status 
+                            {{ $dok->status_verifikasi == 'diterima' ? 'complete' : ($dok->status_verifikasi == 'ditolak' ? 'rejected' : 'pending') }}">
+                            
+                            @if($dok->status_verifikasi == 'diterima')
+                                Lengkap & Valid
+                            @elseif($dok->status_verifikasi == 'ditolak')
+                                Tidak Valid
+                            @else
+                                Menunggu Verifikasi
+                            @endif
+                        </div>
                     </div>
+
                     <div class="doc-actions">
-                        <div class="action-btn view-btn" data-doc="ktp">
-                            <i class="fas fa-eye"></i>
-                        </div>
-                        <div class="action-btn reject-btn" data-doc="ktp">
-                            <i class="fas fa-times"></i>
-                        </div>
-                        <div class="action-btn approve-btn" data-doc="ktp">
+
+                        {{-- 👁 VIEW → buka tab baru --}}
+                        <a href="{{ asset('storage/' . $dok->path_file) }}" target="_blank">
+                            <div class="action-btn view-btn">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                        </a>
+
+                        {{-- ❌ TOLAK (hilang kalau sudah diterima) --}}
+                        @if($dok->status_verifikasi != 'diterima')
+                        <form method="POST" action="{{ route('admin.verifikasi.tolak', $dok->id_dokumen) }}">
+                            @csrf
+                            <button class="action-btn reject-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
+                        @endif
+
+                        {{-- ✅ APPROVE --}}
+                        @if($dok->status_verifikasi != 'diterima')
+                        <form method="POST" action="{{ route('admin.verifikasi.approve', $dok->id_dokumen) }}">
+                            @csrf
+                            <button class="action-btn approve-btn">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </form>
+                        @else
+                        {{-- kalau sudah disetujui, cuma tampil centang --}}
+                        <div class="action-btn approve-btn">
                             <i class="fas fa-check"></i>
                         </div>
+                        @endif
+
                     </div>
                 </div>
-                
-                <div class="document-item">
-                    <div class="doc-info">
-                        <div class="doc-icon complete">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="doc-name">Kartu Keluarga (KK)</div>
-                        <div class="doc-status complete">Lengkap & Valid</div>
-                    </div>
-                    <div class="doc-actions">
-                        <div class="action-btn view-btn" data-doc="kk">
-                            <i class="fas fa-eye"></i>
-                        </div>
-                        <div class="action-btn reject-btn" data-doc="kk">
-                            <i class="fas fa-times"></i>
-                        </div>
-                        <div class="action-btn approve-btn" data-doc="kk">
-                            <i class="fas fa-check"></i>
-                        </div>
-                    </div>
+                @endforeach
                 </div>
-                
-                <div class="document-item">
-                    <div class="doc-info">
-                        <div class="doc-icon complete">
-                            <i class="fas fa-file-invoice-dollar"></i>
-                        </div>
-                        <div class="doc-name">Slip Gaji 3 Bulan Terakhir</div>
-                        <div class="doc-status complete">Lengkap & Valid</div>
-                    </div>
-                    <div class="doc-actions">
-                        <div class="action-btn view-btn" data-doc="slip-gaji">
-                            <i class="fas fa-eye"></i>
-                        </div>
-                        <div class="action-btn reject-btn" data-doc="slip-gaji">
-                            <i class="fas fa-times"></i>
-                        </div>
-                        <div class="action-btn approve-btn" data-doc="slip-gaji">
-                            <i class="fas fa-check"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="document-item">
-                    <div class="doc-info">
-                        <div class="doc-icon pending">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <div class="doc-name">NPWP</div>
-                        <div class="doc-status pending">Menunggu Upload</div>
-                    </div>
-                    <div class="doc-actions">
-                        <div class="action-btn view-btn" data-doc="npwp">
-                            <i class="fas fa-eye"></i>
-                        </div>
-                        <div class="action-btn reject-btn" data-doc="npwp">
-                            <i class="fas fa-times"></i>
-                        </div>
-                        <div class="action-btn approve-btn" data-doc="npwp">
-                            <i class="fas fa-check"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="document-item">
-                    <div class="doc-info">
-                        <div class="doc-icon missing">
-                            <i class="fas fa-file-signature"></i>
-                        </div>
-                        <div class="doc-name">Surat Keterangan Kerja</div>
-                        <div class="doc-status missing">Belum Diupload</div>
-                    </div>
-                    <div class="doc-actions">
-                        <div class="action-btn view-btn" data-doc="sk-kerja">
-                            <i class="fas fa-eye"></i>
-                        </div>
-                        <div class="action-btn reject-btn" data-doc="sk-kerja">
-                            <i class="fas fa-times"></i>
-                        </div>
-                        <div class="action-btn approve-btn" data-doc="sk-kerja">
-                            <i class="fas fa-check"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="document-item">
-                    <div class="doc-info">
-                        <div class="doc-icon missing">
-                            <i class="fas fa-file-invoice"></i>
-                        </div>
-                        <div class="doc-name">Rekening Koran 6 Bulan</div>
-                        <div class="doc-status missing">Belum Diupload</div>
-                    </div>
-                    <div class="doc-actions">
-                        <div class="action-btn view-btn" data-doc="rekening-koran">
-                            <i class="fas fa-eye"></i>
-                        </div>
-                        <div class="action-btn reject-btn" data-doc="rekening-koran">
-                            <i class="fas fa-times"></i>
-                        </div>
-                        <div class="action-btn approve-btn" data-doc="rekening-koran">
-                            <i class="fas fa-check"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
             
-            <div class="verification-notes">
-                <h3 class="notes-title">Catatan Verifikasi</h3>
-                <textarea class="notes-input" placeholder="Masukkan catatan verifikasi jika diperlukan..."></textarea>
-            </div>
-            
-            <div class="footer-actions">
-                <button class="btn-back">Kembali</button>
-                <button class="btn-complete">Selesai</button>
-            </div>
+            <form method="POST" action="{{ route('admin.verifikasi.selesai', $user->id_user) }}">
+                @csrf
+
+                <div class="verification-notes">
+                    <h3 class="notes-title">Catatan Verifikasi</h3>
+                    <textarea name="catatan" class="notes-input" 
+                        placeholder="Masukkan catatan verifikasi jika diperlukan..."></textarea>
+                </div>
+
+                <div class="footer-actions">
+                    <a href="{{ route('admin.halaman_verifikasi') }}">
+                        <button type="button" class="btn-back">Kembali</button>
+                    </a>
+
+                    <button type="submit" class="btn-complete">Selesai</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Document Preview Modal -->
+    <!-- Document Preview Modal
     <div class="modal-overlay" id="previewModal">
         <div class="preview-modal">
             <div class="modal-header">
@@ -1084,45 +1031,45 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
             // Document action buttons
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const docType = this.getAttribute('data-doc');
-                    document.getElementById('previewModal').classList.add('show');
+            // document.querySelectorAll('.view-btn').forEach(btn => {
+            //     btn.addEventListener('click', function() {
+            //         const docType = this.getAttribute('data-doc');
+            //         document.getElementById('previewModal').classList.add('show');
                     
-                    // Update modal title based on document type
-                    const modalTitle = document.querySelector('.modal-title');
-                    let docName = '';
-                    switch(docType) {
-                        case 'ktp':
-                            docName = 'Kartu Tanda Penduduk (KTP)';
-                            break;
-                        case 'kk':
-                            docName = 'Kartu Keluarga (KK)';
-                            break;
-                        case 'slip-gaji':
-                            docName = 'Slip Gaji 3 Bulan Terakhir';
-                            break;
-                        case 'npwp':
-                            docName = 'NPWP';
-                            break;
-                        case 'sk-kerja':
-                            docName = 'Surat Keterangan Kerja';
-                            break;
-                        case 'rekening-koran':
-                            docName = 'Rekening Koran 6 Bulan';
-                            break;
-                        default:
-                            docName = 'Dokumen';
-                    }
-                    modalTitle.textContent = `Preview Dokumen: ${docName}`;
-                });
-            });
+            //         // Update modal title based on document type
+            //         const modalTitle = document.querySelector('.modal-title');
+            //         let docName = '';
+            //         switch(docType) {
+            //             case 'ktp':
+            //                 docName = 'Kartu Tanda Penduduk (KTP)';
+            //                 break;
+            //             case 'kk':
+            //                 docName = 'Kartu Keluarga (KK)';
+            //                 break;
+            //             case 'slip-gaji':
+            //                 docName = 'Slip Gaji 3 Bulan Terakhir';
+            //                 break;
+            //             case 'npwp':
+            //                 docName = 'NPWP';
+            //                 break;
+            //             case 'sk-kerja':
+            //                 docName = 'Surat Keterangan Kerja';
+            //                 break;
+            //             case 'rekening-koran':
+            //                 docName = 'Rekening Koran 6 Bulan';
+            //                 break;
+            //             default:
+            //                 docName = 'Dokumen';
+            //         }
+            //         modalTitle.textContent = `Preview Dokumen: ${docName}`;
+            //     });
+            // });
             
             // Approve button functionality
             document.querySelectorAll('.approve-btn').forEach(btn => {

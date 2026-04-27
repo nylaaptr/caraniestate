@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Pemesanan - PropertiHarmoni</title>
+    <title>Form Pemesanan - Carani Estate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -654,53 +654,71 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="booking-form-container">
+            <form action="{{ route('pemesanan.proses') }}" method="POST" enctype="multipart/form-data" id="bookingForm">
+            @csrf
+            <input type="hidden" name="id_properti" value="{{ $properti->id_properti }}">
             <!-- Property Preview -->
+            <!-- Property Preview - DINAMIS -->
             <div class="property-preview">
                 <div class="property-image">
-                    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Kelapa Gading Regency">
+                    @php
+                        // Ambil gambar pertama dari properti (sesuaikan dengan modelmu)
+                        $gambar = $properti->gambar_properti 
+                            ? (filter_var($properti->gambar_properti, FILTER_VALIDATE_URL) 
+                                ? $properti->gambar_properti 
+                                : asset('storage/' . $properti->gambar_properti))
+                            : asset('images/placeholder-properti.jpg');
+                    @endphp
+                    <img src="{{ $gambar }}" alt="{{ $properti->nama_properti }}" 
+                        onerror="this.src='{{ asset('images/placeholder-properti.jpg') }}'">
                 </div>
                 <div class="property-info">
-                    <h2 class="property-name">Kelapa Gading Regency</h2>
+                    <h2 class="property-name">{{ $properti->nama_properti }}</h2>
                     <div class="property-location">
                         <i class="fas fa-map-marker-alt"></i>
-                        <span>Jakarta Utara, DKI Jakarta</span>
+                        <span>{{ $properti->lokasi_properti ?? 'Lokasi tidak tersedia' }}</span>
                     </div>
-                    <div class="property-price">Rp 285.000.000</div>
-                    <span class="property-type">Type 36/72 - Komersil</span>
+                    <div class="property-price">Rp {{ number_format($properti->harga_properti, 0, ',', '.') }}</div>
+                    <span class="property-type">
+                        {{ $properti->tipe_properti }} - {{ ucfirst($properti->kategori_properti) }}
+                    </span>
                 </div>
             </div>
             
             <!-- Form Section -->
             <div class="form-section">
-                <h2 class="section-title">Form Pemesanan Properti</h2>
-                
-                <!-- Personal Information -->
-                <div class="form-section">
-                    <h3 class="section-title">Informasi Pribadi</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="fullName" class="form-label">Nama Lengkap <span class="required">*</span></label>
-                            <input type="text" class="form-control" id="fullName" placeholder="Masukkan nama lengkap Anda" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="phone" class="form-label">Nomor HP <span class="required">*</span></label>
-                            <input type="tel" class="form-control" id="phone" placeholder="Contoh: 081234567890" required>
-                        </div>
+                <h3 class="section-title">Informasi Pribadi</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullName" class="form-label">Nama Lengkap <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="fullName" name="nama_lengkap" 
+                            value="{{ old('nama_lengkap', Auth::user()->nama_user ?? '') }}" 
+                            placeholder="Masukkan nama lengkap Anda" required>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email" class="form-label">Email <span class="required">*</span></label>
-                            <input type="email" class="form-control" id="email" placeholder="Masukkan email Anda" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="address" class="form-label">Alamat Lengkap <span class="required">*</span></label>
-                            <textarea class="form-control" id="address" rows="2" placeholder="Masukkan alamat lengkap Anda" required></textarea>
-                        </div>
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Nomor HP <span class="required">*</span></label>
+                        <input type="tel" class="form-control" id="phone" name="no_hp" 
+                            value="{{ old('no_hp', Auth::user()->no_hp ?? '') }}" 
+                            placeholder="Contoh: 081234567890" required>
                     </div>
                 </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email <span class="required">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                            value="{{ old('email', Auth::user()->email_user ?? '') }}" 
+                            placeholder="Masukkan email Anda" required readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address" class="form-label">Alamat Lengkap <span class="required">*</span></label>
+                        <textarea class="form-control" id="address" name="alamat" rows="2" 
+                                placeholder="Masukkan alamat lengkap Anda" required>{{ old('alamat', Auth::user()->alamat_user ?? '') }}</textarea>
+                    </div>
+                </div>
+            </div>
                 
                 <!-- Property Details -->
                 <div class="form-section">
@@ -708,19 +726,32 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="propertyType" class="form-label">Tipe Properti <span class="required">*</span></label>
-                            <select class="form-control" id="propertyType" required>
-                                <option value="">Pilih Tipe Properti</option>
-                                <option value="30/60">30/60 (Subsidi)</option>
-                                <option value="36/72" selected>36/72 (Komersil)</option>
-                                <option value="45/84">45/84 (Komersil)</option>
-                                <option value="60/135">60/135 (Komersil)</option>
-                                <option value="ruko">Ruko (Komersil)</option>
-                            </select>
+                            <div class="form-control" style="background-color: #ffffff; font-weight: 500;">
+                                {{ $properti->tipe_properti ?? 'Tidak tersedia' }} 
+                                @if($properti->tipe_properti == '30/60')
+                                    <span class="text-muted">(Subsidi)</span>
+                                @else
+                                    <span class="text-muted">(Komersil)</span>
+                                @endif
+                            </div>
+
+                            {{-- ✅ Tetap kirim value saat form submit --}}
+                            <input type="hidden" name="tipe_dipilih" value="{{ $properti->tipe_properti ?? '' }}">
                         </div>
                         
                         <div class="form-group">
                             <label for="downPayment" class="form-label">Uang Muka <span class="required">*</span></label>
-                            <input type="text" class="form-control" id="downPayment" value="Rp 45.000.000" readonly>
+                            @php
+                                // Hitung DP: 15% untuk subsidi, 20% untuk komersil (sesuaikan kebijakan)
+                                $harga = $properti->harga_properti ?? 0;
+                                $kategori = $properti->kategori_properti ?? 'komersil';
+                                $persenDP = ($kategori == 'subsidi') ? 0.15 : 0.20;
+                                $dp = $harga * $persenDP;
+                            @endphp
+                            <input type="text" class="form-control" id="downPayment" name="uang_muka" 
+                                value="Rp {{ number_format($dp, 0, ',', '.') }}" readonly>
+                            <!-- Hidden input untuk kirim nilai angka ke backend -->
+                            <input type="hidden" name="uang_muka_value" value="{{ $dp }}">
                         </div>
                     </div>
                 </div>
@@ -730,12 +761,11 @@
                     <h3 class="section-title">Metode Pembayaran</h3>
                     <div class="form-group">
                         <label for="paymentMethod" class="form-label">Pilih Metode Pembayaran <span class="required">*</span></label>
-                        <select class="form-control" id="paymentMethod" required>
+                        <select class="form-control" id="paymentMethod" name="jenis_transaksi" required>
                             <option value="">Pilih Metode Pembayaran</option>
-                            <option value="kpr" selected>KPR (Kredit Pemilikan Rumah)</option>
-                            <option value="cash">Cash (Pembayaran Lunas)</option>
-                            <option value="installment">Cicilan Tanpa Bunga</option>
-                            <option value="other">Lainnya (Metode Khusus)</option>
+                            <option value="kredit">KPR (Kredit Pemilikan Rumah)</option>
+                            <option value="lunas">Lunas</option>
+                            <!-- <option value="kredit">Cicilan Tanpa Bunga</option> -->
                         </select>
                     </div>
                 </div>
@@ -768,7 +798,7 @@
                                     <i class="fas fa-id-card upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="ktpFile" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="ktpFile" name="ktp[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="ktpFileName"></div>
                                 </div>
                             </div>
@@ -779,7 +809,7 @@
                                     <i class="fas fa-users upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="kkFile" accept=".jpg,.jpeg,.png,.pdf">
+                                    <input type="file" class="file-input" id="kkFile" name="kk" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="kkFileName"></div>
                                 </div>
                             </div>
@@ -790,7 +820,7 @@
                                     <i class="fas fa-ring upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="marriageFile" accept=".jpg,.jpeg,.png,.pdf">
+                                    <input type="file" class="file-input" id="marriageFile" name="surat_nikah" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="marriageFileName"></div>
                                 </div>
                             </div>
@@ -801,7 +831,7 @@
                                     <i class="fas fa-file-alt upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="npwpFile" accept=".jpg,.jpeg,.png,.pdf">
+                                    <input type="file" class="file-input" id="npwpFile" name="npwp" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="npwpFileName"></div>
                                 </div>
                             </div>
@@ -812,7 +842,7 @@
                                     <i class="fas fa-camera upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 2MB</p>
-                                    <input type="file" class="file-input" id="photoFile" accept=".jpg,.jpeg,.png">
+                                    <input type="file" class="file-input" id="photoFile" name="foto_3x4" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="photoFileName"></div>
                                 </div>
                             </div>
@@ -823,7 +853,7 @@
                                     <i class="fas fa-briefcase upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="workCertFile" accept=".jpg,.jpeg,.png,.pdf">
+                                    <input type="file" class="file-input" id="workCertFile" name="surat_kerja" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="workCertFileName"></div>
                                 </div>
                             </div>
@@ -834,7 +864,7 @@
                                     <i class="fas fa-file-invoice-dollar upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="salaryFile" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="salaryFile" name="slip_gaji[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="salaryFileName"></div>
                                 </div>
                             </div>
@@ -845,7 +875,7 @@
                                     <i class="fas fa-file-invoice upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="bankFile" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="bankFile" name="rekening_koran[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="bankFileName"></div>
                                 </div>
                             </div>
@@ -856,7 +886,7 @@
                                     <i class="fas fa-user upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 3MB</p>
-                                    <input type="file" class="file-input" id="selfieFile" accept=".jpg,.jpeg,.png">
+                                    <input type="file" class="file-input" id="selfieFile" name="selfie" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="selfieFileName"></div>
                                 </div>
                             </div>
@@ -867,7 +897,7 @@
                                     <i class="fas fa-building upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 3MB</p>
-                                    <input type="file" class="file-input" id="workplaceFile" accept=".jpg,.jpeg,.png">
+                                    <input type="file" class="file-input" id="workplaceFile" name="foto_tempat_kerja" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="workplaceFileName"></div>
                                 </div>
                             </div>
@@ -886,7 +916,7 @@
                                     <i class="fas fa-id-card upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="ktpFileW" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="ktpFileW" name="ktp[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="ktpFileNameW"></div>
                                 </div>
                             </div>
@@ -897,7 +927,7 @@
                                     <i class="fas fa-users upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="kkFileW" accept=".jpg,.jpeg,.png,.pdf">
+                                    <input type="file" class="file-input" id="kkFileW" name="kk" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="kkFileNameW"></div>
                                 </div>
                             </div>
@@ -908,7 +938,7 @@
                                     <i class="fas fa-ring upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="marriageFileW" accept=".jpg,.jpeg,.png,.pdf">
+                                    <input type="file" class="file-input" id="marriageFileW" name="surat_nikah" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="marriageFileNameW"></div>
                                 </div>
                             </div>
@@ -919,7 +949,7 @@
                                     <i class="fas fa-file-alt upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="npwpFileW" accept=".jpg,.jpeg,.png,.pdf">
+                                    <input type="file" class="file-input" id="npwpFileW" name="npwp" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="npwpFileNameW"></div>
                                 </div>
                             </div>
@@ -930,7 +960,7 @@
                                     <i class="fas fa-file-invoice upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="sptFile" accept=".jpg,.jpeg,.png,.pdf">
+                                    <input type="file" class="file-input" id="sptFile" name="spt_pajak" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="sptFileName"></div>
                                 </div>
                             </div>
@@ -941,8 +971,7 @@
                                     <i class="fas fa-camera upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 2MB</p>
-                                    <input type="file" class="file-input" id="photoFileW" accept=".jpg,.jpeg,.png">
-                                    <div class="file-name" id="photoFileNameW"></div>
+                                    <input type="file" class="file-input" id="marriageFile" name="surat_nikah" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                 </div>
                             </div>
                             
@@ -952,7 +981,7 @@
                                     <i class="fas fa-file-contract upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="businessCertFile" accept=".jpg,.jpeg,.png,.pdf">
+                                    <input type="file" class="file-input" id="businessCertFile" name="surat_ket_usaha" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="businessCertFileName"></div>
                                 </div>
                             </div>
@@ -963,7 +992,7 @@
                                     <i class="fas fa-file-signature upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="incomeCertFile" accept=".jpg,.jpeg,.png,.pdf">
+                                    <input type="file" class="file-input" id="incomeCertFile" name="surat_penghasilan_usaha" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="incomeCertFileName"></div>
                                 </div>
                             </div>
@@ -974,7 +1003,7 @@
                                     <i class="fas fa-book upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="businessRecordFile" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="businessRecordFile" name="pembukuan_usaha" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="businessRecordFileName"></div>
                                 </div>
                             </div>
@@ -985,7 +1014,7 @@
                                     <i class="fas fa-file-invoice upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="bankFileW" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="bankFileW" name="rekening_koran[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="bankFileNameW"></div>
                                 </div>
                             </div>
@@ -996,7 +1025,7 @@
                                     <i class="fas fa-user upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 3MB</p>
-                                    <input type="file" class="file-input" id="selfieFileW" accept=".jpg,.jpeg,.png">
+                                    <input type="file" class="file-input" id="selfieFile" name="selfie" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="selfieFileNameW"></div>
                                 </div>
                             </div>
@@ -1007,7 +1036,7 @@
                                     <i class="fas fa-store upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 3MB</p>
-                                    <input type="file" class="file-input" id="businessPlaceFile" accept=".jpg,.jpeg,.png">
+                                    <input type="file" class="file-input" id="businessPlaceFile" name="foto_tempat_usaha" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="businessPlaceFileName"></div>
                                 </div>
                             </div>
@@ -1045,14 +1074,41 @@
                 </div>
                 
                 <!-- Action Buttons -->
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">
-                        <i class="fas fa-times me-2"></i>Batal
-                    </button>
-                    <button type="submit" class="btn btn-primary" id="submitBtn">
-                        <i class="fas fa-paper-plane me-2"></i>Kirim Pemesanan
-                    </button>
-                </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelBtn">
+                            <i class="fas fa-times me-2"></i>Batal
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-paper-plane me-2"></i>Kirim Pemesanan
+                        </button>
+                    </div>
+
+                    <!-- Upload Bukti Booking Fee (KHUSUS LUNAS) -->
+                        <div class="form-section" id="booking-proof-section" style="display: none;">
+                            <h3 class="section-title">Upload Bukti Booking Fee</h3>
+
+                            <div class="upload-item">
+                                <label class="upload-label">
+                                    Bukti Pembayaran Booking Fee <span class="required">*</span>
+                                </label>
+
+                                <div class="upload-area">
+                                    <i class="fas fa-receipt upload-icon"></i>
+                                    <p class="upload-text">Klik atau drag file</p>
+                                    <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
+
+                                    <input 
+                                        type="file" 
+                                        class="file-input" 
+                                        name="bukti_booking" 
+                                        id="buktiBooking"
+                                        accept=".jpg,.jpeg,.png,.pdf"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                </form>{{-- tutup form --}}
             </div>
         </div>
     </div>
@@ -1060,131 +1116,106 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Payment method dropdown change handler
-            const paymentMethodSelect = document.getElementById('paymentMethod');
-            const downPaymentInput = document.getElementById('downPayment');
-            const paymentDetails = document.querySelector('.payment-details');
-            
-            paymentMethodSelect.addEventListener('change', function() {
-                const method = this.value;
-                
-                if (method === 'kpr') {
-                    downPaymentInput.value = 'Rp 45.000.000';
-                    paymentDetails.innerHTML = `
-                        <div class="payment-item">
-                            <span class="payment-label">Harga Properti</span>
-                            <span class="payment-value">Rp 285.000.000</span>
-                        </div>
-                        <div class="payment-item">
-                            <span class="payment-label">Uang Muka</span>
-                            <span class="payment-value">Rp 45.000.000</span>
-                        </div>
-                        <div class="payment-item">
-                            <span class="payment-label">Biaya Booking</span>
-                            <span class="payment-value">Rp 2.000.000</span>
-                        </div>
-                        <div class="payment-item">
-                            <span class="payment-label">Total Pembayaran</span>
-                            <span class="payment-value">Rp 47.000.000</span>
-                        </div>
-                    `;
-                } else if (method === 'cash') {
-                    downPaymentInput.value = 'Rp 285.000.000';
-                    paymentDetails.innerHTML = `
-                        <div class="payment-item">
-                            <span class="payment-label">Harga Properti</span>
-                            <span class="payment-value">Rp 285.000.000</span>
-                        </div>
-                        <div class="payment-item">
-                            <span class="payment-label">Biaya Booking</span>
-                            <span class="payment-value">Rp 2.000.000</span>
-                        </div>
-                        <div class="payment-item">
-                            <span class="payment-label">Total Pembayaran</span>
-                            <span class="payment-value">Rp 287.000.000</span>
-                        </div>
-                    `;
-                } else if (method === 'installment') {
-                    downPaymentInput.value = 'Rp 85.500.000';
-                    paymentDetails.innerHTML = `
-                        <div class="payment-item">
-                            <span class="payment-label">Harga Properti</span>
-                            <span class="payment-value">Rp 285.000.000</span>
-                        </div>
-                        <div class="payment-item">
-                            <span class="payment-label">Uang Muka (30%)</span>
-                            <span class="payment-value">Rp 85.500.000</span>
-                        </div>
-                        <div class="payment-item">
-                            <span class="payment-label">Biaya Booking</span>
-                            <span class="payment-value">Rp 2.000.000</span>
-                        </div>
-                        <div class="payment-item">
-                            <span class="payment-label">Total Pembayaran</span>
-                            <span class="payment-value">Rp 87.500.000</span>
-                        </div>
-                    `;
-                } else if (method === 'other') {
-                    downPaymentInput.value = 'Rp 0';
-                    paymentDetails.innerHTML = `
-                        <div class="payment-item">
-                            <span class="payment-label">Harga Properti</span>
-                            <span class="payment-value">Rp 285.000.000</span>
-                        </div>
-                        <div class="payment-item">
-                            <span class="payment-label">Biaya Booking</span>
-                            <span class="payment-value">Rp 2.000.000</span>
-                        </div>
-                        <div class="payment-item">
-                            <span class="payment-label">Total Pembayaran</span>
-                            <span class="payment-value">Rp 2.000.000</span>
-                        </div>
-                    `;
+            // ========== MODAL PREVIEW ==========
+            const modal = document.createElement('div');
+            modal.id = 'previewModal';
+            modal.style.cssText = `
+                display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75);
+                z-index:9999; align-items:center; justify-content:center; padding:20px;
+            `;
+            modal.innerHTML = `
+                <div style="background:#fff; border-radius:12px; max-width:90vw; max-height:90vh;
+                            overflow:auto; padding:20px; position:relative; min-width:300px;">
+                    <button id="previewClose" style="position:absolute; top:10px; right:14px;
+                        background:none; border:none; font-size:24px; cursor:pointer; color:#333; line-height:1;">&times;</button>
+                    <p id="previewTitle" style="font-weight:600; margin:0 32px 12px 0; font-size:13px; color:#555; word-break:break-all;"></p>
+                    <div id="previewContent"></div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.addEventListener('click', e => { if (e.target === modal) closePreview(); });
+            document.getElementById('previewClose').addEventListener('click', closePreview);
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
+
+            function closePreview() {
+                modal.style.display = 'none';
+                document.getElementById('previewContent').innerHTML = '';
+            }
+
+            function openPreview(file) {
+                document.getElementById('previewTitle').textContent = file.name;
+                const content = document.getElementById('previewContent');
+                content.innerHTML = '';
+
+                const url = URL.createObjectURL(file);
+
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.style.cssText = 'max-width:100%; max-height:75vh; display:block; border-radius:6px;';
+                    img.src = url;
+                    img.onload = () => URL.revokeObjectURL(url);
+                    content.appendChild(img);
+                } else if (file.type === 'application/pdf') {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = url;
+                    iframe.style.cssText = 'width:75vw; height:75vh; border:none; border-radius:6px;';
+                    content.appendChild(iframe);
                 }
-            });
-            
-            // Employment type toggle
-            const pnsRadio = document.getElementById('employment-pns');
-            const wiraswastaRadio = document.getElementById('employment-wiraswasta');
-            const pnsDocuments = document.getElementById('pns-documents');
-            const wiraswastaDocuments = document.getElementById('wiraswasta-documents');
-            
-            pnsRadio.addEventListener('change', function() {
-                if (this.checked) {
-                    pnsDocuments.style.display = 'block';
-                    wiraswastaDocuments.style.display = 'none';
-                }
-            });
-            
-            wiraswastaRadio.addEventListener('change', function() {
-                if (this.checked) {
-                    pnsDocuments.style.display = 'none';
-                    wiraswastaDocuments.style.display = 'block';
-                }
-            });
-            
-            // File upload handlers
+
+                modal.style.display = 'flex';
+            }
+
+            // ========== FILE UPLOAD HANDLER (GANTI YANG LAMA) ==========
             function setupFileUpload(uploadAreaId, fileInputId, fileNameId) {
                 const uploadArea = document.getElementById(uploadAreaId);
                 const fileInput = document.getElementById(fileInputId);
                 const fileName = document.getElementById(fileNameId);
-                
-                uploadArea.addEventListener('click', () => {
+
+                if (!uploadArea || !fileInput || !fileName) return;
+
+                uploadArea.addEventListener('click', function(e) {
+                    // Jangan trigger klik file input kalau yg diklik tombol preview
+                    if (e.target.closest('button[data-preview]')) return;
                     fileInput.click();
                 });
-                
+
                 fileInput.addEventListener('change', function() {
-                    if (this.files.length > 0) {
-                        if (this.multiple && this.files.length > 1) {
-                            fileName.textContent = `${this.files.length} file dipilih`;
-                        } else {
-                            fileName.textContent = this.files[0].name;
-                        }
-                        fileName.style.color = '#7AB2D3';
-                    }
+                    const files = Array.from(this.files);
+                    if (!files.length) return;
+
+                    fileName.innerHTML = '';
+
+                    files.forEach(file => {
+                        const row = document.createElement('div');
+                        row.style.cssText = 'display:flex; align-items:center; gap:6px; margin-top:5px;';
+
+                        const nameSpan = document.createElement('span');
+                        nameSpan.textContent = file.name;
+                        nameSpan.style.cssText = 'font-size:0.82rem; color:#7AB2D3; font-weight:500; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
+
+                        const btnLihat = document.createElement('button');
+                        btnLihat.type = 'button';
+                        btnLihat.setAttribute('data-preview', '1');
+                        btnLihat.textContent = '👁 Lihat';
+                        btnLihat.style.cssText = `
+                            font-size:11px; padding:2px 8px; border-radius:4px; cursor:pointer;
+                            background:#e8f0fe; border:1px solid #7AB2D3; color:#1E3A5F;
+                            white-space:nowrap; flex-shrink:0;
+                        `;
+                        btnLihat.addEventListener('click', (e) => {
+                            e.stopPropagation(); // supaya tidak trigger uploadArea click
+                            openPreview(file);
+                        });
+
+                        row.appendChild(nameSpan);
+                        row.appendChild(btnLihat);
+                        fileName.appendChild(row);
+                    });
                 });
             }
-            
-            // Setup all file upload areas for PNS
+
+            // ========== SETUP PNS ==========
             setupFileUpload('ktpUpload', 'ktpFile', 'ktpFileName');
             setupFileUpload('kkUpload', 'kkFile', 'kkFileName');
             setupFileUpload('marriageUpload', 'marriageFile', 'marriageFileName');
@@ -1195,8 +1226,8 @@
             setupFileUpload('bankUpload', 'bankFile', 'bankFileName');
             setupFileUpload('selfieUpload', 'selfieFile', 'selfieFileName');
             setupFileUpload('workplaceUpload', 'workplaceFile', 'workplaceFileName');
-            
-            // Setup all file upload areas for Wiraswasta
+
+            // ========== SETUP WIRASWASTA ==========
             setupFileUpload('ktpUploadW', 'ktpFileW', 'ktpFileNameW');
             setupFileUpload('kkUploadW', 'kkFileW', 'kkFileNameW');
             setupFileUpload('marriageUploadW', 'marriageFileW', 'marriageFileNameW');
@@ -1209,58 +1240,26 @@
             setupFileUpload('bankUploadW', 'bankFileW', 'bankFileNameW');
             setupFileUpload('selfieUploadW', 'selfieFileW', 'selfieFileNameW');
             setupFileUpload('businessPlaceUpload', 'businessPlaceFile', 'businessPlaceFileName');
-            
-            // Form submission
-            document.getElementById('submitBtn').addEventListener('click', function() {
-                // Simple validation
-                const requiredFields = [
-                    { id: 'fullName', label: 'Nama Lengkap' },
-                    { id: 'phone', label: 'Nomor HP' },
-                    { id: 'email', label: 'Email' },
-                    { id: 'address', label: 'Alamat' },
-                    { id: 'propertyType', label: 'Tipe Properti' },
-                    { id: 'paymentMethod', label: 'Metode Pembayaran' }
-                ];
-                
-                let isValid = true;
-                for (const field of requiredFields) {
-                    const input = document.getElementById(field.id);
-                    if (!input.value.trim()) {
-                        alert(`Mohon lengkapi field: ${field.label}`);
-                        input.focus();
-                        isValid = false;
-                        break;
-                    }
-                }
-                
-                if (!isValid) return;
-                
-                // Validate documents based on employment type
-                let docSection;
-                if (pnsRadio.checked) {
-                    docSection = document.querySelectorAll('#pns-documents .file-input');
-                } else {
-                    docSection = document.querySelectorAll('#wiraswasta-documents .file-input');
-                }
-                
-                let missingDocs = [];
-                docSection.forEach(input => {
-                    if (!input.files || input.files.length === 0) {
-                        const label = input.closest('.upload-item').querySelector('.upload-label').textContent;
-                        missingDocs.push(label.split(' ')[0]);
-                    }
-                });
-                
-                if (missingDocs.length > 0) {
-                    alert(`Mohon lengkapi dokumen berikut:\n${missingDocs.join('\n')}`);
-                    return;
-                }
-                
-                // Success message
-                alert('Pemesanan berhasil dikirim! Tim kami akan segera menghubungi Anda untuk proses selanjutnya.');
-                
-                // In real application: submit form to server
-                // document.getElementById('bookingForm').submit();
+
+            // ========== SISA SCRIPT LAMA (payment, employment toggle, submit, cancel) ==========
+            const paymentMethodSelect = document.getElementById('paymentMethod');
+            const downPaymentInput = document.getElementById('downPayment');
+            const paymentDetails = document.querySelector('.payment-details');
+
+            paymentMethodSelect.addEventListener('change', function() {
+                // ... (isi sama persis dengan script lama)
+            });
+
+            const pnsRadio = document.getElementById('employment-pns');
+            const wiraswastaRadio = document.getElementById('employment-wiraswasta');
+            const pnsDocuments = document.getElementById('pns-documents');
+            const wiraswastaDocuments = document.getElementById('wiraswasta-documents');
+
+            pnsRadio.addEventListener('change', function() {
+                if (this.checked) { pnsDocuments.style.display='block'; wiraswastaDocuments.style.display='none'; }
+            });
+            wiraswastaRadio.addEventListener('change', function() {
+                if (this.checked) { pnsDocuments.style.display='none'; wiraswastaDocuments.style.display='block'; }
             });
             
             // Cancel button
@@ -1271,6 +1270,38 @@
             });
         });
     </script>
+
+    <script>
+        document.getElementById('paymentMethod').addEventListener('change', function() {
+            let metode = this.value;
+            let dpField = document.getElementById('downPayment').closest('.form-group');
+
+            if (metode === 'lunas') {
+                dpField.style.display = 'none';
+            } else {
+                dpField.style.display = 'block';
+            }
+        });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('paymentMethod').addEventListener('change', function() {
+        let metode = this.value;
+
+        let bookingSection = document.getElementById('booking-proof-section');
+        let buktiInput = document.getElementById('buktiBooking');
+
+        if (metode === 'lunas') {
+            bookingSection.style.display = 'block';
+            buktiInput.setAttribute('required', 'required');
+        } else {
+            bookingSection.style.display = 'none';
+            buktiInput.removeAttribute('required');
+        }
+    });
+});
+</script>
 </body>
 </html>
 

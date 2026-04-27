@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PropertiHarmoni - Temukan Rumah Impian Anda</title>
+    <title>Carani Estate - Temukan Rumah Impian Anda</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -168,7 +169,7 @@
         
         /* Hero Section */
         .hero {
-            background: url('https://placehold.co/1920x1080/e6f2f8/1E3A5F?text=Properti+Impian') no-repeat center center;
+            background: url('') no-repeat center center;
             background-size: cover;
             padding: 150px 30px 100px;
             position: relative;
@@ -396,7 +397,59 @@
             margin-top: 10px;
         }
 
+        /* CSS IKLAN */
+        .email-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
 
+        .email-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 350px;
+            text-align: center;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .email-box h2 {
+            margin-bottom: 10px;
+        }
+
+        .email-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .email-box button {
+            width: 100%;
+            padding: 10px;
+            background: #1E3A5F;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .close-btn {
+            float: right;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        @keyframes fadeIn {
+            from {transform: scale(0.8); opacity: 0;}
+            to {transform: scale(1); opacity: 1;}
+        }
 
         
         /* About Section */
@@ -559,10 +612,10 @@
             line-height: 1.6;
         }
 
-        /* Services Grid - 4 Columns */
+        /* Services Grid - 3 Columns, ganti bagian repeat */
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr); 
             gap: 25px;
             margin-bottom: 50px;
         }
@@ -743,47 +796,6 @@
             transform: translateX(4px);
         }
 
-        /* Bottom CTA */
-        .services-cta {
-            text-align: center;
-            padding: 30px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(226, 232, 240, 0.6);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .services-cta p {
-            font-size: 1.1rem;
-            color: var(--dark-blue);
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .btn-services-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 14px 35px;
-            background: linear-gradient(135deg, var(--dark-blue), #2a4a6f);
-            color: white;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-services-cta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(30, 58, 95, 0.3);
-            background: linear-gradient(135deg, #2a4a6f, var(--dark-blue));
-        }
-
         /* Responsive Design */
         @media (max-width: 1200px) {
             .services-grid {
@@ -872,6 +884,183 @@
             .btn-services-cta {
                 width: 100%;
                 justify-content: center;
+            }
+        }
+
+        /*--------------------------------------------------------------
+        # Call To Action Section-1 (CUSTOM COLOR)
+        --------------------------------------------------------------*/
+        .call-to-action-1 {
+            position: relative;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Background */
+        .call-to-action-1 .cta-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+
+        /* Overlay pakai PRIMARY BLUE */
+        .call-to-action-1 .cta-bg::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(122, 178, 211, 0.4); /* primary-blue */
+        }
+
+        /* Content */
+        .call-to-action-1 .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Title */
+        .call-to-action-1 .cta-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .call-to-action-1 .cta-content h2 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Description */
+        .call-to-action-1 .cta-content p {
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.6;
+        }
+
+        /* Buttons */
+        .call-to-action-1 .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        /* Base Button */
+        .call-to-action-1 .cta-buttons .btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* PRIMARY BUTTON */
+        .call-to-action-1 .cta-buttons .btn.btn-primary {
+            background-color: var(--dark-blue);
+            color: white;
+            border-color: var(--dark-blue);
+        }
+
+        .call-to-action-1 .cta-buttons .btn.btn-primary:hover {
+            background-color: #162c47;
+            border-color: #162c47;
+            transform: translateY(-2px);
+        }
+
+        /* OUTLINE BUTTON */
+        .call-to-action-1 .cta-buttons .btn.btn-outline {
+            background-color: transparent;
+            color: white;
+            border-color: white;
+        }
+
+        .call-to-action-1 .cta-buttons .btn.btn-outline:hover {
+            background-color: white;
+            color: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Button */
+        @media (max-width: 576px) {
+            .call-to-action-1 .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .call-to-action-1 .cta-buttons .btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+        }
+
+        /* Features */
+        .call-to-action-1 .cta-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* Feature Item */
+        .call-to-action-1 .cta-features .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Icon pakai primary */
+        .call-to-action-1 .cta-features .feature-item i {
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        /* Text */
+        .call-to-action-1 .cta-features .feature-item span {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 576px) {
+            .call-to-action-1 .cta-features {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .call-to-action-1 .cta-features .feature-item {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .call-to-action-1 {
+                min-height: 400px;
+                padding: 80px 0;
+            }
+
+            .call-to-action-1 .cta-content h2 {
+                margin-bottom: 1rem;
+            }
+
+            .call-to-action-1 .cta-content p {
+                margin-bottom: 2rem;
+            }
+
+            .call-to-action-1 .cta-buttons {
+                margin-bottom: 2rem;
             }
         }
 
@@ -1831,7 +2020,7 @@
 
                 {{-- Guest --}}
                 @guest
-                    <a href="{{ route('login') }}" class="nav-item login-link">
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
@@ -2023,7 +2212,7 @@
                 </div>
 
                 <!-- Service 4: Verifikasi & After-Sales -->
-                <div class="service-card">
+                <!-- <div class="service-card">
                     <div class="service-icon-wrapper">
                         <div class="service-icon">
                             <i class="fas fa-shield-alt"></i>
@@ -2042,20 +2231,52 @@
                     <a href="{{ route('halaman-kontak') }}" class="service-link">
                         Pelajari Lebih Lanjut <i class="fas fa-arrow-right"></i>
                     </a>
-                </div>
+                </div> -->
 
-            </div>
-
-            <!-- CTA Bottom -->
-            <div class="services-cta">
-                <p>Butuh bantuan lebih lanjut? Tim kami siap membantu Anda!</p>
-                <a href="{{ route('halaman-chatbot') }}" class="btn-services-cta">
-                    <i class="fas fa-comments me-2"></i>Chat dengan Kami
-                </a>
             </div>
 
         </div>
     </section>
+
+    <!-- Call To Action Section -->
+        <section class="call-to-action-1 call-to-action-1 section" id="call-to-action">
+        <div class="cta-bg" style="background-image: url('assets/img/about/about-4.webp');"></div>
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+            <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-8">
+
+                <div class="cta-content text-center">
+                <h2>Butuh Bantuan Menemukan Properti Impian Anda?</h2>
+                <p>Kami siap membantu Anda memilih properti terbaik dengan panduan ahli, sesuai kebutuhan dan budget Anda. Mulai perjalanan properti Anda sekarang!</p>
+
+                <div class="cta-buttons">
+                    <a href="https://wa.me/6281234567890" target="_blank" class="btn btn-primary">Hubungi Kami Sekarang</a>
+                    <a href="properties.html" class="btn btn-outline">Lihat Properti</a>
+                </div>
+
+                <div class="cta-features">
+                    <div class="feature-item" data-aos="fade-up" data-aos-delay="200">
+                    <i class="bi bi-telephone-fill"></i>
+                    <span>Konsultasi Gratis</span>
+                    </div>
+                    <div class="feature-item" data-aos="fade-up" data-aos-delay="250">
+                    <i class="bi bi-clock-fill"></i>
+                    <span>Dukungan 24/7</span>
+                    </div>
+                    <div class="feature-item" data-aos="fade-up" data-aos-delay="300">
+                    <i class="bi bi-shield-check-fill"></i>
+                    <span>Ahli Properti Terpercaya</span>
+                    </div>
+                </div>
+
+                </div><!-- End CTA Content -->
+
+            </div>
+            </div>
+
+        </div>
+        </section><!-- /Call To Action Section -->
 
     <!-- Properti Unggulan -->
     <section class="properti-unggulan">
@@ -2407,15 +2628,6 @@
 
             </div>
 
-            <!-- Contact CTA -->
-            <div class="faq-contact">
-                <h3>Masih Punya Pertanyaan?</h3>
-                <p>Tim kami siap membantu Anda 24/7. Jangan ragu untuk menghubungi kami!</p>
-                <a href="https://wa.me/6281234567890" class="faq-contact-btn" target="_blank">
-                    <i class="fab fa-whatsapp"></i> Hubungi via WhatsApp
-                </a>
-            </div>
-
         </div>
     </section>
 
@@ -2461,16 +2673,16 @@
                 <div class="footer-column">
                     <h3>Kontak Kami</h3>
                     <div class="footer-contact">
-                        <p><i class="fas fa-map-marker-alt"></i> Jl. Melati No. 45, Jakarta Selatan</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Jl. Raya Pakisan, Bunduh, Bataan, Kec. Tenggarang, Kabupaten Bondowoso, Jawa Timur 68271</p>
                         <p><i class="fas fa-phone"></i> 0812-3456-7890</p>
-                        <p><i class="fas fa-envelope"></i> info@propertiharmoni.com</p>
+                        <p><i class="fas fa-envelope"></i> caranibhanubalakosa@gmail.com</p>
                         <p><i class="fas fa-clock"></i> Senin - Sabtu: 08:00 - 17:00</p>
                     </div>
                 </div>
             </div>
             
             <div class="copyright">
-                &copy; 2025 PropertiHarmoni. Semua hak dilindungi.
+                &copy; 2025 CaraniEstate. Semua hak dilindungi.
             </div>
         </div>
     </footer>
@@ -2616,58 +2828,123 @@ function toggleDropdown() {
 </script>
 
 <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // FAQ Accordion Functionality
-            const faqQuestions = document.querySelectorAll('.faq-question');
-            
-            faqQuestions.forEach(question => {
-                question.addEventListener('click', function() {
-                    const answer = this.nextElementSibling;
-                    const isActive = this.classList.contains('active');
-                    
-                    // Close all other FAQs
-                    faqQuestions.forEach(q => {
-                        q.classList.remove('active');
-                        q.nextElementSibling.style.maxHeight = '0';
-                        q.nextElementSibling.style.padding = '0 30px 0 30px';
-                    });
-                    
-                    // Toggle current FAQ
-                    if (!isActive) {
-                        this.classList.add('active');
-                        answer.style.maxHeight = answer.scrollHeight + 'px';
-                        answer.style.padding = '0 30px 25px 30px';
-                    }
-                });
+document.addEventListener('DOMContentLoaded', function() {
+
+    // ================================
+    // FAQ ACCORDION
+    // ================================
+    const faqQuestions = document.querySelectorAll('.faq-question');
+
+    faqQuestions.forEach(question => {
+        question.addEventListener('click', function() {
+            const answer = this.nextElementSibling;
+            const isActive = this.classList.contains('active');
+
+            // Tutup semua
+            faqQuestions.forEach(q => {
+                q.classList.remove('active');
+                q.nextElementSibling.style.maxHeight = '0';
+                q.nextElementSibling.style.padding = '0 30px 0 30px';
             });
-            
-            // Category Filter
-            const categoryBtns = document.querySelectorAll('.faq-category-btn');
-            const faqItems = document.querySelectorAll('.faq-item');
-            
-            categoryBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // Update active button
-                    categoryBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const category = this.dataset.category;
-                    
-                    // Filter FAQs
-                    faqItems.forEach(item => {
-                        if (category === 'all' || item.dataset.category === category) {
-                            item.style.display = 'block';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                });
-            });
-            
-            // Auto-expand first FAQ (optional)
-            // faqQuestions[0].click();
+
+            // Buka yang diklik
+            if (!isActive) {
+                this.classList.add('active');
+                answer.style.maxHeight = answer.scrollHeight + 'px';
+                answer.style.padding = '0 30px 25px 30px';
+            }
         });
-    </script>
+    });
+
+
+    // ================================
+    // CATEGORY FILTER
+    // ================================
+    const categoryBtns = document.querySelectorAll('.faq-category-btn');
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    categoryBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+
+            // Set active button
+            categoryBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            const category = this.dataset.category;
+
+            // Filter item
+            faqItems.forEach(item => {
+                if (item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Tutup semua accordion saat ganti kategori
+            faqQuestions.forEach(q => {
+                q.classList.remove('active');
+                q.nextElementSibling.style.maxHeight = '0';
+                q.nextElementSibling.style.padding = '0 30px 0 30px';
+            });
+        });
+    });
+
+
+    // ================================
+    // DEFAULT CATEGORY (UMUM)
+    // ================================
+    const defaultCategory = 'umum';
+
+    categoryBtns.forEach(btn => {
+        if (btn.dataset.category === defaultCategory) {
+            btn.classList.add('active');
+        }
+    });
+
+    faqItems.forEach(item => {
+        if (item.dataset.category === defaultCategory) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+});
+</script>
+
+<script>
+window.onload = function() {
+    if (!localStorage.getItem("email_popup_shown")) {
+        setTimeout(() => {
+            document.getElementById("emailModal").style.display = "flex";
+        }, 2000); // muncul setelah 2 detik
+
+        localStorage.setItem("email_popup_shown", "true");
+    }
+}
+
+function closeModal() {
+    document.getElementById("emailModal").style.display = "none";
+}
+</script>
+
+<!-- IKLAN -->
+<!-- EMAIL CAPTURE MODAL -->
+<div id="emailModal" class="email-modal">
+    <div class="email-box">
+        <span class="close-btn" onclick="closeModal()">×</span>
+        
+        <h2>Dapatkan Info Properti Terbaru!</h2>
+        <p>Masukkan email kamu untuk dapat promo & rekomendasi terbaik 🔥</p>
+
+        <form method="POST" action="{{ route('save-email-visitor') }}">
+            @csrf
+            <input type="email" name="email" placeholder="Masukkan email..." required>
+            <button type="submit">Daftar Sekarang</button>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>

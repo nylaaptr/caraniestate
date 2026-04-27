@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifikasi - PropertiHarmoni</title>
+    <title>Notifikasi - Carani Estate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -559,64 +559,105 @@
     <!-- Main Content -->
     <div class="main-content">
         <h1 class="page-title">Notifikasi</h1>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div>
+                <input type="checkbox" id="selectAll">
+                <label for="selectAll">Pilih Semua</label>
+            </div>
+
+            <button id="deleteSelected"
+                style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:8px; cursor:pointer;">
+                <i class="fas fa-trash"></i> Hapus Terpilih
+            </button>
+
+        </div>
         
         <div class="notification-list">
-            <!-- Notification 1 -->
-            <div class="notification-item">
-                <div class="notification-icon-container mail">
-                    <i class="fas fa-envelope"></i>
-                </div>
-                <div class="notification-content">
-                    <h3 class="notification-title">Dokumen telah diverifikasi oleh admin</h3>
-                    <p class="notification-description">Silahkan lanjut ke proses transaksi</p>
-                </div>
-                <div class="notification-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </div>
+            @forelse($notifikasi ?? [] as $n)
+            {{-- ✅ Mapping tipe notifikasi ke icon & style yang sudah ada --}}
+            @php
+                // Tentukan icon & class berdasarkan tipe notifikasi
+                switch($n->tipe) {
+                    case 'pemesanan':
+                    case 'transaksi':
+                        $icon = 'fa-shopping-cart';
+                        $iconClass = 'mail'; // pakai class existing
+                        break;
+                    case 'dokumen':
+                    case 'verifikasi':
+                        $icon = 'fa-file-check';
+                        $iconClass = 'info';
+                        break;
+                    case 'peringatan':
+                    case 'tagihan':
+                        $icon = 'fa-exclamation-triangle';
+                        $iconClass = 'warning';
+                        break;
+                    default:
+                        $icon = 'fa-bell';
+                        $iconClass = 'mail';
+                }
+                
+                // Tentukan link tujuan berdasarkan referensi
+                $link = '#';
+                if($n->referensi_tipe == 'transaksi' && $n->referensi_id) {
+                    $link = route('detail-pemesanan', $n->referensi_id);
+                } elseif($n->referensi_tipe == 'dokumen' && $n->referensi_id) {
+                    $link = route('admin.halaman_verifikasi'); // atau route dokumen
+                }
+            @endphp
             
-            <!-- Notification 2 -->
-            <div class="notification-item">
-                <div class="notification-icon-container warning">
-                    <i class="fas fa-exclamation-triangle"></i>
+            <a href="{{ $link }}" style="text-decoration:none; color:inherit; display:block;">
+                <div class="notification-item {{ $n->status_baca == 0 ? 'unread' : '' }}">
+                    <input type="checkbox" class="notif-checkbox" value="{{ $n->id_notifikasi }}" 
+                        onclick="event.stopPropagation();">
+
+                    <div class="notification-icon-container {{ $iconClass }}">
+                        <i class="fas {{ $icon }}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h3 class="notification-title">{{ $n->judul }}</h3>
+                        <p class="notification-description">{{ $n->pesan }}</p>
+                        <small class="text-muted" style="font-size:0.8rem;">
+                            {{ \Carbon\Carbon::parse($n->created_at)->diffForHumans() }}
+                        </small>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+
+                        {{-- 🗑 HAPUS NOTIF --}}
+                        <form id="bulkDeleteForm" method="POST" action="{{ route('notifikasi.hapus.massal') }}">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="ids" id="selectedIds">
+                        </form>
+
+                        {{-- ➡️ PANAH --}}
+                        <div class="notification-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+
+                    </div>
                 </div>
-                <div class="notification-content">
-                    <h3 class="notification-title">Jangan Lupa Bayar Cicilan</h3>
-                    <p class="notification-description">Paling lambat tanggal 05/06</p>
+            </a>
+            @empty
+            {{-- ✅ Empty state: class tetap sama --}}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-bell-slash"></i>
                 </div>
-                <div class="notification-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
+                <h3 class="empty-title">Belum Ada Notifikasi</h3>
+                <p class="empty-description">Kamu akan menerima notifikasi saat ada update pemesanan atau verifikasi dokumen.</p>
             </div>
-            
-            <!-- Notification 3 -->
-            <div class="notification-item">
-                <div class="notification-icon-container info">
-                    <i class="fas fa-info-circle"></i>
-                </div>
-                <div class="notification-content">
-                    <h3 class="notification-title">Jadwal Survey Lokasi</h3>
-                    <p class="notification-description">Sabtu, 10 Juni 2025 pukul 10.00 WIB di Kelapa Gading Regency</p>
-                </div>
-                <div class="notification-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </div>
-            
-            <!-- Notification 4 -->
-            <div class="notification-item">
-                <div class="notification-icon-container mail">
-                    <i class="fas fa-envelope"></i>
-                </div>
-                <div class="notification-content">
-                    <h3 class="notification-title">Konfirmasi Pembayaran</h3>
-                    <p class="notification-description">Pembayaran DP Rp 50.000.000 telah diterima. Terima kasih!</p>
-                </div>
-                <div class="notification-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </div>
+            @endforelse
         </div>
+
+        {{-- ✅ Pagination (jika pakai) - class Bootstrap tetap utuh --}}
+        @if(isset($notifikasi) && method_exists($notifikasi, 'links'))
+        <div class="mt-4">
+            {{ $notifikasi->links() }}
+        </div>
+        @endif
     </div>
 
     <script>
@@ -685,6 +726,28 @@
                 this.style.background = '';
             });
         });
+
+        // Tambahkan di akhir script
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                // Jangan jalankan jika klik di elemen yang tidak ingin trigger
+                if(e.target.closest('a')) {
+                    const notifId = this.dataset.id;
+                    
+                    // Mark as read via AJAX (tanpa reload)
+                    if(notifId) {
+                        fetch(`/notifikasi/${notifId}/read`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({})
+                        }).catch(err => console.log('Gagal update status baca:', err));
+                    }
+                }
+            });
+        });
         
         // Pagination functionality
         document.querySelectorAll('.page-item').forEach(item => {
@@ -700,6 +763,43 @@
             document.getElementById('navMenu').classList.toggle('show');
         }
     </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.notif-checkbox');
+    const deleteBtn = document.getElementById('deleteSelected');
+    const selectedIdsInput = document.getElementById('selectedIds');
+
+    // SELECT ALL
+    selectAll.addEventListener('change', function() {
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+
+    // DELETE SELECTED
+    deleteBtn.addEventListener('click', function() {
+        let selected = [];
+
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                selected.push(cb.value);
+            }
+        });
+
+        if (selected.length === 0) {
+            alert('Pilih notifikasi dulu!');
+            return;
+        }
+
+        if (!confirm('Hapus notifikasi terpilih?')) return;
+
+        selectedIdsInput.value = selected.join(',');
+        document.getElementById('bulkDeleteForm').submit();
+    });
+
+});
+</script>
 </body>
 </html>
 

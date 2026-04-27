@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar - PropertiHarmoni</title>
+    <title>Daftar - Carani Estate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -431,6 +431,25 @@
                         <input type="tel" class="form-control" id="phone" placeholder="Contoh: 081234567890" required>
                     </div>
                 </div>
+
+                <!-- Tambahkan setelah field "Nomor HP", sebelum "Password" -->
+                <div class="form-group">
+                    <label for="pekerjaan" class="form-label">Pekerjaan</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-briefcase"></i>
+                        </span>
+                        <input type="text" 
+                            class="form-control" 
+                            id="pekerjaan" 
+                            name="pekerjaan"
+                            value="{{ old('pekerjaan') }}"
+                            placeholder="Contoh: Pegawai Swasta / Wiraswasta / PNS">
+                    </div>
+                    <small style="color: #64748b; font-size: 0.8rem; margin-top: 4px; display: block;">
+                        <i class="fas fa-info-circle"></i> Opsional, bisa diisi nanti
+                    </small>
+                </div>
                 
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
@@ -458,13 +477,14 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn-register w-100">
-                    <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
-                </button>
-                
-                <div class="login-link">
-                    <p>Sudah memiliki akun? <a href="#">Login di sini</a></p>
-                </div>
+                <a href="{{ route('welcome') }}" class="btn-register w-100 d-block text-center">
+                    Daftar Sekarang
+                </a>
+
+                <p>
+                    Sudah memiliki akun?
+                    <a href="{{ route('login') }}">Login di sini</a>
+                </p>
             </form>
         </div>
     </div>

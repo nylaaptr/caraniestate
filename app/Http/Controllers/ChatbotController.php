@@ -4,110 +4,68 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-// app/Http/Controllers/ChatbotController.php
-class ChatbotController extends Controller
+class ChatBotController extends Controller
 {
-    public function index()
+    public function sendMessage(Request $request)
     {
-        return view('halaman-chatbot');
-    }
+        $message = strtolower(trim($request->input('message')));
+        
+        // Database pengetahuan (bisa nanti dipindah ke database MySQL jika mau)
+        $responses = [
+            [
+                'keywords' => ['halo', 'hai', 'hello', 'pagi', 'siang', 'malam'],
+                'reply' => "Halo kak! 👋 Selamat datang di Carani Estate. Ada yang bisa dibantu hari ini?",
+                'options' => ["Cari Rumah", "Info KPR", "Lokasi Kantor"]
+            ],
+            [
+                'keywords' => ['harga', 'biaya', 'mahal', 'murah', 'budget', 'dp'],
+                'reply' => "Untuk harga, kami punya banyak pilihan mulai dari Rp 500 jutaan sampai miliaran, Kak. 😊 Kamu lagi cari properti di daerah mana nih?",
+                'options' => ["Daerah Malang", "Daerah Batu", "Budget < 1 Milyar"]
+            ],
+            [
+                'keywords' => ['kpr', 'kredit', 'bank', 'cicil', 'bunga'],
+                'reply' => "Siap! Untuk KPR, bunganya mulai dari 4% fixed tahun pertama lho. 🏦 Mau aku hitungin simulasi cicilannya sekalian?",
+                'options' => ["Hitung Simulasi", "Syarat Dokumen"]
+            ],
+            [
+                'keywords' => ['lokasi', 'alamat', 'dimana', 'tempat', 'kantornya'],
+                'reply' => "Kantor pemasaran kami ada di pusat kota, strategis banget! 📍 Mau dikirim lokasi Google Maps-nya?",
+                'options' => ["Kirim Peta", "Jadwalkan Kunjungan"]
+            ],
+            [
+                'keywords' => ['tipe', 'jenis', 'rumah', 'apartemen', 'spesifikasi', 'luas'],
+                'reply' => "Kami punya tipe Minimalis Modern dan Industrial Kekinian. Keduanya udah include kanopi & pagar loh! 🏠 Kamu lebih suka yang mana?",
+                'options' => ["Lihat Foto Tipe A", "Lihat Foto Tipe B"]
+            ]
+        ];
 
-    public function reply(Request $request)
-    {
-        $pesan = strtolower($request->input('pesan'));
-        $balasan = $this->prosesPersan($pesan);
+        $bestMatch = null;
+        $highestScore = 0;
 
-        // Simpan ke tabel chat_messages
-        ChatMessage::create([
-            'session_id' => session()->getId(),
-            'pengirim'   => 'user',
-            'pesan'      => $request->input('pesan'),
-        ]);
-        ChatMessage::create([
-            'session_id' => session()->getId(),
-            'pengirim'   => 'bot',
-            'pesan'      => $balasan,
-        ]);
-
-        return response()->json(['balasan' => $balasan]);
-    }
-
-    private function prosesPersan($pesan)
-    {
-        // Rekomendasi berdasarkan budget
-        if (str_contains($pesan, 'subsidi') || str_contains($pesan, 'murah')) {
-            return $this->rekomendasiProperti('subsidi');
-        }
-        if (str_contains($pesan, 'type 36') || str_contains($pesan, 'tipe 36')) {
-            return $this->rekomendasiProperti('36');
-        }
-        if (str_contains($pesan, 'type 45') || str_contains($pesan, 'tipe 45')) {
-            return $this->rekomendasiProperti('45');
-        }
-        if (str_contains($pesan, 'ruko')) {
-            return $this->rekomendasiProperti('ruko');
-        }
-
-        // Pertanyaan harga
-        if (str_contains($pesan, 'harga') || str_contains($pesan, 'berapa')) {
-            return "Harga properti kami mulai dari:\n
-            - Type 30 (Subsidi): Rp 162.000.000\n
-            - Type 36: Rp 200.000.000\n
-            - Type 45: Rp 300.000.000\n
-            - Type 60: Rp 435.000.000\n
-            - Ruko: Rp 600.000.000\n
-            Mau tanya type yang mana?";
+        // Algoritma pencocokan sederhana (Naive Logic)
+        foreach ($responses as $data) {
+            $score = 0;
+            foreach ($data['keywords'] as $keyword) {
+                if (str_contains($message, $keyword)) {
+                    $score++;
+                }
+            }
+            if ($score > $highestScore) {
+                $highestScore = $score;
+                $bestMatch = $data;
+            }
         }
 
-        // Pertanyaan KPR
-        if (str_contains($pesan, 'kpr') || str_contains($pesan, 'kredit')) {
-            return "Kami melayani KPR dengan tenor 10-20 tahun. 
-            Syaratnya KTP, KK, slip gaji, dan NPWP. 
-            Mau tahu cicilan untuk type berapa?";
+        if ($bestMatch && $highestScore > 0) {
+            return response()->json([
+                'reply' => $bestMatch['reply'],
+                'options' => $bestMatch['options']
+            ]);
+        } else {
+            return response()->json([
+                'reply' => "Waduh, maaf Kak, saya belum paham maksudnya 😅. Bisa coba tanya tentang 'Harga', 'KPR', atau 'Lokasi'?",
+                'options' => ["Tanya Harga", "Tanya KPR"]
+            ]);
         }
-
-        // Pertanyaan cicilan
-        if (str_contains($pesan, 'cicil') || str_contains($pesan, 'angsuran')) {
-            return "Estimasi angsuran KPR per bulan:\n
-            - Type 36 (10th): Rp 1.875.900\n
-            - Type 45 (10th): Rp 2.813.800\n
-            - Type 60 (10th): Rp 4.080.000\n
-            Mau simulasi tenor yang lain?";
-        }
-
-        // Salam
-        if (str_contains($pesan, 'halo') || str_contains($pesan, 'hai') || 
-            str_contains($pesan, 'hello')) {
-            return "Halo! Selamat datang di Kelapa Gading Regency 🏠
-            Saya siap membantu kamu menemukan rumah impian.
-            Boleh saya tahu budget dan kebutuhan kamu?";
-        }
-
-        // Default
-        return "Maaf, saya belum mengerti pertanyaanmu. 
-        Kamu bisa tanya tentang:\n
-        - Harga properti\n
-        - Type rumah (36, 45, 60, Ruko)\n
-        - KPR & cicilan\n
-        - Cara booking";
-    }
-
-    private function rekomendasiProperti($type)
-    {
-        $properti = Properti::where('type', 'like', "%$type%")
-                    ->where('status', 'tersedia')
-                    ->get();
-
-        if ($properti->isEmpty()) {
-            return "Maaf, properti type $type sedang tidak tersedia. 
-            Mau lihat type lain?";
-        }
-
-        $hasil = "Rekomendasi properti type $type yang tersedia:\n";
-        foreach ($properti as $p) {
-            $hasil .= "- Blok {$p->blok}, Harga: Rp " . 
-                    number_format($p->harga, 0, ',', '.') . "\n";
-        }
-        return $hasil;
     }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Dokumen - PropertiHarmoni</title>
+    <title>Verifikasi Dokumen - Carani Estate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -305,6 +305,7 @@
             border: none;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .filter-btn.active {
@@ -783,13 +784,13 @@
                 
                 {{-- Filter --}}
                 <div class="filter-controls">
-                    <a href="{{ route('halaman_verifikasi') }}" 
+                    <a href="{{ route('admin.halaman_verifikasi') }}" 
                     class="filter-btn {{ !request('status') ? 'active' : '' }}">Semua</a>
-                    <a href="{{ route('halaman_verifikasi', ['status' => 'pending']) }}" 
+                    <a href="{{ route('admin.halaman_verifikasi', ['status' => 'pending']) }}" 
                     class="filter-btn {{ request('status') == 'pending' ? 'active' : '' }}">Menunggu</a>
-                    <a href="{{ route('halaman_verifikasi', ['status' => 'diterima']) }}" 
+                    <a href="{{ route('admin.halaman_verifikasi', ['status' => 'diterima']) }}" 
                     class="filter-btn {{ request('status') == 'diterima' ? 'active' : '' }}">Disetujui</a>
-                    <a href="{{ route('halaman_verifikasi', ['status' => 'ditolak']) }}" 
+                    <a href="{{ route('admin.halaman_verifikasi', ['status' => 'ditolak']) }}" 
                     class="filter-btn {{ request('status') == 'ditolak' ? 'active' : '' }}">Ditolak</a>
                 </div>
             </div>
@@ -815,77 +816,60 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($dokumen as $d)
-                        @php
-                            if ($d->status_verifikasi == 'pending') {
-                                $statusClass = 'status-pending';
-                                $statusLabel = 'Pending';
-                            } elseif ($d->status_verifikasi == 'diterima') {
-                                $statusClass = 'status-approved';
-                                $statusLabel = 'Disetujui';
-                            } elseif ($d->status_verifikasi == 'ditolak') {
-                                $statusClass = 'status-rejected';
-                                $statusLabel = 'Ditolak';
-                            } else {
-                                $statusClass = 'status-pending';
-                                $statusLabel = 'Revisi';
-                            }
-                        @endphp
+                        @forelse($user as $u)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $d->user->nama_user ?? '-' }}</td>
-                            <td>{{ $d->user->no_hp ?? '-' }}</td>
-                            <td>{{ $d->user->email_user ?? '-' }}</td>
-                            <td>{{ ucfirst(str_replace('_', ' ', $d->jenis_dokumen)) }}</td>
+                            <td>{{ $u->nama_user ?? '-' }}</td>
+                            <td>{{ $u->no_hp ?? '-' }}</td>
+                            <td>{{ $u->email_user ?? '-' }}</td>
+
                             <td>
-                                <a href="{{ asset('storage/' . $d->path_file) }}" 
-                                target="_blank" 
-                                style="color:var(--primary-blue); font-weight:600;">
-                                    <i class="fas fa-file"></i> Lihat File
-                                </a>
+                                {{ $u->dokumen->count() }} Dokumen
                             </td>
+
                             <td>
+                                -
+                            </td>
+
+                            <td>
+                                @php
+                                    $status = $u->dokumen->pluck('status_verifikasi');
+
+                                    if ($status->contains('pending')) {
+                                        $statusLabel = 'Pending';
+                                        $statusClass = 'status-pending';
+                                    } elseif ($status->every(fn($s) => $s == 'diterima')) {
+                                        $statusLabel = 'Disetujui';
+                                        $statusClass = 'status-approved';
+                                    } elseif ($status->contains('ditolak')) {
+                                        $statusLabel = 'Ditolak';
+                                        $statusClass = 'status-rejected';
+                                    } else {
+                                        $statusLabel = 'Revisi';
+                                        $statusClass = 'status-pending';
+                                    }
+                                @endphp
+
                                 <span class="status-badge {{ $statusClass }}">
                                     {{ $statusLabel }}
                                 </span>
                             </td>
-                            <td>
-                                @if($d->status_verifikasi == 'pending')
-                                <div style="display:flex; gap:5px;">
-                                    {{-- Approve --}}
-                                    <form method="POST" action="{{ route('verifikasi.approve', $d->id_dokumen) }}">
-                                        @csrf
-                                        <button type="submit" 
-                                                style="background:#059669; color:white; border:none; 
-                                                    padding:6px 12px; border-radius:8px; cursor:pointer;
-                                                    font-size:0.85rem;"
-                                                onclick="return confirm('Setujui dokumen ini?')">
-                                            <i class="fas fa-check"></i> Setujui
-                                        </button>
-                                    </form>
 
-                                    {{-- Tolak --}}
-                                    @php $dokumenId = $d->id_dokumen; @endphp
-                                    <button onclick="showTolakModal({{ $id_dokumen }})"
-                                            style="background:#dc2626; color:white; border:none; 
-                                                padding:6px 12px; border-radius:8px; cursor:pointer;
-                                                font-size:0.85rem;">
-                                        <i class="fas fa-times"></i> Tolak
-                                    </button>
-                                </div>
-                                @else
-                                    <span style="color:#94a3b8; font-size:0.85rem;">Sudah diproses</span>
-                                @endif
+                            <td>
+                                <a href="{{ route('admin.verifikasi_dokumen', $u->id_user) }}"
+                                style="color:#2563eb; font-size:1.2rem;">
+                                    <i class="fas fa-eye"></i>
+                                </a>
                             </td>
                         </tr>
                         @empty
                         <tr>
                             <td colspan="8" style="text-align:center; padding:30px; color:#64748b;">
-                                Belum ada dokumen
+                                Belum ada data user
                             </td>
                         </tr>
                         @endforelse
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>

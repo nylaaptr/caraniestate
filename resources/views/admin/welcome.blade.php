@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - PropertiHarmoni</title>
+    <title>Dashboard Admin - Carani Estate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -630,31 +630,34 @@
         <!-- Dashboard Stats -->
         <div class="dashboard-stats">
             <div class="stat-card">
-                <div class="stat-title">Total Pengguna</div>
-                <div class="stat-value">2,458</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    +12% dari bulan lalu
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-title">Properti Aktif</div>
-                <div class="stat-value">1,892</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    +8% dari bulan lalu
-                </div>
-            </div>
-            
-            
-            
-            <div class="stat-card">
-                <div class="stat-title">Verifikasi Pending</div>
-                <div class="stat-value">23</div>
+                <div class="stat-title">Visitor</div>
+                <div class="stat-value">5,200</div>
                 <div class="stat-change">
-                    <i class="fas fa-clock"></i>
-                    Perlu segera diproses
+                    Pengunjung website
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">Leads</div>
+                <div class="stat-value">320</div>
+                <div class="stat-change positive">
+                    Isi email / tertarik
+                </div>
+            </div>
+
+            <!-- <div class="stat-card">
+                <div class="stat-title">User Terdaftar</div>
+                <div class="stat-value">180</div>
+                <div class="stat-change positive">
+                    Sudah login akun
+                </div>
+            </div> -->
+
+            <div class="stat-card">
+                <div class="stat-title">Transaksi</div>
+                <div class="stat-value">75</div>
+                <div class="stat-change positive">
+                    Pembelian berhasil
                 </div>
             </div>
         </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Properti - PropertiHarmoni</title>
+    <title>Detail Properti - Carani Estate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -1290,7 +1290,7 @@
                                 <div class="description-section" style="padding:0; box-shadow:none; background:transparent;">
                                     <div class="description-content" style="font-size:0.95rem;">
                                         <p style="margin:10px 0;">
-                                            {{ $properti->nama_properti }} merupakan properti {{ $properti->jenis_properti }} 
+                                            {{ $properti->nama_properti }} merupakan properti {{ $properti->jenis_properti }} php
                                             kategori {{ $properti->kategori_properti }}.
                                         </p>
                                         <ul style="padding-left:20px; margin:10px 0;">
@@ -1318,32 +1318,7 @@
                 <!-- KOLOM KANAN: Property Info (SIDEBAR) -->
                 <div class="property-info">
                     <!-- Contact Section -->
-                    <div class="contact-section">
-                        <h3 class="contact-title">Hubungi Agen Properti</h3>
-                        <div class="agent-info">
-                            <div class="agent-avatar">A</div>
-                            <div class="agent-details">
-                                <div class="agent-name">Admin Carani Estate</div>
-                                <div class="agent-role">Konsultan Properti</div>
-                                <div class="agent-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <span>5.0</span>
-                                </div>
-                                <div class="agent-contact">
-                                    <a href="tel:+6281234567890" class="contact-btn btn-call">
-                                        <i class="fas fa-phone"></i> Hubungi
-                                    </a>
-                                    <a href="https://wa.me/6281234567890" class="contact-btn btn-whatsapp">
-                                        <i class="fab fa-whatsapp"></i> WhatsApp
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
 
                     <h1 class="property-title">{{ $properti->nama_properti }}</h1>
                     
@@ -1367,7 +1342,12 @@
                                 <i class="fas fa-shopping-cart"></i> Beli Sekarang
                             </a>
                         @else
-                            <a href="{{ route('login') }}?redirect={{ urlencode(url()->current()) }}" 
+                            @php
+                                // 🔥 PENTING: Gunakan URL RELATIF saja (dimulai dengan /)
+                                $targetUrl = '/form-pemesanan/' . $properti->id_properti;
+                            @endphp
+                            
+                            <a href="{{ route('login') }}?redirect={{ urlencode($targetUrl) }}" 
                             class="contact-btn"
                             style="background:var(--dark-blue); color:white; border-radius:12px; 
                                     padding:14px; font-weight:600; text-decoration:none;
@@ -1508,15 +1488,15 @@
             });
         });
         
-        // Contact buttons
-        document.querySelectorAll('.contact-btn').forEach(btn => {
+        // Contact buttons - HANYA untuk agen kontak
+        document.querySelectorAll('.agent-contact .contact-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const action = this.textContent.trim();
                 if (action.includes('WhatsApp')) {
-                    alert('Mengarahkan ke WhatsApp...');
+                    window.open('https://wa.me/6281234567890', '_blank');
                 } else if (action.includes('Hubungi')) {
-                    alert('Mengarahkan ke panggilan telepon...');
+                    window.location.href = 'tel:+6281234567890';
                 }
             });
         });

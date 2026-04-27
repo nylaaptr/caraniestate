@@ -16,7 +16,7 @@ class Transaksi extends Model
         'id_properti',
         'tanggal_transaksi',
         'total_harga',
-        'jenis_pembayaran',
+        'jenis_transaksi',
         'status_transaksi',
     ];
 

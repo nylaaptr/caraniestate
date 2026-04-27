@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Pemesanan - PropertiHarmoni</title>
+    <title>Riwayat Pemesanan - Carani Estate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -541,6 +541,99 @@
         .btn-primary:hover {
             background: #6aa5c6;
         }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-blue);
+            color: white;
+            padding: 50px 30px 20px;
+            margin-top: 80px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--primary-blue);
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-blue);
+        }
+        
+        .footer-contact p {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-contact i {
+            color: var(--primary-blue);
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            background: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #cbd5e0;
+        }
         
         /* Responsive Design */
         @media (max-width: 992px) {
@@ -906,6 +999,60 @@
             </div>
         </div>
     </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Carani Estate</h3>
+                    <p>Platform terpercaya untuk membeli, menjual, dan menyewa properti sejak 2015.</p>
+                    <div class="footer-social">
+                        <div class="social-icon"><i class="fab fa-facebook-f"></i></div>
+                        <div class="social-icon"><i class="fab fa-twitter"></i></div>
+                        <div class="social-icon"><i class="fab fa-instagram"></i></div>
+                        <div class="social-icon"><i class="fab fa-linkedin-in"></i></div>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Tautan Cepat</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Beranda</a></li>
+                        <li><a href="#">Katalog Properti</a></li>
+                        <li><a href="#">ChatBot</a></li>
+                        <li><a href="#">Riwayat Pemesanan</a></li>
+                        <li><a href="#">Tentang Kami</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Layanan</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Pembelian Properti</a></li>
+                        <li><a href="#">Penjualan Properti</a></li>
+                        <li><a href="#">Sewa Properti</a></li>
+                        <li><a href="#">Konsultasi Properti</a></li>
+                        <li><a href="#">Finansial & KPR</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Kontak Kami</h3>
+                    <div class="footer-contact">
+                        <p><i class="fas fa-map-marker-alt"></i> Jl. Raya Pakisan, Bunduh, Bataan, Kec. Tenggarang, Kabupaten Bondowoso, Jawa Timur 68271</p>
+                        <p><i class="fas fa-phone"></i> 0812-3456-7890</p>
+                        <p><i class="fas fa-envelope"></i> caranibhanubalakosa@gmail.com</p>
+                        <p><i class="fas fa-clock"></i> Senin - Sabtu: 08:00 - 17:00</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                &copy; 2025 CaraniEstate. Semua hak dilindungi.
+            </div>
+        </div>
+    </footer>
 
     <script>
         function toggleDropdown() {
