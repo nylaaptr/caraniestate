@@ -148,6 +148,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .profile-icon:hover {
@@ -188,21 +189,25 @@
             margin-bottom: 40px;
         }
         
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
+        /* Profilll */
+        .profile-avatar,
+        .profile-avatar-default {
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
-            background: var(--primary-blue);
+            object-fit: cover;
+            text-decoration: none;
+        }
+
+        .profile-avatar-default {
+            background: #7AB2D3;
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 36px;
-            font-weight: 700;
-            color: white;
-            border: 4px solid #f8fafc;
-            box-shadow: 0 8px 20px rgba(122, 178, 211, 0.3);
-        }
+            font-weight: bold;
+            text-decoration: none;
+        } 
         
         .profile-name {
             font-size: 1.8rem;
@@ -224,14 +229,14 @@
             margin: auto;
         }
 
-        .profile-avatar,
+        .profile-avatar-2,
         .profile-avatar-img {
             width: 80px;
             height: 80px;
             border-radius: 50%;
         }
 
-        .profile-avatar {
+        .profile-avatar-2 {
             background: #7AB2D3;
             color: white;
             font-size: 2rem;
@@ -431,6 +436,7 @@
             box-shadow: 0 6px 20px rgba(var(--primary-blue-rgb), 0.3);
         }
 
+
         
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -586,6 +592,7 @@
     </style>
 </head>
 <body>
+    {{ Auth::check() ? 'LOGIN BERHASIL' : 'BELUM LOGIN' }}
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -653,16 +660,41 @@
 
                 {{-- Guest --}}
                 @guest
-                    <a href="{{ route('login') }}" class="nav-item login-link">
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
                     {{-- HANYA ICON PROFILE --}}
                     <a href="{{ route('halaman-profil') }}" class="profile-icon">
-                        <img src="{{ Auth::user()->profile_photo 
-                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
-                            : asset('default-avatar.png') }}" 
-                            alt="Profile" class="profile-img">
+                        @php
+                            $user = Auth::user();
+                        @endphp
+
+                        {{-- Prioritas 1: Foto upload user --}}
+                        @if($user->profile_photo)
+
+                            <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
+                                class="profile-avatar"
+                                alt="Profile Photo">
+
+                        {{-- Prioritas 2: Foto Google --}}
+                        @elseif($user->google_avatar)
+
+                            <img src="{{ $user->google_avatar }}"
+                                class="profile-avatar"
+                                referrerpolicy="no-referrer"
+                                alt="Google Photo"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}'">
+
+                        {{-- Prioritas 3: Inisial --}}
+                        @else
+
+                            <div class="profile-avatar-default">
+                                {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                            </div>
+
+                        @endif
+
                     </a>
                 @endguest
             </div>
@@ -675,7 +707,7 @@
 
             @php
                 $user = Auth::user();
-                $inisial = strtoupper(substr($user->name, 0, 1));
+                $inisial = strtoupper(substr($user->nama_user, 0, 1));
             @endphp
 
             <!-- Profile Header -->
@@ -687,10 +719,18 @@
 
                 <div class="avatar-wrapper">
                     @if($user->profile_photo)
-                        <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}" 
+                        <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
                             class="profile-avatar-img">
+
+                    @elseif($user->google_avatar)
+                        <img src="{{ $user->google_avatar }}"
+                            referrerpolicy="no-referrer"
+                            class="profile-avatar-img">
+
                     @else
-                        <div class="profile-avatar">{{ $inisial }}</div>
+                        <div class="profile-avatar-2">
+                            {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                        </div>
                     @endif
 
                     <!-- tombol upload -->

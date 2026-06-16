@@ -145,6 +145,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .profile-icon:hover {
@@ -577,6 +578,24 @@
             background: #cbd5e0;
             transform: translateY(-2px);
         }
+
+        /* Profilll */
+            .profile-avatar,
+            .profile-avatar-default {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .profile-avatar-default {
+                background: #7AB2D3;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+            }
         
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -649,6 +668,8 @@
 </head>
 <body>
     <!-- Header -->
+    {{ Auth::check() ? 'LOGIN BERHASIL' : 'BELUM LOGIN' }}
+    <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="logo">
@@ -715,16 +736,41 @@
 
                 {{-- Guest --}}
                 @guest
-                    <a href="{{ route('login') }}" class="nav-item login-link">
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
                     {{-- HANYA ICON PROFILE --}}
                     <a href="{{ route('halaman-profil') }}" class="profile-icon">
-                        <img src="{{ Auth::user()->profile_photo 
-                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
-                            : asset('default-avatar.png') }}" 
-                            alt="Profile" class="profile-img">
+                        @php
+                            $user = Auth::user();
+                        @endphp
+
+                        {{-- Prioritas 1: Foto upload user --}}
+                        @if($user->profile_photo)
+
+                            <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
+                                class="profile-avatar"
+                                alt="Profile Photo">
+
+                        {{-- Prioritas 2: Foto Google --}}
+                        @elseif($user->google_avatar)
+
+                            <img src="{{ $user->google_avatar }}"
+                                class="profile-avatar"
+                                referrerpolicy="no-referrer"
+                                alt="Google Photo"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}'">
+
+                        {{-- Prioritas 3: Inisial --}}
+                        @else
+
+                            <div class="profile-avatar-default">
+                                {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                            </div>
+
+                        @endif
+
                     </a>
                 @endguest
             </div>

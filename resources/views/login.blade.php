@@ -157,14 +157,14 @@
         }
         
         .form-group {
-            margin-bottom: 22px;
+            margin-bottom: 15px;
             position: relative;
         }
         
         .form-label {
             font-weight: 600;
             color: #2d3748;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-size: 0.95rem;
         }
         
@@ -450,20 +450,24 @@
                     <i class="fas fa-home"></i>
                 </div>
                 <h1 class="branding-title">Carani Estate</h1>
-                <p class="branding-subtitle">Platform terpercaya untuk membeli, menjual, dan menyewa properti berkualitas sejak 2015</p>
-                
+                <p class="branding-subtitle">
+                    Platform properti terpercaya untuk membantu Anda menemukan dan membeli properti dengan proses yang mudah dan aman.
+                </p>
+
                 <ul class="features-list">
                     <li class="feature-item">
                         <i class="fas fa-check-circle"></i>
-                        <span>Lebih dari 10.000 properti tersedia</span>
+                        <span>Menyediakan pilihan rumah dan ruko berkualitas</span>
                     </li>
+
                     <li class="feature-item">
                         <i class="fas fa-check-circle"></i>
-                        <span>Proses transaksi aman dan transparan</span>
+                        <span>Proses pemesanan dan pembayaran lebih mudah</span>
                     </li>
+
                     <li class="feature-item">
                         <i class="fas fa-check-circle"></i>
-                        <span>Dukungan customer service 24/7</span>
+                        <span>Tim siap membantu kebutuhan properti Anda</span>
                     </li>
                 </ul>
             </div>
@@ -533,6 +537,21 @@
                 <button type="submit" class="btn-login w-100">
                     <i class="fas fa-sign-in-alt me-2"></i>Masuk ke Akun
                 </button>
+
+                <div class="divider">
+                    <span>atau</span>
+                </div>
+
+                <a href="{{ route('google.login') }}" class="btn btn-light w-100"
+                style="
+                    border:2px solid #e2e8f0;
+                    padding:14px;
+                    border-radius:14px;
+                    font-weight:600;
+                ">
+                    <i class="fab fa-google me-2"></i>
+                    Login dengan Google
+                </a>
 
                 <!-- 🔥 TAMBAHAN: Link ke Register -->
                 <div class="signup-link">

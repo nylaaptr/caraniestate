@@ -148,6 +148,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .profile-icon:hover {
@@ -169,11 +170,11 @@
         
         /* Hero Section */
         .hero {
-            background: url('') no-repeat center center;
+            background: url("{{ asset('images/header1.webp') }}") no-repeat center center;
             background-size: cover;
             padding: 150px 30px 100px;
             position: relative;
-            margin-top: 80px;
+            /* margin-top: 80px; */
         }
         
         .hero-overlay {
@@ -911,7 +912,7 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: rgba(122, 178, 211, 0.4); /* primary-blue */
+            background: linear-gradient(rgba(30, 58, 95, 0.8), rgba(30, 58, 95, 0.8)); /* primary-blue */
         }
 
         /* Content */
@@ -967,9 +968,9 @@
 
         /* PRIMARY BUTTON */
         .call-to-action-1 .cta-buttons .btn.btn-primary {
-            background-color: var(--dark-blue);
+            background-color: var(--primary-blue);
             color: white;
-            border-color: var(--dark-blue);
+            border-color: var(--primary-blue);
         }
 
         .call-to-action-1 .cta-buttons .btn.btn-primary:hover {
@@ -1613,6 +1614,26 @@
             font-size: 0.9rem;
             color: #cbd5e0;
         }
+
+
+        /* Profilll */
+        .profile-avatar,
+        .profile-avatar-default {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-avatar-default {
+            background: #7AB2D3;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            text-decoration: none;
+        } 
         
         /* Responsive Design */
         @media (max-width: 992px) {
@@ -1953,6 +1974,7 @@
     </style>
 </head>
 <body>
+    {{ Auth::check() ? 'LOGIN BERHASIL' : 'BELUM LOGIN' }}
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -2026,10 +2048,35 @@
                 @else
                     {{-- HANYA ICON PROFILE --}}
                     <a href="{{ route('halaman-profil') }}" class="profile-icon">
-                        <img src="{{ Auth::user()->profile_photo 
-                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
-                            : asset('default-avatar.png') }}" 
-                            alt="Profile" class="profile-img">
+                        @php
+                            $user = Auth::user();
+                        @endphp
+
+                        {{-- Prioritas 1: Foto upload user --}}
+                        @if($user->profile_photo)
+
+                            <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
+                                class="profile-avatar"
+                                alt="Profile Photo">
+
+                        {{-- Prioritas 2: Foto Google --}}
+                        @elseif($user->google_avatar)
+
+                            <img src="{{ $user->google_avatar }}"
+                                class="profile-avatar"
+                                referrerpolicy="no-referrer"
+                                alt="Google Photo"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}'">
+
+                        {{-- Prioritas 3: Inisial --}}
+                        @else
+
+                            <div class="profile-avatar-default">
+                                {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                            </div>
+
+                        @endif
+
                     </a>
                 @endguest
             </div>
@@ -2037,24 +2084,24 @@
     </header>
     
     <section class="hero">
-    <div class="hero-overlay"></div>
+        <div class="hero-overlay"></div>
 
-    <!-- Konten teks kiri -->
-    <div class="hero-content">
-        <h1 class="hero-title">Temukan Rumah Impian Anda</h1>
-        <p class="hero-subtitle">
-            Kami membantu Anda menemukan properti terbaik sesuai kebutuhan dan anggaran.
-        </p>
+        <!-- Konten teks kiri -->
+        <div class="hero-content">
+            <h1 class="hero-title">Temukan Rumah Impian Anda</h1>
+            <p class="hero-subtitle">
+                Kami membantu Anda menemukan properti terbaik sesuai kebutuhan dan anggaran.
+            </p>
 
-        <div class="hero-buttons">
-            <a href="{{ route('halaman-katalog') }}" class="btn-primary" style="text-decoration: none; display: inline-block;">
-                Lihat Katalog
-            </a>
-            <a href="{{ route('tentang-kami') }}" class="btn-secondary" style="text-decoration: none; display: inline-block;">
-                Tentang Kami
-            </a>
+            <div class="hero-buttons">
+                <a href="{{ route('halaman-katalog') }}" class="btn-primary" style="text-decoration: none; display: inline-block;">
+                    Lihat Katalog
+                </a>
+                <a href="{{ route('tentang-kami') }}" class="btn-secondary" style="text-decoration: none; display: inline-block;">
+                    Tentang Kami
+                </a>
+            </div>
         </div>
-    </div>
 
     <!-- ✅ FORM PENCARIAN DI SINI -->
     <div class="hero-search">
@@ -2123,7 +2170,7 @@
                 </div>
                 
                 <div class="about-image">
-                    <img src="https://placehold.co/600x400/e6f2f8/1E3A5F?text=Gambar+Perusahaan" alt="Gambar Perusahaan">
+                    <img src="{{ asset('images/gambar-perusahaan.webp') }}" alt="Gambar Perusahaan">
                 </div>
             </div>
         </div>
@@ -2193,22 +2240,32 @@
                 <div class="service-card">
                     <div class="service-icon-wrapper">
                         <div class="service-icon">
-                            <i class="fas fa-hand-holding-usd"></i>
+                            <i class="fas fa-clipboard-list"></i>
                         </div>
                         <div class="service-icon-glow"></div>
                     </div>
-                    <h3 class="service-title">Pendampingan KPR</h3>
+
+                    <h3 class="service-title">Monitoring Pemesanan</h3>
+
                     <p class="service-description">
-                        Kami bantu proses pengajuan KPR Anda dari awal hingga cair, dengan bank partner terpercaya.
+                        Pantau seluruh proses pemesanan properti mulai dari verifikasi data hingga serah terima rumah secara transparan.
                     </p>
+
                     <ul class="service-list">
-                        <li><i class="fas fa-check"></i> Simulasi cicilan gratis</li>
-                        <li><i class="fas fa-check"></i> Bantuan dokumen lengkap</li>
-                        <li><i class="fas fa-check"></i> Proses cepat 7-14 hari</li>
+                        <li><i class="fas fa-check"></i> Tracking progres transaksi</li>
+                        <li><i class="fas fa-check"></i> Update status real-time</li>
+                        <li><i class="fas fa-check"></i> Dokumen digital lengkap</li>
                     </ul>
-                    <a href="{{ route('login') }}" class="service-link">
-                        Ajukan KPR <i class="fas fa-arrow-right"></i>
-                    </a>
+
+                    @auth
+                        <a href="{{ route('riwayat-pemesanan') }}" class="service-link">
+                            Lihat Monitoring <i class="fas fa-arrow-right"></i>
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="service-link">
+                            Login untuk Monitoring <i class="fas fa-arrow-right"></i>
+                        </a>
+                    @endauth
                 </div>
 
                 <!-- Service 4: Verifikasi & After-Sales -->
@@ -2240,7 +2297,7 @@
 
     <!-- Call To Action Section -->
         <section class="call-to-action-1 call-to-action-1 section" id="call-to-action">
-        <div class="cta-bg" style="background-image: url('assets/img/about/about-4.webp');"></div>
+        <div class="cta-bg" style="background-image: url('{{ asset('images/cta.webp') }}');"></div>
         <div class="container" data-aos="fade-up" data-aos-delay="100">
 
             <div class="row justify-content-center">
@@ -2252,7 +2309,7 @@
 
                 <div class="cta-buttons">
                     <a href="https://wa.me/6281234567890" target="_blank" class="btn btn-primary">Hubungi Kami Sekarang</a>
-                    <a href="properties.html" class="btn btn-outline">Lihat Properti</a>
+                    <a href="{{ route('halaman-katalog') }}" class="btn btn-outline">Lihat Properti</a>
                 </div>
 
                 <div class="cta-features">
@@ -2290,7 +2347,12 @@
                 @foreach($unggulan as $p)
                 <div class="properti-card">
                     <div class="properti-image">
-                        <img src="{{ asset('img/tipe36.jpg') }}" alt="{{ $p->nama_properti }}">
+                        <img
+                        src="{{ $p->gambar->first()
+                            ? asset('storage/images/' . $p->gambar->first()->path_gambar)
+                            : asset('images/placeholder-properti.png')
+                        }}"
+                        alt="{{ $p->nama_properti }}">
                     </div>
                     <div class="properti-content">
                         <span class="properti-label">{{ ucfirst($p->jenis_properti) }}</span>
@@ -2321,7 +2383,7 @@
 
 
     <!-- Testimoni Section -->
-<section class="testimoni">
+<!-- <section class="testimoni">
     <div class="testimoni-container">
         <h2 class="testimoni-title">Apa Kata Klien Kami</h2>
         <p class="testimoni-subtitle">
@@ -2396,7 +2458,7 @@
             <button class="slide-btn right" onclick="slideTestimoni(1)">❯</button>
         </div>
     </div>
-</section>
+</section> -->
 
 <!-- FAQ Section -->
     <section class="faq-section">
@@ -2633,7 +2695,6 @@
 
 
     
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -2651,24 +2712,15 @@
                 <div class="footer-column">
                     <h3>Tautan Cepat</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Beranda</a></li>
-                        <li><a href="#">Katalog Properti</a></li>
-                        <li><a href="#">ChatBot</a></li>
-                        <li><a href="#">Riwayat Pemesanan</a></li>
-                        <li><a href="#">Tentang Kami</a></li>
+                        <li><a href="{{ route('welcome') }}">Beranda</a></li>
+                        <li><a href="{{ route('halaman-katalog') }}">Katalog Properti</a></li>
+                        <li><a href="{{ route('halaman-chatbot') }}">ChatBot</a></li>
+                        <li><a href="{{ route('halaman-katalog') }}">Kontak</a></li>
+                        <li><a href="{{ route('tentang-kami') }}">Tentang Kami</a></li>
                     </ul>
                 </div>
                 
-                <div class="footer-column">
-                    <h3>Layanan</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Pembelian Properti</a></li>
-                        <li><a href="#">Penjualan Properti</a></li>
-                        <li><a href="#">Sewa Properti</a></li>
-                        <li><a href="#">Konsultasi Properti</a></li>
-                        <li><a href="#">Finansial & KPR</a></li>
-                    </ul>
-                </div>
+                
                 
                 <div class="footer-column">
                     <h3>Kontak Kami</h3>
@@ -2913,20 +2965,61 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<script>
-window.onload = function() {
-    if (!localStorage.getItem("email_popup_shown")) {
-        setTimeout(() => {
-            document.getElementById("emailModal").style.display = "flex";
-        }, 2000); // muncul setelah 2 detik
+<!-- TRACK VISITOR -->
+ <script>
+document.addEventListener('DOMContentLoaded', function() {
 
-        localStorage.setItem("email_popup_shown", "true");
+    // visitor hanya dihitung sekali per session
+    if (!sessionStorage.getItem('visitor_counted')) {
+
+        fetch("{{ route('track-visitor') }}", {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Content-Type": "application/json"
+            }
+        });
+
+        sessionStorage.setItem('visitor_counted', 'true');
     }
-}
 
-function closeModal() {
-    document.getElementById("emailModal").style.display = "none";
-}
+});
+</script>
+
+<!-- POP UP EMAIL -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const emailModal = document.getElementById('emailModal');
+
+    const leadSubmitted = localStorage.getItem('lead_submitted');
+    const popupShown = sessionStorage.getItem('popup_shown');
+
+    // kalau belum jadi lead
+    if (!leadSubmitted && !popupShown) {
+
+        setTimeout(() => {
+
+            emailModal.style.display = 'flex';
+
+            sessionStorage.setItem('popup_shown', 'true');
+
+        }, 15000);
+
+    }
+
+    window.closeModal = function() {
+        emailModal.style.display = 'none';
+    }
+
+    window.saveLeadPopup = function() {
+
+        // user sudah jadi lead
+        localStorage.setItem('lead_submitted', 'true');
+
+    }
+
+});
 </script>
 
 <!-- IKLAN -->
@@ -2935,10 +3028,10 @@ function closeModal() {
     <div class="email-box">
         <span class="close-btn" onclick="closeModal()">×</span>
         
-        <h2>Dapatkan Info Properti Terbaru!</h2>
-        <p>Masukkan email kamu untuk dapat promo & rekomendasi terbaik 🔥</p>
+        <h2>Dapatkan Update Properti & Promo Eksklusif</h2>
+        <p>Tinggalkan email untuk info unit terbaru, promo cicilan, dan rekomendasi properti yang sesuai.</p>
 
-        <form method="POST" action="{{ route('save-email-visitor') }}">
+        <form method="POST" action="{{ route('save-email-visitor') }}" onsubmit="saveLeadPopup()">
             @csrf
             <input type="email" name="email" placeholder="Masukkan email..." required>
             <button type="submit">Daftar Sekarang</button>

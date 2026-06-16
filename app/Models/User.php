@@ -10,48 +10,43 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    // ✅ Tentukan primary key kustom
+    // Nama tabel & primary key custom
     protected $table = 'user';
     protected $primaryKey = 'id_user';
-    public $incrementing = true; // atau false jika id_user bukan auto-increment
-    protected $keyType = 'int'; // atau 'string' jika UUID
 
-    // ✅ Tentukan nama kolom password kustom
-    protected $password = 'password_user';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
-    // ✅ Kolom yang bisa diisi mass-assignment
+    // Kolom yang boleh diisi
     protected $fillable = [
         'nama_user',
         'email_user',
         'no_hp',
         'password_user',
         'role_user',
+        'google_id',
+        'google_avatar',
     ];
 
-    // ✅ Hidden attributes (tidak dikirim saat toJSON/toArray)
+    // Hidden fields
     protected $hidden = [
         'password_user',
         'remember_token',
     ];
 
-    // ✅ Beritahu Laravel field mana yang digunakan untuk auth
-    public function getAuthIdentifierName()
-    {
-        return 'id_user';
-    }
-
+    // Laravel auth pakai password_user
     public function getAuthPassword()
     {
         return $this->password_user;
     }
 
-    public function getAuthPasswordName()
-    {
-        return 'password_user';
-    }
-
+    // Relasi
     public function dokumen()
     {
-        return $this->hasMany(\App\Models\Dokumen::class, 'id_user', 'id_user');
+        return $this->hasMany(
+            \App\Models\Dokumen::class,
+            'id_user',
+            'id_user'
+        );
     }
 }

@@ -115,6 +115,48 @@
             overflow: hidden;
         }
 
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-parent {
+            justify-content: space-between;
+        }
+
+        .arrow {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-submenu {
+            display: none;
+            flex-direction: column;
+            padding-left: 40px;
+            transition: all 0.2s ease;
+        }
+        
+
+        /* optional arrow */
+        .nav-group.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-submenu a {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        .nav-submenu a:hover {
+            opacity: 1;
+        }
+
+        /* open state */
+        .nav-group.open .nav-submenu {
+            display: flex;
+        }
+
         .nav-item:hover {
             background: rgba(255,255,255,0.08);
             border-left-color: var(--primary-blue);
@@ -156,6 +198,7 @@
             margin-top: auto;
             white-space: nowrap;
             overflow: hidden;
+            color: #ffff;
         }
 
         .logout-btn:hover {
@@ -408,6 +451,37 @@
             color: var(--primary-blue);
             font-weight: 500;
         }
+
+        /* IMAGE PREVIEW */
+        .old-image-item{
+            position:relative;
+        }
+
+        .old-image-preview{
+            width:120px;
+            height:90px;
+            object-fit:cover;
+            border-radius:8px;
+            border:1px solid #ddd;
+        }
+
+        .delete-old-image{
+            position:absolute;
+            top:-8px;
+            right:-8px;
+
+            width:24px;
+            height:24px;
+
+            border:none;
+            border-radius:50%;
+
+            background:transparent;
+            color:white;
+
+            cursor:pointer;
+            font-weight:bold;
+        }
         
         /* Action buttons */
         .form-actions {
@@ -565,12 +639,12 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar"  id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
                 <i class="fas fa-home"></i>
             </div>
-            <div class="company-name">PT. Properti Harmoni</div>
+            <div class="company-name">PT. Carani Bhanu Balakosa</div>
         </div>
         
         <div class="nav-menu" id="navMenu">
@@ -580,17 +654,23 @@
                 <span>Dashboard</span>
             </a>
 
-            <a href="{{ route('admin.data_user') }}"
-                class="nav-item {{ request()->routeIs('admin.data_user') ? 'active' : '' }}">
-                <i class="fas fa-users"></i>
-                <span>Data User</span>
-            </a>
+            <div class="nav-group" id="propertiMenu">
+                <div class="nav-item nav-parent" onclick="toggleMenu('propertiMenu')">
+                    <i class="fas fa-house"></i>
+                    <span>Properti</span>
+                    <i class="fas fa-chevron-down arrow"></i>
+                </div>
 
-            <a href="{{ route('admin.data_rumah') }}"
-                class="nav-item {{ request()->routeIs('admin.data_rumah') ? 'active' : '' }}">
-                <i class="fas fa-house"></i>
-                <span>Data Rumah</span>
-            </a>
+                <div class="nav-submenu">
+                    <a href="{{ route('admin.data_rumah') }}" class="nav-subitem">
+                        <span>Data Rumah</span>
+                    </a>
+
+                    <a href="{{ route('admin.perumahan') }}" class="nav-subitem">
+                        <span>Perumahan</span>
+                    </a>
+                </div>
+            </div>
 
             <a href="{{ route('admin.halaman_verifikasi') }}"
                 class="nav-item {{ request()->routeIs('admin.halaman_verifikasi') ? 'active' : '' }}">
@@ -598,16 +678,31 @@
                 <span>Verifikasi Data</span>
             </a>
 
-            <a href="{{ route('admin.halaman_chatbot') }}"
-                class="nav-item {{ request()->routeIs('admin.halaman_chatbot') ? 'active' : '' }}">
+            <a href="{{ route('admin.monitoring-pemesanan') }}"
+                class="nav-item {{ request()->routeIs('admin.monitoring-pemesanan') ? 'active' : '' }}">
+                <i class="fas fa-chart-line"></i>
+                <span>Monitoring</span>
+            </a>
+
+            <a href="{{ route('admin.laporan_penjualan') }}"
+                class="nav-item {{ request()->routeIs('admin.laporan_penjualan') ? 'active' : '' }}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Laporan Penjualan</span>
+            </a>
+
+            <a href="{{ route('admin.pesan_pelanggan') }}"
+                class="nav-item {{ request()->routeIs('admin.pesan_pelanggan') ? 'active' : '' }}">
                 <i class="fas fa-comments"></i>
-                <span>Chatbot</span>
+                <span>Pesan Pelanggan</span>
             </a>
         
-            <div class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="logout-btn" style="width:100%; background:none; border:none; cursor:pointer; text-align:left;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </div>
     
@@ -620,7 +715,7 @@
                 <div class="breadcrumb">
                     <a href="dashboard.html" class="breadcrumb-link">Dashboard</a>
                     <i class="fas fa-chevron-right"></i>
-                    <a href="data-rumah.html" class="breadcrumb-link">Data Rumah</a>
+                    <a href="{{ route('admin.data_rumah') }}" class="breadcrumb-link">Data Rumah</a>
                     <i class="fas fa-chevron-right"></i>
                     <span>Edit Data Rumah</span>
                 </div>
@@ -629,7 +724,7 @@
             <div class="user-profile">
                 <div class="avatar">A</div>
                 <div class="user-info">
-                    <div class="user-name">Admin Utama</div>
+                    <div class="user-name">Admin</div>
                     <div class="user-role">Administrator</div>
                 </div>
             </div>
@@ -642,7 +737,9 @@
                 <p class="form-subtitle">Perbarui informasi properti dengan data yang valid</p>
             </div>
             
-            <form id="editPropertyForm">
+            <form id="editPropertyForm" method="POST" action="{{ route('admin.update_rumah', $properti->id_properti) }}" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
                 <!-- Property Information Section -->
                 <div class="form-section">
                     <h3 class="section-title">
@@ -652,46 +749,55 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="namaProperti" class="form-label">Nama Properti</label>
-                            <input type="text" class="form-control" id="namaProperti" value="Kelapa Gading Regency" required>
+                            <input type="text" class="form-control" id="namaProperti"  name="nama_properti"
+                                value="{{ $properti->nama_properti }}" required>
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="jenisProperti" class="form-label">Jenis Properti</label>
-                            <select class="form-control" id="jenisProperti" required>
-                                <option value="">Pilih Jenis Properti</option>
-                                <option value="rumah" selected>Rumah</option>
-                                <option value="ruko">Ruko</option>
-                            </select>
+                            <label class="form-label">Perumahan</label>
+                            <input type="text" class="form-control" name="nama_perumahan"
+                                value="{{ $properti->perumahan->nama_perumahan ?? '-' }}"
+                                readonly>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="kategoriProperti" class="form-label">Kategori Properti</label>
-                            <select class="form-control" id="kategoriProperti" required>
+                            <select class="form-control" name="kategori_properti" id="kategoriProperti" required>
                                 <option value="">Pilih Kategori</option>
-                                <option value="subsidi" selected>Subsidi</option>
-                                <option value="komersial">Komersial</option>
+                                <option value="subsidi" {{ $properti->kategori_properti == 'subsidi' ? 'selected' : '' }}>Subsidi</option>
+                                <option value="komersial" {{ $properti->kategori_properti == 'komersial' ? 'selected' : '' }}>Komersial</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="tipeProperti" class="form-label">Tipe Properti</label>
-                            <select class="form-control" id="tipeProperti" required>
-                                <option value="">Pilih Tipe</option>
-                                <option value="30/60">30/60</option>
-                                <option value="36/72" selected>36/72</option>
-                                <option value="45/84">45/84</option>
-                                <option value="60/135">60/135</option>
-                                <option value="ruko">Ruko</option>
+                            <label for="jenisProperti" class="form-label">Jenis Properti</label>
+                            <select class="form-control" name="jenis_properti" id="jenisProperti" required>
+                                <option value="">Pilih Jenis Properti</option>
+                                <option value="rumah" {{ $properti->jenis_properti == 'rumah' ? 'selected' : '' }}>Rumah</option>
+                                <option value="ruko" {{ $properti->jenis_properti == 'ruko' ? 'selected' : '' }}>Ruko</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="form-row">
-                        <div class="form-group" style="grid-column: 1 / -1;">
+                        <div class="form-group">
+                            <label for="tipeProperti" class="form-label">Tipe Properti</label>
+                            <select class="form-control" name="tipe_properti" id="tipeProperti" required>
+                                <option value="">Pilih Tipe</option>
+                                <option value="30/60" {{ $properti->tipe_properti == '30/60' ? 'selected' : '' }}>30/60</option>
+                                <option value="36/72" {{ $properti->tipe_properti == '36/72' ? 'selected' : '' }}>36/72</option>
+                                <option value="45/84" {{ $properti->tipe_properti == '45/84' ? 'selected' : '' }}>45/84</option>
+                                <option value="60/135" {{ $properti->tipe_properti == '60/135' ? 'selected' : '' }}>60/135</option>
+                                <option value="Ruko" {{ $properti->tipe_properti == 'Ruko' ? 'selected' : '' }}>Ruko</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="grid-column: 2 / -1;">
                             <label for="blokRumah" class="form-label">Blok Rumah</label>
-                            <input type="text" class="form-control" id="blokRumah" placeholder="Contoh: Blok A, Cluster Bunga" value="Blok C">
+                            <input type="text" class="form-control" name="nama_blok" id="blokRumah"
+                                value="{{ $properti->blok->nama_blok ?? '' }}">
                         </div>
                     </div>
                 </div>
@@ -705,24 +811,28 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="hargaProperti" class="form-label">Harga Properti (Rp)</label>
-                            <input type="number" class="form-control" id="hargaProperti" value="450000000" min="0" required>
+                            <input type="number" class="form-control" name="harga_properti" id="hargaProperti"
+                                value="{{ $properti->harga_properti }}" min="0" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="luasBangunan" class="form-label">Luas Bangunan (m²)</label>
-                            <input type="number" class="form-control" id="luasBangunan" value="36" min="0" required>
+                            <input type="number" class="form-control" name="luas_bangunan" id="luasBangunan"
+                                value="{{ $properti->luas_bangunan }}" min="0" required>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="luasTanah" class="form-label">Luas Tanah (m²)</label>
-                            <input type="number" class="form-control" id="luasTanah" value="72" min="0" required>
+                            <input type="number" class="form-control" name="luas_tanah" id="luasTanah"
+                                value="{{ $properti->luas_tanah }}" min="0" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="stokUnit" class="form-label">Stok Unit</label>
-                            <input type="number" class="form-control" id="stokUnit" value="8" min="0" required>
+                            <input type="number" class="form-control" name="stok_unit" id="stokUnit"
+                                value="{{ $properti->stok_unit }}" min="0" required>
                         </div>
                     </div>
                 </div>
@@ -735,30 +845,97 @@
                     
                     <div class="form-group">
                         <label for="statusUnit" class="form-label">Status Unit</label>
-                        <select class="form-control" id="statusUnit" required>
+                        <select class="form-control" name="status_unit" id="statusUnit" required>
                             <option value="">Pilih Status</option>
-                            <option value="tersedia">Tersedia</option>
-                            <option value="dipesan" selected>Dipesan</option>
-                            <option value="terjual">Terjual</option>
+                            <option value="tersedia" {{ $properti->status_unit == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
+                            <option value="dipesan" {{ $properti->status_unit == 'dipesan' ? 'selected' : '' }}>Dipesan</option>
+                            <option value="terjual" {{ $properti->status_unit == 'terjual' ? 'selected' : '' }}>Terjual</option>
                         </select>
                     </div>
                 </div>
                 
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">Gambar Saat Ini</label>
+
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+                        @foreach($properti->gambar as $img)
+                            <div class="old-image-item"
+                                style="position:relative;">
+
+                                <img src="{{ asset('storage/images/'.$img->path_gambar) }}"
+                                    onclick="lihatGambar(this.src)"
+                                    class="old-image-preview"
+                                    style="
+                                        width:120px;
+                                        height:90px;
+                                        object-fit:cover;
+                                        border-radius:6px;
+                                        border:1px solid #ddd;
+                                        cursor:pointer;
+                                    ">
+
+                                <button type="button"
+                                        onclick="hapusGambar(this)"
+                                        style="
+                                            position:absolute;
+                                            top:-8px;
+                                            right:-8px;
+                                            width:24px;
+                                            height:24px;
+                                            border:none;
+                                            border-radius:50%;
+                                            background:transparent;
+                                            color:black;
+                                            cursor:pointer;
+                                        ">
+                                    ×
+                                </button>
+
+                                <input type="hidden"
+                                    class="gambar-lama"
+                                    name="gambar_lama[]"
+                                    value="{{ $img->id_gambar }}">
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
                 <!-- Image Upload Section -->
                 <div class="image-upload-section">
                     <h3 class="section-title">
-                        <i class="fas fa-image"></i> Gambar Properti
+                        <i class="fas fa-image"></i>
+                        Tambah Gambar Baru
                     </h3>
-                    <p class="form-subtitle">Upload gambar terbaru untuk properti ini (opsional)</p>
-                    
-                    <div class="upload-area" id="imageUpload">
-                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                        <p class="upload-text">Klik atau drag file gambar ke sini</p>
-                        <p class="upload-hint">Format: JPG, PNG | Max: 5MB | Maksimal 5 file</p>
-                        <input type="file" class="file-input" id="propertyImage" accept=".jpg,.jpeg,.png" multiple>
-                        <div class="file-name" id="imageName">kelapa-gading-36-72.jpg</div>
+
+                    <button type="button"
+                        onclick="hapusGambar(this)"
+                            style="
+                                position:absolute;
+                                top:-8px;
+                                right:-8px;
+                                width:24px;
+                                height:24px;
+                                border:none;
+                                border-radius:50%;
+                                background:transparent;
+                                color:black;
+                                cursor:pointer;
+                            ">
+                        ×
+                    </button>
+                    <input
+                        type="file"
+                        name="gambar[]"
+                        id="propertyImage"
+                        accept=".jpg,.jpeg,.png,.webp"
+                        multiple>
+
+                    <div id="previewContainer"
+                        style="display:flex;gap:10px;flex-wrap:wrap;margin-top:15px;">
                     </div>
                 </div>
+
                 
                 <!-- Action Buttons -->
                 <div class="form-actions">
@@ -774,143 +951,339 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // Image upload handling
-            const uploadArea = document.getElementById('imageUpload');
-            const fileInput = document.getElementById('propertyImage');
-            const fileName = document.getElementById('imageName');
+        function hapusGambar(button)
+        {
+            if(confirm('Hapus gambar ini?'))
+            {
+                const item = button.closest('.old-image-item');
 
-            uploadArea.addEventListener('click', () => {
-                fileInput.click();
+                // hidden input gambar lama
+                const input = item.querySelector('.gambar-lama');
+
+                // tandai untuk dihapus
+                input.name = 'gambar_hapus[]';
+
+                // sembunyikan dari tampilan
+                item.style.display = 'none';
+            }
+        }
+        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // =========================
+            // PREVIEW GAMBAR BARU
+            // =========================
+            const fileInput = document.getElementById('propertyImage');
+            const previewContainer = document.getElementById('previewContainer');
+
+            let selectedFiles = [];
+
+            fileInput.addEventListener('change', function () {
+
+                // simpan file baru
+                selectedFiles = [...selectedFiles, ...Array.from(this.files)];
+
+                renderPreview();
+
             });
 
-            fileInput.addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    if (this.files.length > 1) {
-                        fileName.textContent = `${this.files.length} file dipilih`;
-                    } else {
-                        fileName.textContent = this.files[0].name;
+            function renderPreview()
+            {
+                previewContainer.innerHTML = '';
+
+                selectedFiles.forEach((file, index) => {
+
+                    const reader = new FileReader();
+
+                    reader.onload = function(e)
+                    {
+                        const wrapper = document.createElement('div');
+
+                        wrapper.style.position = 'relative';
+                        wrapper.style.display = 'inline-block';
+
+                        // gambar preview
+                        const img = document.createElement('img');
+
+                        img.src = e.target.result;
+
+                        img.style.width = '120px';
+                        img.style.height = '90px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '6px';
+                        img.style.border = '1px solid #ddd';
+                        img.style.cursor = 'pointer';
+
+                        img.onclick = function () {
+                            lihatGambar(this.src);
+                        };
+
+                        wrapper.appendChild(img);
+
+                        // tombol silang
+                        const btn = document.createElement('button');
+
+                        btn.type = 'button';
+                        btn.innerHTML = '&times;';
+
+                        btn.style.position = 'absolute';
+                        btn.style.top = '-8px';
+                        btn.style.right = '-8px';
+                        btn.style.width = '24px';
+                        btn.style.height = '24px';
+                        btn.style.border = 'none';
+                        btn.style.borderRadius = '50%';
+                        btn.style.background = 'white';
+                        btn.style.cursor = 'pointer';
+                        btn.style.fontSize = '16px';
+                        btn.style.boxShadow = '0 0 3px rgba(0,0,0,.3)';
+
+                        btn.onclick = function () {
+
+                            // hapus file dari array
+                            selectedFiles.splice(index, 1);
+
+                            // rebuild file input
+                            const dt = new DataTransfer();
+
+                            selectedFiles.forEach(file => {
+                                dt.items.add(file);
+                            });
+
+                            fileInput.files = dt.files;
+
+                            renderPreview();
+                        };
+
+                        wrapper.appendChild(btn);
+
+                        previewContainer.appendChild(wrapper);
+                    };
+
+                    reader.readAsDataURL(file);
+                });
+
+                // sinkronkan file input
+                const dt = new DataTransfer();
+
+                selectedFiles.forEach(file => {
+                    dt.items.add(file);
+                });
+
+                fileInput.files = dt.files;
+            }
+
+            // =========================
+            // VALIDASI FORM
+            // =========================
+            const form = document.getElementById('editPropertyForm');
+
+            if (form) {
+
+                form.addEventListener('submit', function (e) {
+
+                    const namaProperti =
+                        document.getElementById('namaProperti').value.trim();
+
+                    const hargaProperti =
+                        document.getElementById('hargaProperti').value.trim();
+
+                    const luasBangunan =
+                        document.getElementById('luasBangunan').value.trim();
+
+                    const luasTanah =
+                        document.getElementById('luasTanah').value.trim();
+
+                    const stokUnit =
+                        document.getElementById('stokUnit').value.trim();
+
+                    if (!namaProperti) {
+                        e.preventDefault();
+                        alert('Nama properti harus diisi');
+                        return;
                     }
 
-                    const rootStyles = getComputedStyle(document.documentElement);
-                    const primaryColor = rootStyles.getPropertyValue('--primary-blue');
+                    if (!hargaProperti || parseInt(hargaProperti) <= 0) {
+                        e.preventDefault();
+                        alert('Harga properti tidak valid');
+                        return;
+                    }
 
-                    fileName.style.color = primaryColor;
-                }
-            });
-            
-            // Form submission
-            document.getElementById('editPropertyForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Get form values
-                const namaProperti = document.getElementById('namaProperti').value.trim();
-                const jenisProperti = document.getElementById('jenisProperti').value;
-                const kategoriProperti = document.getElementById('kategoriProperti').value;
-                const tipeProperti = document.getElementById('tipeProperti').value;
-                const blokRumah = document.getElementById('blokRumah').value.trim();
-                const hargaProperti = document.getElementById('hargaProperti').value.trim();
-                const luasBangunan = document.getElementById('luasBangunan').value.trim();
-                const luasTanah = document.getElementById('luasTanah').value.trim();
-                const stokUnit = document.getElementById('stokUnit').value.trim();
-                const statusUnit = document.getElementById('statusUnit').value;
-                
-                // Simple validation
-                if (!namaProperti) {
-                    alert('Nama properti harus diisi');
-                    document.getElementById('namaProperti').focus();
-                    return;
-                }
-                
-                if (!jenisProperti) {
-                    alert('Jenis properti harus dipilih');
-                    document.getElementById('jenisProperti').focus();
-                    return;
-                }
-                
-                if (!kategoriProperti) {
-                    alert('Kategori properti harus dipilih');
-                    document.getElementById('kategoriProperti').focus();
-                    return;
-                }
-                
-                if (!tipeProperti) {
-                    alert('Tipe properti harus dipilih');
-                    document.getElementById('tipeProperti').focus();
-                    return;
-                }
-                
-                if (!hargaProperti || isNaN(hargaProperti) || parseInt(hargaProperti) <= 0) {
-                    alert('Harga properti harus diisi dan berupa angka positif');
-                    document.getElementById('hargaProperti').focus();
-                    return;
-                }
-                
-                if (!luasBangunan || isNaN(luasBangunan) || parseInt(luasBangunan) <= 0) {
-                    alert('Luas bangunan harus diisi dan berupa angka positif');
-                    document.getElementById('luasBangunan').focus();
-                    return;
-                }
-                
-                if (!luasTanah || isNaN(luasTanah) || parseInt(luasTanah) <= 0) {
-                    alert('Luas tanah harus diisi dan berupa angka positif');
-                    document.getElementById('luasTanah').focus();
-                    return;
-                }
-                
-                if (!stokUnit || isNaN(stokUnit) || parseInt(stokUnit) < 0) {
-                    alert('Stok unit harus diisi dan berupa angka non-negatif');
-                    document.getElementById('stokUnit').focus();
-                    return;
-                }
-                
-                if (!statusUnit) {
-                    alert('Status unit harus dipilih');
-                    document.getElementById('statusUnit').focus();
-                    return;
-                }
-                
-                // Success message
-                alert('Data properti berhasil diperbarui!\n\nBlok Rumah: ' + (blokRumah || 'Tidak diisi'));
-                
-                // In a real Laravel application, you would submit the form data to the server here
-                // window.location.href = 'data-rumah.html';
-            });
-            
-            // Cancel button
-            document.getElementById('cancelBtn').addEventListener('click', function() {
-                if (confirm('Apakah Anda yakin ingin membatalkan perubahan? Semua perubahan yang belum disimpan akan hilang.')) {
-                    // Redirect to data rumah page
-                    window.location.href = 'data-rumah.html';
-                }
-            });
-        });
+                    if (!luasBangunan || parseInt(luasBangunan) <= 0) {
+                        e.preventDefault();
+                        alert('Luas bangunan tidak valid');
+                        return;
+                    }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            
-            if (isCollapsed) {
-                sidebar.classList.add('collapsed');
-                mainContent.classList.add('expanded');
+                    if (!luasTanah || parseInt(luasTanah) <= 0) {
+                        e.preventDefault();
+                        alert('Luas tanah tidak valid');
+                        return;
+                    }
+
+                    if (!stokUnit || parseInt(stokUnit) < 0) {
+                        e.preventDefault();
+                        alert('Stok unit tidak valid');
+                        return;
+                    }
+
+                });
+
             }
-            
-            // Hover effect untuk sidebar (opsional - untuk expand temporary)
-            sidebar.addEventListener('mouseenter', function() {
-                if (this.classList.contains('collapsed')) {
-                    this.style.width = 'var(--sidebar-width-expanded)';
-                }
-            });
-            
-            sidebar.addEventListener('mouseleave', function() {
-                if (this.classList.contains('collapsed')) {
-                    this.style.width = 'var(--sidebar-width-collapsed)';
-                }
-            });
+
+            // =========================
+            // CANCEL BUTTON
+            // =========================
+            const cancelBtn = document.getElementById('cancelBtn');
+
+            if (cancelBtn) {
+
+                cancelBtn.addEventListener('click', function () {
+
+                    if (confirm('Batalkan perubahan?')) {
+                        window.location.href = "{{ route('admin.data_rumah') }}";
+                    }
+
+                });
+
+            }
+
         });
-    </script>
+        </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    if (!sidebar || !mainContent) {
+        console.error("sidebar / mainContent tidak ditemukan");
+        return;
+    }
+
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+    function closeAllDropdowns() {
+        document.querySelectorAll('.nav-group.open').forEach(el => {
+            el.classList.remove('open');
+        });
+    }
+
+    // INIT STATE
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+        mainContent.classList.add('expanded');
+        closeAllDropdowns();
+    }
+
+    // HOVER IN
+    sidebar.addEventListener('mouseenter', function () {
+        if (this.classList.contains('collapsed')) {
+            this.classList.add('hovering');
+        }
+    });
+
+    // HOVER OUT
+    sidebar.addEventListener('mouseleave', function () {
+        this.classList.remove('hovering');
+        closeAllDropdowns();
+    });
+});
+
+
+/* ===================================================
+   TOGGLE DROPDOWN (INI WAJIB GLOBAL BIAR onclick WORK)
+=================================================== */
+window.toggleMenu = function (id) {
+
+    const sidebar = document.getElementById('sidebar');
+    const el = document.getElementById(id);
+
+    if (!el || !sidebar) return;
+
+    // kalau sidebar collapsed DAN tidak hover → blok
+    const isBlocked =
+        sidebar.classList.contains('collapsed') &&
+        !sidebar.classList.contains('hovering');
+
+    if (isBlocked) return;
+
+    el.classList.toggle('open');
+};
+</script>
+
+<!-- JS MODAL -->
+ <script>
+function lihatGambar(src)
+{
+    const modal = document.getElementById('imageModal');
+    const image = document.getElementById('modalImage');
+
+    image.src = src;
+    modal.style.display = 'flex';
+}
+
+function tutupGambar()
+{
+    document.getElementById('imageModal').style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+
+    const modal = document.getElementById('imageModal');
+
+    if(modal)
+    {
+        modal.addEventListener('click', function(e){
+
+            if(e.target === modal)
+            {
+                tutupGambar();
+            }
+
+        });
+    }
+
+});
+</script>
+
+
+<!-- GAMBAR LAMA MODAL -->
+    <div id="imageModal"
+        style="
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,.8);
+            z-index:9999;
+            justify-content:center;
+            align-items:center;
+        ">
+
+        <span onclick="tutupGambar()"
+            style="
+                position:absolute;
+                top:20px;
+                right:30px;
+                color:white;
+                font-size:40px;
+                cursor:pointer;
+            ">
+            &times;
+        </span>
+
+        <img id="modalImage"
+            style="
+                max-width:90%;
+                max-height:90%;
+                border-radius:10px;
+            ">
+    </div>
 </body>
 </html>
 

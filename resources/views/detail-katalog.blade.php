@@ -147,6 +147,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .profile-icon:hover {
@@ -822,8 +823,14 @@
         .properties-grid {
             display: flex;
             gap: 25px;
-            transition: transform 0.5s ease;
+            overflow-x: auto;
             scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .properties-grid::-webkit-scrollbar {
+            display: none;
         }
         
         .property-card {
@@ -984,6 +991,24 @@
         .btn-contact:hover {
             background: #6aa5c6;
         }
+
+        /* Profilll */
+            .profile-avatar,
+            .profile-avatar-default {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .profile-avatar-default {
+                background: #7AB2D3;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+            }
         
         /* Responsive Design */
         @media (max-width: 992px) {
@@ -1155,6 +1180,7 @@
     </style>
 </head>
 <body>
+    {{ Auth::check() ? 'LOGIN BERHASIL' : 'BELUM LOGIN' }}
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -1222,16 +1248,41 @@
 
                 {{-- Guest --}}
                 @guest
-                    <a href="{{ route('login') }}" class="nav-item login-link">
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
                     {{-- HANYA ICON PROFILE --}}
                     <a href="{{ route('halaman-profil') }}" class="profile-icon">
-                        <img src="{{ Auth::user()->profile_photo 
-                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
-                            : asset('default-avatar.png') }}" 
-                            alt="Profile" class="profile-img">
+                        @php
+                            $user = Auth::user();
+                        @endphp
+
+                        {{-- Prioritas 1: Foto upload user --}}
+                        @if($user->profile_photo)
+
+                            <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
+                                class="profile-avatar"
+                                alt="Profile Photo">
+
+                        {{-- Prioritas 2: Foto Google --}}
+                        @elseif($user->google_avatar)
+
+                            <img src="{{ $user->google_avatar }}"
+                                class="profile-avatar"
+                                referrerpolicy="no-referrer"
+                                alt="Google Photo"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}'">
+
+                        {{-- Prioritas 3: Inisial --}}
+                        @else
+
+                            <div class="profile-avatar-default">
+                                {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                            </div>
+
+                        @endif
+
                     </a>
                 @endguest
             </div>
@@ -1248,45 +1299,36 @@
                 <!-- KOLOM KIRI: Image Gallery + Tabs --> 
                 <div class="image-gallery"> 
                     <!-- Main Image -->
-                    <img src="img/tipe36.jpg" alt="{{ $properti->nama_properti }}" class="main-image"> 
+                    <img id="mainImage"
+                    src="{{ $properti->gambar->first()
+                        ? asset('storage/images/' . $properti->gambar->first()->path_gambar)
+                        : asset('images/placeholder-properti.png')
+                    }}"
+                    alt="{{ $properti->nama_properti }}"
+                    class="main-image">
                     <button class="gallery-arrow arrow-left">&#10094;</button>
                     <button class="gallery-arrow arrow-right">&#10095;</button>
 
                     <!-- Thumbnail Grid -->
-                    <div class="thumbnail-grid"> 
-                        <div class="thumbnail active"> 
-                            <img src="img/tipe36.jpg" alt="Tampak Depan"> 
-                        </div> 
-                        <div class="thumbnail"> 
-                            <img src="img/tipe36.jpg" alt="Ruang Tamu"> 
-                        </div> 
-                        <div class="thumbnail"> 
-                            <img src="img/tipe36.jpg" alt="Kamar Tidur"> 
-                        </div> 
-                        <div class="thumbnail"> 
-                            <img src="img/tipe36.jpg" alt="Dapur"> 
-                        </div> 
-                        <div class="thumbnail"> 
-                            <img src="img/tipe36.jpg" alt="Kamar Mandi"> 
-                        </div> 
-                    </div> 
+                    <div class="thumbnail-grid">
+                        @foreach($properti->gambar as $index => $gambar)
+                            <div class="thumbnail {{ $index == 0 ? 'active' : '' }}"
+                                data-image="{{ asset('storage/images/' . $gambar->path_gambar) }}">
+                                <img 
+                                    src="{{ asset('storage/images/' . $gambar->path_gambar) }}"
+                                    alt="Thumbnail {{ $index + 1 }}">
+                            </div>
+                        @endforeach
+                    </div>
 
                     <!-- ✅ TABS DI BAWAH GAMBAR (masih dalam .image-gallery) -->
                     <div style="padding: 15px 20px 0 20px;">
                         <div class="property-tabs">
-                            <button class="tab-btn active" data-tab="overview">Overview</button>
-                            <button class="tab-btn" data-tab="description">Deskripsi</button>
+                            <button class="tab-btn active" data-tab="description">Deskripsi</button>
                             <button class="tab-btn" data-tab="address">Lokasi</button>
                         </div>
                         <div class="tab-content">
-                            <div class="tab-panel active" id="overview">
-                                <p style="margin:0; font-size:0.95rem;">
-                                    {{ $properti->nama_properti }} adalah properti {{ $properti->jenis_properti }} 
-                                    tipe {{ $properti->tipe_properti }} dengan luas {{ $properti->luas_bangunan }} m², 
-                                    terletak di Blok {{ $properti->blok->nama_blok ?? '-' }}.
-                                </p>
-                            </div>
-                            <div class="tab-panel" id="description">
+                            <div class="tab-panel active" id="description">
                                 <div class="description-section" style="padding:0; box-shadow:none; background:transparent;">
                                     <div class="description-content" style="font-size:0.95rem;">
                                         <p style="margin:10px 0;">
@@ -1304,11 +1346,30 @@
                                 </div>
                             </div>
                             <div class="tab-panel" id="address">
-                                <p style="margin:10px 0;"><i class="fas fa-map-marker-alt"></i> Bondowoso, Jawa Timur</p>
-                                <p style="margin:5px 0;"><strong>Blok:</strong> {{ $properti->blok->nama_blok ?? '-' }}</p>
-                                @if($properti->perumahan)
-                                    <p style="margin:5px 0;"><strong>Perumahan:</strong> {{ $properti->perumahan->nama_perumahan }}</p>
-                                @endif
+                                <h4>{{ $properti->perumahan->nama_perumahan }}</h4>
+
+                                <p>
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ $properti->perumahan->lokasi_perumahan }}
+                                </p>
+
+                                <iframe
+                                    src="https://www.google.com/maps?q={{ $properti->perumahan->latitude }},{{ $properti->perumahan->longitude }}&output=embed"
+                                    width="100%"
+                                    height="300"
+                                    style="border:0; border-radius:12px;"
+                                    loading="lazy"
+                                    allowfullscreen>
+                                </iframe>
+
+                                <a href="{{ $properti->perumahan->link_maps }}"
+                                    target="_blank"
+                                    class="contact-btn"
+                                    style="margin-top:15px; display:inline-block;">
+                                    <i class="fas fa-map"></i>
+                                    Buka di Google Maps
+                                </a>
+
                             </div>
                         </div>
                     </div>
@@ -1404,9 +1465,9 @@
                     <button class="slider-btn slider-prev">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <div class="properties-grid">
+                    <div class="properties-grid" id= "similarPropertiesSlider">
                         @php
-                            $serupaList = \App\Models\Properti::with('blok')
+                            $serupaList = \App\Models\Properti::with('blok','gambar')
                                 ->where('tipe_properti', $properti->tipe_properti)
                                 ->where('id_properti', '!=', $properti->id_properti)
                                 ->limit(5)->get();
@@ -1423,7 +1484,13 @@
                         @endphp
                         <div class="property-card">
                             <div class="property-img">
-                                <img src="{{ asset('img/tipe36.jpg') }}" alt="{{ $serupa->nama_properti }}">
+                                <img 
+                                src="{{ $serupa->gambar->first()
+                                    ? asset('storage/images/' . $serupa->gambar->first()->path_gambar)
+                                    : asset('images/placeholder-properti.png')
+                                }}"
+                                alt="{{ $serupa->nama_properti }}">
+
                                 <div class="property-badge" style="background:{{ $badgeColor }}">
                                     {{ ucfirst($serupa->status_unit) }}
                                 </div>
@@ -1494,9 +1561,9 @@
                 e.preventDefault();
                 const action = this.textContent.trim();
                 if (action.includes('WhatsApp')) {
-                    window.open('https://wa.me/6281234567890', '_blank');
+                    window.open('https://wa.me/6285755649471', '_blank');
                 } else if (action.includes('Hubungi')) {
-                    window.location.href = 'tel:+6281234567890';
+                    window.location.href = 'tel:+6285755649471';
                 }
             });
         });
@@ -1555,41 +1622,129 @@
     </script>
 
     <!-- JavaScript untuk Thumbnail & Tabs -->
-<script>
-    // Thumbnail gallery
-    document.querySelectorAll('.thumbnail').forEach(thumbnail => {
-        thumbnail.addEventListener('click', function() {
-            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            const mainImage = document.querySelector('.main-image');
-            const src = this.querySelector('img').src;
-            mainImage.src = src;
+     <script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    // =====================================
+    // MAIN GALLERY
+    // =====================================
+
+    const mainImage = document.getElementById('mainImage');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    const btnLeft = document.querySelector('.arrow-left');
+    const btnRight = document.querySelector('.arrow-right');
+
+    let currentIndex = 0;
+
+    function updateImage(index) {
+
+        const imagePath = thumbnails[index]
+            .getAttribute('data-image');
+
+        mainImage.src = imagePath;
+
+        thumbnails.forEach(thumb => {
+            thumb.classList.remove('active');
         });
+
+        thumbnails[index].classList.add('active');
+
+        currentIndex = index;
+    }
+
+    // CLICK THUMBNAIL
+    thumbnails.forEach((thumbnail, index) => {
+
+        thumbnail.addEventListener('click', function () {
+
+            updateImage(index);
+
+        });
+
     });
 
-    // Tab functionality
-    document.addEventListener("DOMContentLoaded", function () {
-        const tabButtons = document.querySelectorAll(".tab-btn");
-        const tabPanels = document.querySelectorAll(".tab-panel");
+    // BUTTON RIGHT
+    btnRight.addEventListener('click', function () {
 
-        tabButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                const targetTab = button.getAttribute("data-tab");
-                tabButtons.forEach(btn => btn.classList.remove("active"));
-                tabPanels.forEach(panel => panel.classList.remove("active"));
-                button.classList.add("active");
-                document.getElementById(targetTab).classList.add("active");
+        let nextIndex = currentIndex + 1;
+
+        if (nextIndex >= thumbnails.length) {
+            nextIndex = 0;
+        }
+
+        updateImage(nextIndex);
+
+    });
+
+    // BUTTON LEFT
+    btnLeft.addEventListener('click', function () {
+
+        let prevIndex = currentIndex - 1;
+
+        if (prevIndex < 0) {
+            prevIndex = thumbnails.length - 1;
+        }
+
+        updateImage(prevIndex);
+
+    });
+
+
+
+
+    // =====================================
+    // SLIDER PROPERTI SERUPA
+    // =====================================
+
+    const slider = document.getElementById('similarPropertiesSlider');
+
+    const prevBtn = document.querySelector('.slider-prev');
+
+    const nextBtn = document.querySelector('.slider-next');
+
+    nextBtn.addEventListener('click', () => {
+        const maxScroll =
+            slider.scrollWidth - slider.clientWidth;
+
+        if (slider.scrollLeft >= maxScroll - 10) {
+            slider.scrollTo({
+                left: 0,
+                behavior: 'smooth'
             });
-        });
+        } else {
+
+            slider.scrollBy({
+                left: 350,
+                behavior: 'smooth'
+            });
+
+        }
     });
 
-    // Slider functionality
-    document.querySelector('.slider-prev')?.addEventListener('click', function() {
-        document.querySelector('.properties-grid')?.scrollBy({ left: -325, behavior: 'smooth' });
+    prevBtn.addEventListener('click', () => {
+        const maxScroll =
+            slider.scrollWidth - slider.clientWidth;
+
+        if (slider.scrollLeft <= 10) {
+
+            slider.scrollTo({
+                left: maxScroll,
+                behavior: 'smooth'
+            });
+
+        } else {
+
+            slider.scrollBy({
+                left: -350,
+                behavior: 'smooth'
+            });
+
+        }
     });
-    document.querySelector('.slider-next')?.addEventListener('click', function() {
-        document.querySelector('.properties-grid')?.scrollBy({ left: 325, behavior: 'smooth' });
-    });
+
+});
+
 </script>
 
 </body>

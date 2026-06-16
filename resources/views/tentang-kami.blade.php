@@ -154,6 +154,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .profile-icon:hover {
@@ -239,7 +240,7 @@
             background-size: cover;
             padding: 150px 30px 100px;
             position: relative;
-            margin-top: 60px;
+            margin-top: 30px;
         }
         
         .hero-overlay {
@@ -801,6 +802,24 @@
             font-size: 0.9rem;
             color: #cbd5e0;
         }
+
+        /* Profilll */
+        .profile-avatar,
+        .profile-avatar-default {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-avatar-default {
+            background: #7AB2D3;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        } 
         
         /* Responsive Design */
         @media (max-width: 992px) {
@@ -1086,9 +1105,8 @@
                 height: 28px;
                 font-size: 12px;
             }
+
         }
-        
-        
         
         @media (max-width: 768px) {
             .header {
@@ -1440,6 +1458,7 @@
     </style>
 </head>
 <body>
+    {{ Auth::check() ? 'LOGIN BERHASIL' : 'BELUM LOGIN' }}
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -1507,16 +1526,41 @@
 
                 {{-- Guest --}}
                 @guest
-                    <a href="{{ route('login') }}" class="nav-item login-link">
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
                     {{-- HANYA ICON PROFILE --}}
                     <a href="{{ route('halaman-profil') }}" class="profile-icon">
-                        <img src="{{ Auth::user()->profile_photo 
-                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
-                            : asset('default-avatar.png') }}" 
-                            alt="Profile" class="profile-img">
+                        @php
+                            $user = Auth::user();
+                        @endphp
+
+                        {{-- Prioritas 1: Foto upload user --}}
+                        @if($user->profile_photo)
+
+                            <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
+                                class="profile-avatar"
+                                alt="Profile Photo">
+
+                        {{-- Prioritas 2: Foto Google --}}
+                        @elseif($user->google_avatar)
+
+                            <img src="{{ $user->google_avatar }}"
+                                class="profile-avatar"
+                                referrerpolicy="no-referrer"
+                                alt="Google Photo"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}'">
+
+                        {{-- Prioritas 3: Inisial --}}
+                        @else
+
+                            <div class="profile-avatar-default">
+                                {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                            </div>
+
+                        @endif
+
                     </a>
                 @endguest
             </div>
@@ -1528,7 +1572,7 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1 class="hero-title">Tentang Carani Estate</h1>
-            <p class="hero-subtitle">Mewujudkan impian memiliki rumah yang nyaman dan berkualitas sejak 2015</p>
+            <p class="hero-subtitle">Mewujudkan impian memiliki rumah yang nyaman dan berkualitas sejak 2019</p>
         </div>
     </section>
     
@@ -1541,18 +1585,45 @@
             <div class="about-content">
                 <div class="about-text">
                     <h3 class="about-title">Sejarah & Perjalanan Kami</h3>
-                    <p class="about-description">Berdiri sejak tahun 2015, PropertiHarmoni Bondowoso telah menjadi salah satu pengembang properti terkemuka di Kabupaten Bondowoso. Berawal dari keinginan untuk menyediakan hunian layak bagi masyarakat menengah, kami telah mengembangkan lebih dari 500 unit rumah dan ruko di berbagai lokasi strategis di Bondowoso.</p>
-                    
+
+                    <p class="about-description">
+                        PT. Carani Bhanu Balakosa hadir untuk membantu masyarakat menemukan hunian yang nyaman dan berkualitas di Kabupaten Bondowoso. Dengan berbagai pilihan rumah dan ruko di lokasi yang strategis, kami terus berkomitmen memberikan pelayanan terbaik serta menghadirkan properti yang sesuai dengan kebutuhan masyarakat.
+                    </p>
+
                     <ul class="about-features">
-                        <li><i class="fas fa-check-circle"></i> Ribuan keluarga telah tinggal di hunian kami</li>
-                        <li><i class="fas fa-check-circle"></i> Lokasi strategis di pusat kota Bondowoso</li>
-                        <li><i class="fas fa-check-circle"></i> Harga terjangkau dengan kualitas terjamin</li>
-                        <li><i class="fas fa-check-circle"></i> Pelayanan purna jual terbaik di Bondowoso</li>
+                        <li><i class="fas fa-check-circle"></i> Telah membantu banyak pelanggan mendapatkan hunian impian</li>
+                        <li><i class="fas fa-check-circle"></i> Menyediakan pilihan rumah dan ruko di lokasi strategis</li>
+                        <li><i class="fas fa-check-circle"></i> Harga kompetitif dengan kualitas yang terjaga</li>
+                        <li><i class="fas fa-check-circle"></i> Pelayanan yang ramah dan terpercaya</li>
                     </ul>
                 </div>
                 
                 <div class="about-image">
-                    <img src="https://placehold.co/600x400/e6f2f8/1E3A5F?text=Kantor+PropertiHarmoni+Bondowoso" alt="Kantor PropertiHarmoni Bondowoso">
+                    <img src="{{ asset('images/gambar-perusahaan.webp') }}" alt="Gambar Perusahaan">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">150+</div>
+                    <div class="stat-label">Properti Tersedia</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100+</div>
+                    <div class="stat-label">Pelanggan Terlayani</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">5+</div>
+                    <div class="stat-label">Perumahan Pilihan</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Pelayanan Maksimal</div>
                 </div>
             </div>
         </div>
@@ -1587,80 +1658,7 @@
             </div>
         </div>
     </section>
-
-    <!-- Stats Section -->
-    <section class="stats-section">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-value">10.000+</div>
-                    <div class="stat-label">Properti Terbangun</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">8.500+</div>
-                    <div class="stat-label">Keluarga Bahagia</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">25+</div>
-                    <div class="stat-label">Lokasi Strategis</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">98%</div>
-                    <div class="stat-label">Kepuasan Pelanggan</div>
-                </div>
-            </div>
-        </div>
-    </section>
     
-    <!-- Team Section -->
-    <section class="team-section">
-        <div class="container">
-            <h2 class="section-title">Tim Manajemen</h2>
-            <p class="section-subtitle">Profesional berpengalaman yang siap melayani Anda dengan sepenuh hati.</p>
-            
-            <div class="team-grid">
-                <div class="team-member">
-                    <div class="member-photo">B</div>
-                    <h3 class="member-name">Bambang Sutrisno</h3>
-                    <p class="member-position">Direktur Utama</p>
-                    <div class="member-social">
-                        <div class="social-icon"><i class="fab fa-whatsapp"></i></div>
-                        <div class="social-icon"><i class="fas fa-envelope"></i></div>
-                    </div>
-                </div>
-                
-                <div class="team-member">
-                    <div class="member-photo">S</div>
-                    <h3 class="member-name">Sari Dewi</h3>
-                    <p class="member-position">Manajer Pemasaran</p>
-                    <div class="member-social">
-                        <div class="social-icon"><i class="fab fa-whatsapp"></i></div>
-                        <div class="social-icon"><i class="fas fa-envelope"></i></div>
-                    </div>
-                </div>
-                
-                <div class="team-member">
-                    <div class="member-photo">R</div>
-                    <h3 class="member-name">Rudi Hartono</h3>
-                    <p class="member-position">Manajer Proyek</p>
-                    <div class="member-social">
-                        <div class="social-icon"><i class="fab fa-whatsapp"></i></div>
-                        <div class="social-icon"><i class="fas fa-envelope"></i></div>
-                    </div>
-                </div>
-                
-                <div class="team-member">
-                    <div class="member-photo">N</div>
-                    <h3 class="member-name">Nayla Putri</h3>
-                    <p class="member-position">Customer Service</p>
-                    <div class="member-social">
-                        <div class="social-icon"><i class="fab fa-whatsapp"></i></div>
-                        <div class="social-icon"><i class="fas fa-envelope"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Call To Action Section -->
     <section id="call-to-action" class="call-to-action section light-background">
@@ -1679,7 +1677,7 @@
                 </div>
                 <div class="col-lg-4">
                 <div class="cta-action" data-aos="zoom-in" data-aos-delay="200">
-                    <a href="https://wa.me/6281234567890?text=Halo,%20saya%20ingin%20mendapatkan%20informasi%20properti%20di%20Batu" target="_blank" class="btn btn-cta">
+                    <a href="{{ route('halaman-katalog') }}" class="btn btn-cta">
                     <i class="bi bi-whatsapp me-2"></i>
                     Jelajahi Properti
                     </a>
@@ -1711,24 +1709,15 @@
                 <div class="footer-column">
                     <h3>Tautan Cepat</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Beranda</a></li>
-                        <li><a href="#">Katalog Properti</a></li>
-                        <li><a href="#">ChatBot</a></li>
-                        <li><a href="#">Riwayat Pemesanan</a></li>
-                        <li><a href="#">Tentang Kami</a></li>
+                        <li><a href="{{ route('welcome') }}">Beranda</a></li>
+                        <li><a href="{{ route('halaman-katalog') }}">Katalog Properti</a></li>
+                        <li><a href="{{ route('halaman-chatbot') }}">ChatBot</a></li>
+                        <li><a href="{{ route('halaman-katalog') }}">Kontak</a></li>
+                        <li><a href="{{ route('tentang-kami') }}">Tentang Kami</a></li>
                     </ul>
                 </div>
                 
-                <div class="footer-column">
-                    <h3>Layanan</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Pembelian Properti</a></li>
-                        <li><a href="#">Penjualan Properti</a></li>
-                        <li><a href="#">Sewa Properti</a></li>
-                        <li><a href="#">Konsultasi Properti</a></li>
-                        <li><a href="#">Finansial & KPR</a></li>
-                    </ul>
-                </div>
+                
                 
                 <div class="footer-column">
                     <h3>Kontak Kami</h3>

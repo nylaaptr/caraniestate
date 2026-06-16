@@ -147,6 +147,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .profile-icon:hover {
@@ -435,6 +436,26 @@
             background: #dbeafe;
             color: #2563eb;
         }
+
+        .payment-cash{
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .payment-kpr{
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .payment-bertahap{
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .payment-default{
+            background: #e2e8f0;
+            color: #475569;
+        }
         
         .price {
             font-weight: 700;
@@ -451,6 +472,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-right: 5px;
+            text-decoration: none;
         }
         
         .btn-view {
@@ -634,6 +656,24 @@
             font-size: 0.9rem;
             color: #cbd5e0;
         }
+
+        /* Profilll */
+            .profile-avatar,
+            .profile-avatar-default {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .profile-avatar-default {
+                background: #7AB2D3;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+            }
         
         /* Responsive Design */
         @media (max-width: 992px) {
@@ -786,6 +826,7 @@
     </style>
 </head>
 <body>
+    {{ Auth::check() ? 'LOGIN BERHASIL' : 'BELUM LOGIN' }}
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -853,16 +894,41 @@
 
                 {{-- Guest --}}
                 @guest
-                    <a href="{{ route('login') }}" class="nav-item login-link">
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
                     {{-- HANYA ICON PROFILE --}}
                     <a href="{{ route('halaman-profil') }}" class="profile-icon">
-                        <img src="{{ Auth::user()->profile_photo 
-                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
-                            : asset('default-avatar.png') }}" 
-                            alt="Profile" class="profile-img">
+                        @php
+                            $user = Auth::user();
+                        @endphp
+
+                        {{-- Prioritas 1: Foto upload user --}}
+                        @if($user->profile_photo)
+
+                            <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
+                                class="profile-avatar"
+                                alt="Profile Photo">
+
+                        {{-- Prioritas 2: Foto Google --}}
+                        @elseif($user->google_avatar)
+
+                            <img src="{{ $user->google_avatar }}"
+                                class="profile-avatar"
+                                referrerpolicy="no-referrer"
+                                alt="Google Photo"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}'">
+
+                        {{-- Prioritas 3: Inisial --}}
+                        @else
+
+                            <div class="profile-avatar-default">
+                                {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                            </div>
+
+                        @endif
+
                     </a>
                 @endguest
             </div>
@@ -931,33 +997,49 @@
                         <th>Properti</th>
                         <th>Tanggal Pemesanan</th>
                         <th>Harga</th>
-                        <th>Status</th>
+                        <th>Metode Pembayaran</th>
+                        <th>Tahap</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($transaksi as $t)
                     @php
-                        $statusClass = match($t->status_transaksi) {
-                            'menunggu_pembayaran'  => 'status-pending',
-                            'menunggu_verifikasi'  => 'status-pending',
-                            'berhasil'             => 'status-approved',
-                            'ditolak'              => 'status-rejected',
-                            default                => 'status-pending'
-                        };
-                        $statusLabel = match($t->status_transaksi) {
-                            'menunggu_pembayaran'  => 'Menunggu Pembayaran',
-                            'menunggu_verifikasi'  => 'Menunggu Verifikasi',
-                            'berhasil'             => 'Berhasil',
-                            'ditolak'              => 'Ditolak',
-                            default                => $t->status_transaksi
-                        };
-                    @endphp
+                    $tahap = $t->pemesanan->tahap_saat_ini ?? '';
+                    $status = $t->pemesanan->status ?? '';
+
+                    // normalisasi biar aman dari huruf besar/kecil & spasi
+                    $tahapClean = strtolower(trim($tahap));
+
+                    // STATUS SELESAI
+                    if (in_array($tahapClean, ['serah terima rumah', 'selesai'])) {
+
+                        $statusClass = 'status-approved';
+                        $statusLabel = 'Selesai';
+
+                    }
+
+                    // STATUS DITOLAK
+                    elseif ($status == 'Ditolak') {
+
+                        $statusClass = 'status-rejected';
+                        $statusLabel = 'Ditolak';
+
+                    }
+
+                    // STATUS PROSES
+                    else {
+
+                        $statusClass = 'status-pending';
+                        $statusLabel = $tahap ?: 'Proses';
+
+                    }
+                @endphp
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>
                             <div class="property-info">
-                                <img src="img/tipe36.jpg" class="property-image">
+                                <!-- <img src="img/tipe36.jpg" class="property-image"> -->
                                 <div class="property-details">
                                     <h4>{{ $t->properti->nama_properti ?? '-' }}</h4>
                                     <p>Tipe {{ $t->properti->tipe_properti ?? '-' }}</p>
@@ -967,25 +1049,52 @@
                         <td>{{ \Carbon\Carbon::parse($t->tanggal_transaksi)->format('d M Y') }}</td>
                         <td class="price">Rp {{ number_format($t->total_harga, 0, ',', '.') }}</td>
                         <td>
+                            @php
+                                $metode = strtolower($t->pemesanan->metode_pembayaran ?? '');
+
+                                $metodeClass = match($metode) {
+                                    'lunas' => 'payment-cash',
+                                    'kredit' => 'payment-kpr',
+                                    default => 'payment-default'
+                                };
+
+                                $metodeLabel = match($metode) {
+                                    'lunas' => 'Lunas',
+                                    'kredit' => 'KPR',
+                                    default => '-'
+                                };
+                            @endphp
+
+                            <span class="status-badge {{ $metodeClass }}">
+
+                                {{ $metodeLabel }}
+
+                                @if($t->bank_kpr)
+                                    - {{ $t->bank_kpr }}
+                                @endif
+
+                            </span>
+                        </td>
+                        <td>
                             <span class="status-badge {{ $statusClass }}">
                                 {{ $statusLabel }}
                             </span>
                         </td>
                         <td>
-                            <a href="{{ route('detail-pemesanan', $t->id_transaksi) }}" 
+                            <a href="{{ route('detail-pemesanan', $t->pemesanan->id_pemesanan) }}" 
                             class="action-btn btn-view">
                                 <i class="fas fa-eye"></i> Lihat
-                            </a>
+                            <!-- </a>
                             @if($t->status_transaksi == 'menunggu_pembayaran')
                             <button class="action-btn btn-cancel">
                                 <i class="fas fa-times"></i> Batalkan
                             </button>
-                            @endif
+                            @endif -->
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" style="text-align:center; padding:40px; color:#64748b;">
+                        <td colspan="7" style="text-align:center; padding:40px; color:#64748b;">
                             Belum ada riwayat pemesanan
                         </td>
                     </tr>
@@ -1000,7 +1109,6 @@
         </div>
     </div>
 
-    <!-- FOOTER -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -1018,24 +1126,15 @@
                 <div class="footer-column">
                     <h3>Tautan Cepat</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Beranda</a></li>
-                        <li><a href="#">Katalog Properti</a></li>
-                        <li><a href="#">ChatBot</a></li>
-                        <li><a href="#">Riwayat Pemesanan</a></li>
-                        <li><a href="#">Tentang Kami</a></li>
+                        <li><a href="{{ route('welcome') }}">Beranda</a></li>
+                        <li><a href="{{ route('halaman-katalog') }}">Katalog Properti</a></li>
+                        <li><a href="{{ route('halaman-chatbot') }}">ChatBot</a></li>
+                        <li><a href="{{ route('halaman-katalog') }}">Kontak</a></li>
+                        <li><a href="{{ route('tentang-kami') }}">Tentang Kami</a></li>
                     </ul>
                 </div>
                 
-                <div class="footer-column">
-                    <h3>Layanan</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Pembelian Properti</a></li>
-                        <li><a href="#">Penjualan Properti</a></li>
-                        <li><a href="#">Sewa Properti</a></li>
-                        <li><a href="#">Konsultasi Properti</a></li>
-                        <li><a href="#">Finansial & KPR</a></li>
-                    </ul>
-                </div>
+                
                 
                 <div class="footer-column">
                     <h3>Kontak Kami</h3>

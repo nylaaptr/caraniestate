@@ -403,20 +403,24 @@
                     <i class="fas fa-home"></i>
                 </div>
                 <h1 class="branding-title">Carani Estate</h1>
-                <p class="branding-subtitle">Platform terpercaya untuk membeli, menjual, dan menyewa properti berkualitas sejak 2015</p>
-                
+                <p class="branding-subtitle">
+                    Platform properti terpercaya untuk membantu Anda menemukan dan membeli properti dengan proses yang mudah dan aman.
+                </p>
+
                 <ul class="features-list">
                     <li class="feature-item">
                         <i class="fas fa-check-circle"></i>
-                        <span>Lebih dari 10.000 properti tersedia</span>
+                        <span>Menyediakan pilihan rumah dan ruko berkualitas</span>
                     </li>
+
                     <li class="feature-item">
                         <i class="fas fa-check-circle"></i>
-                        <span>Proses transaksi aman dan transparan</span>
+                        <span>Proses pemesanan dan pembayaran lebih mudah</span>
                     </li>
+
                     <li class="feature-item">
                         <i class="fas fa-check-circle"></i>
-                        <span>Dukungan customer service 24/7</span>
+                        <span>Tim siap membantu kebutuhan properti Anda</span>
                     </li>
                 </ul>
             </div>
@@ -493,13 +497,13 @@
                         <input type="password" 
                             class="form-control password-input" 
                             id="confirmPassword"
-                            name="konfirmasi_password"
+                            name="password_baru_confirmation"
                             placeholder="Konfirmasi password baru" required>
                         <span class="eye-icon" id="toggleConfirmPassword">
                             <i class="fas fa-eye"></i>
                         </span>
                     </div>
-                    @error('konfirmasi_password')
+                    @error('password_baru_confirmation')
                         <div style="color:red; font-size:0.85rem; margin-top:5px;">{{ $message }}</div>
                     @enderror
                 </div>

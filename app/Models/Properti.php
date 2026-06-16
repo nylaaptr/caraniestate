@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Perumahan;
 use App\Models\Blok;
+use App\Models\GambarProperti;
 
 class Properti extends Model
 {
@@ -28,8 +29,13 @@ class Properti extends Model
         'status_unit',
         'id_perumahan',
         'id_blok',
-        'deskripsi', // jika ada
-        // ... tambah kolom lainnya sesuai tabel
+
+        'bookingFee',
+        'luas_bangunan',
+        'luas_tanah',
+        'stok_unit',
+
+        'deskripsi',
     ];
 
     // ✅ Relationship ke Perumahan
@@ -74,4 +80,10 @@ class Properti extends Model
         
         return 'Rp ' . number_format($cicilan, 0, ',', '.');
     }
+
+    // RELASI KE GAMBAR PROPERTI
+    public function gambar()
+{
+    return $this->hasMany(GambarProperti::class, 'id_properti', 'id_properti');
+}
 }

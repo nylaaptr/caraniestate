@@ -372,20 +372,24 @@
                     <i class="fas fa-home"></i>
                 </div>
                 <h1 class="branding-title">Carani Estate</h1>
-                <p class="branding-subtitle">Platform terpercaya untuk membeli, menjual, dan menyewa properti berkualitas sejak 2015</p>
-                
+                <p class="branding-subtitle">
+                    Platform properti terpercaya untuk membantu Anda menemukan dan membeli properti dengan proses yang mudah dan aman.
+                </p>
+
                 <ul class="features-list">
                     <li class="feature-item">
                         <i class="fas fa-check-circle"></i>
-                        <span>Lebih dari 10.000 properti tersedia</span>
+                        <span>Menyediakan pilihan rumah dan ruko berkualitas</span>
                     </li>
+
                     <li class="feature-item">
                         <i class="fas fa-check-circle"></i>
-                        <span>Proses transaksi aman dan transparan</span>
+                        <span>Proses pemesanan dan pembayaran lebih mudah</span>
                     </li>
+
                     <li class="feature-item">
                         <i class="fas fa-check-circle"></i>
-                        <span>Dukungan customer service 24/7</span>
+                        <span>Tim siap membantu kebutuhan properti Anda</span>
                     </li>
                 </ul>
             </div>
@@ -401,44 +405,63 @@
                 <p class="form-subtitle">Daftar sekarang untuk mengakses semua fitur layanan kami</p>
             </div>
             
-            <form id="registerForm">
+            <form method="POST" action="{{ route('register.proses') }}">
+                @csrf
+
                 <div class="form-group">
-                    <label for="fullName" class="form-label">Nama Lengkap</label>
+                    <label class="form-label">Nama Lengkap</label>
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="fas fa-user"></i>
                         </span>
-                        <input type="text" class="form-control" id="fullName" placeholder="Masukkan nama lengkap Anda" required>
+                        <input type="text" 
+                            name="nama_user"
+                            class="form-control" 
+                            placeholder="Masukkan nama lengkap Anda" 
+                            required>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
+                    <label class="form-label">Email</label>
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="fas fa-envelope"></i>
                         </span>
-                        <input type="email" class="form-control" id="email" placeholder="Masukkan email Anda" required>
+                        <input type="email" 
+                            name="email_user"
+                            class="form-control" 
+                            placeholder="Masukkan email Anda" 
+                            required>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="phone" class="form-label">Nomor HP</label>
+                    <label class="form-label">Nomor HP</label>
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="fas fa-phone"></i>
                         </span>
-                        <input type="tel" class="form-control" id="phone" placeholder="Contoh: 081234567890" required>
+                        <input type="text" 
+                            name="no_hp"
+                            class="form-control" 
+                            placeholder="Contoh: 081234567890" 
+                            required>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
+                    <label class="form-label">Password</label>
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="fas fa-lock"></i>
                         </span>
-                        <input type="password" class="form-control password-input" id="password" placeholder="Buat password yang kuat" required>
+                        <input type="password" 
+                            name="password_user"
+                            id="password"
+                            class="form-control password-input" 
+                            placeholder="Buat password yang kuat" 
+                            required>
                         <span class="eye-icon" id="togglePassword">
                             <i class="fas fa-eye"></i>
                         </span>
@@ -446,12 +469,17 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="confirmPassword" class="form-label">Konfirmasi Password</label>
+                    <label class="form-label">Konfirmasi Password</label>
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="fas fa-lock"></i>
                         </span>
-                        <input type="password" class="form-control password-input" id="confirmPassword" placeholder="Ketik ulang password" required>
+                        <input type="password" 
+                            name="password_user_confirmation"
+                            id="confirmPassword"
+                            class="form-control password-input" 
+                            placeholder="Ketik ulang password" 
+                            required>
                         <span class="eye-icon" id="toggleConfirmPassword">
                             <i class="fas fa-eye"></i>
                         </span>
@@ -461,9 +489,11 @@
                 <button type="submit" class="btn-register w-100">
                     <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
                 </button>
-                
+
                 <div class="login-link">
-                    <p>Sudah memiliki akun? <a href="#">Login di sini</a></p>
+                    <p>Sudah memiliki akun? 
+                        <a href="{{ route('login') }}">Login di sini</a>
+                    </p>
                 </div>
             </form>
         </div>

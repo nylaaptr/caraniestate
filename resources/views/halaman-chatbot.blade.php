@@ -151,6 +151,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .profile-icon:hover {
@@ -278,6 +279,23 @@
             border-radius: 50%;
             display: inline-block;
             margin-right: 5px;
+        }
+
+        /* HAPUS CHAT */
+        .hapus-chat-btn{
+            margin-left:auto;
+            width:40px;
+            height:40px;
+            border:none;
+            border-radius:10px;
+            background:#fee2e2;
+            color:#dc2626;
+            cursor:pointer;
+            transition:0.2s;
+        }
+
+        .hapus-chat-btn:hover{
+            background:#fecaca;
         }
         
         /* Messages Area */
@@ -480,6 +498,153 @@
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
         }
+
+        .chat-katalog-wrapper {
+            max-width: 100%; /* samakan dengan bubble chat */
+            width: fit-content;
+            margin-top: 12px;
+            margin-left: 0;
+            padding-left: 20px; /* sejajar avatar bot */
+        }
+
+        /* Property Cards */
+        .properti-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .properti-card{
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            border-radius:14px;
+            overflow:hidden;
+            transition:0.3s;
+        }
+
+        .properti-card:hover {
+            box-shadow: 0 4px 15px rgba(122, 178, 211, 0.3);
+            border-color: var(--primary-blue);
+        }
+
+        .properti-card-content{
+            padding:16px;
+        }
+
+        .properti-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .properti-card-nama {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom:8px;
+            color: var(--dark-blue);
+        }
+
+        .properti-card-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-subsidi {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .badge-komersial {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .properti-card-info{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px 12px;
+            margin-bottom:14px;
+            color:#64748b;
+        }
+
+        .properti-card-info span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .properti-card-harga {
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .properti-card-image{
+            width:100%;
+            height:170px;
+            object-fit:cover;
+            display:block;
+            margin:0;
+            border-radius:0;
+        }
+
+        .properti-card-lokasi{
+            font-size:13px;
+            color:#64748b;
+            margin-top:8px;
+            margin-bottom:12px;
+            line-height:1.5;
+        }
+
+        .properti-card-lokasi div{
+            margin-bottom:4px;
+        }
+
+        .properti-card-btn {
+            width: 100%;
+            padding: 8px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .properti-card-btn:hover {
+            background: var(--dark-blue);
+            color: white;
+        }
+
+        /* KATALOG */
+        
+
+        /* Profilll */
+            .profile-avatar,
+            .profile-avatar-default {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .profile-avatar-default {
+                background: #7AB2D3;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+            }
         
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -654,6 +819,7 @@
     </style>
 </head>
 <body>
+    {{ Auth::check() ? 'LOGIN BERHASIL' : 'BELUM LOGIN' }}
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -721,16 +887,41 @@
 
                 {{-- Guest --}}
                 @guest
-                    <a href="{{ route('login') }}" class="nav-item login-link">
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
                     {{-- HANYA ICON PROFILE --}}
                     <a href="{{ route('halaman-profil') }}" class="profile-icon">
-                        <img src="{{ Auth::user()->profile_photo 
-                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
-                            : asset('default-avatar.png') }}" 
-                            alt="Profile" class="profile-img">
+                        @php
+                            $user = Auth::user();
+                        @endphp
+
+                        {{-- Prioritas 1: Foto upload user --}}
+                        @if($user->profile_photo)
+
+                            <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
+                                class="profile-avatar"
+                                alt="Profile Photo">
+
+                        {{-- Prioritas 2: Foto Google --}}
+                        @elseif($user->google_avatar)
+
+                            <img src="{{ $user->google_avatar }}"
+                                class="profile-avatar"
+                                referrerpolicy="no-referrer"
+                                alt="Google Photo"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}'">
+
+                        {{-- Prioritas 3: Inisial --}}
+                        @else
+
+                            <div class="profile-avatar-default">
+                                {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                            </div>
+
+                        @endif
+
                     </a>
                 @endguest
             </div>
@@ -745,10 +936,15 @@
                 <i class="fas fa-robot"></i>
             </div>
             <div class="chat-info">
-                <h1>PropertiBot Assistant</h1>
+                <h1>CaraniBot Assistant</h1>
                 <p><span class="status-indicator"></span>Online - Siap membantu Anda</p>
             </div>
+
+            <button class="hapus-chat-btn" onclick="hapusRiwayatChat()">
+            <i class="fas fa-trash"></i>
+        </button>
         </div>
+        
         
         <!-- Messages Area -->
         <div class="messages-area" id="messagesArea">
@@ -756,10 +952,10 @@
             <div class="message bot-message">
                 <div class="message-header">
                     <div class="bot-avatar" style="width:30px; height:30px; font-size:14px;">PH</div>
-                    <div>PropertiBot</div>
+                    <div>CaraniBot</div>
                 </div>
                 <div class="message-content">
-                    Halo! Saya PropertiBot. Ada yang bisa dibantu hari ini? 😊<br>
+                    Halo! Saya CaraniBot. Ada yang bisa dibantu hari ini? 😊<br>
                     Silakan tanya tentang harga, lokasi, atau KPR.
                 </div>
                 <div class="message-time">{{ date('H:i') }}</div>
@@ -768,17 +964,16 @@
                 <div class="quick-actions">
                     <button class="quick-btn" onclick="handleQuickReply('Cari Properti')">Cari Properti</button>
                     <button class="quick-btn" onclick="handleQuickReply('Info Harga')">Info Harga</button>
-                    <button class="quick-btn" onclick="handleQuickReply('Simulasi KPR')">Simulasi KPR</button>
+                    <!-- <button class="quick-btn" onclick="handleQuickReply('Simulasi KPR')">Simulasi KPR</button> -->
                 </div>
             </div>
-
-            <!-- Typing Indicator (Tersembunyi) -->
-            <!-- <div class="typing-indicator" id="typingIndicator">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-            </div> -->
         </div>
+        <input type="hidden" id="sessionId" value="{{ $chatSession->id_sessions ?? '' }}">
+        <input
+            type="hidden"
+            id="lastMessageId"
+            value="{{ $messages->last()->id_messages ?? 0 }}"
+        >
         
         <!-- Input Area -->
         <div class="input-area">
@@ -788,289 +983,974 @@
             </button>
         </div>
     </div>
+    <input type="hidden" id="sessionId" value="{{ $chatSession->id_sessions ?? '' }}">
 
     <script>
-        // BAGIAN NAV
-        // Add hover effect to table rows
-        document.querySelectorAll('tbody tr').forEach(row => {
-            row.addEventListener('mouseenter', function() {
-                this.style.background = '#f8fafc';
-            });
-            
-            row.addEventListener('mouseleave', function() {
-                this.style.background = '';
-            });
-        });
-        
-        // Pagination functionality
-        document.querySelectorAll('.page-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.page-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-                alert(`Menampilkan halaman ${this.textContent}`);
-            });
-        });
+        const sessionId = "{{ $chatSession?->id_sessions }}";
+    </script>
 
-        // TOGGLE NAV
-        function toggleMenu(){
-            document.getElementById('navMenu').classList.toggle('show');
-        }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
 
-        // SCRIPT CHAT
-
-        document.addEventListener('DOMContentLoaded', function() {
-    // --- KONFIGURASI ELEMENT ---
+    // =========================
+    // KONFIGURASI
+    // =========================
     const messagesArea = document.getElementById('messagesArea');
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
-    const typingIndicator = document.querySelector('.typing-indicator');
-    
-    // Kunci penyimpanan di browser
+
     const STORAGE_KEY = 'properti_chat_history';
 
-    // Token CSRF Laravel
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
-                      document.querySelector('input[name="_token"]')?.value;
+    const csrfToken =
+        document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+        document.querySelector('input[name="_token"]')?.value;
 
-    // --- 1. FUNGSI LOAD CHAT SAAT HALAMAN DIBUKA ---
+    let typingElement = null;
+
+
+    // =========================
+    // LOAD HISTORY
+    // =========================
     function loadChatHistory() {
-        const savedChat = sessionStorage.getItem(STORAGE_KEY);
-        if (savedChat) {
-            const history = JSON.parse(savedChat);
-            
-            history.forEach(msg => {
-                // Render ulang pesan tanpa memicu logika kirim ke server
-                renderMessageOnly(msg.text, msg.sender, msg.options);
+
+        if (
+            typeof existingMessages !== 'undefined' &&
+            existingMessages &&
+            existingMessages.length > 0
+        ) {
+
+            // messagesArea.innerHTML = '';
+
+            existingMessages.forEach(msg => {
+                loadedMessageIds.push(msg.id);
+                let senderType = 'bot';
+
+                if (msg.sender === 'user') {
+                    senderType = 'user';
+                }
+                if (msg.sender === 'admin') {
+                    senderType = 'bot';
+                }
+
+                let propertiData = [];
+
+                // decode properti_data dari database
+                if (msg.properti_data) {
+
+                    try {
+
+                        propertiData =
+                            typeof msg.properti_data === 'string'
+                                ? JSON.parse(msg.properti_data)
+                                : msg.properti_data;
+
+                    } catch (e) {
+
+                        console.log(e);
+
+                        propertiData = [];
+                    }
+                }
+
+                renderMessageOnly(
+                    msg.message,
+                    senderType,
+                    msg.options || [],
+                    propertiData
+                );
+
             });
+
             scrollToBottom();
-        } 
+
+            return;
+        }
+
+
+        // SESSION STORAGE
+        const savedChat =
+            sessionStorage.getItem(STORAGE_KEY);
+
+        if (savedChat) {
+
+            // messagesArea.innerHTML = '';
+
+            const history =
+                JSON.parse(savedChat);
+
+            history.forEach(msg => {
+
+                renderMessageOnly(
+                    msg.text,
+                    msg.sender,
+                    msg.options || [],
+                    msg.properti || []
+                );
+
+            });
+
+            scrollToBottom();
+        }
     }
 
-    // --- 2. FUNGSI SIMPAN CHAT ---
-    function saveChatToHistory(text, sender, options = null) {
+    // =========================
+// AUTO REFRESH CHAT ADMIN
+// =========================
+let lastMessageId = 0;
+
+async function loadNewMessages() {
+
+    try {
+
+        const sessionId =
+            document.getElementById('sessionId')?.value;
+            
+            console.log('SESSION ID =', sessionId);
+        const response = await fetch(
+            `/chatbot/pesan-terbaru?session_id=${sessionId}`
+        );
+
+        const data = await response.json();
+
+        if (!data.messages) return;
+
+        data.messages.forEach(msg => {
+
+            if (msg.id_messages <= lastMessageId) return;
+
+            lastMessageId = msg.id_messages;
+
+            let senderType = msg.sender === 'user' ? 'user' : 'bot';
+
+            let propertiData = [];
+
+            if (msg.properti_data) {
+                try {
+                    propertiData =
+                        typeof msg.properti_data === 'string'
+                            ? JSON.parse(msg.properti_data)
+                            : msg.properti_data;
+                } catch (e) {
+                    propertiData = [];
+                }
+            }
+
+            renderMessageOnly(
+                msg.message,
+                senderType,
+                [],
+                propertiData
+            );
+
+        });
+
+        scrollToBottom();
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// refresh tiap 3 detik
+setInterval(loadNewMessages, 1000);
+
+
+    // =========================
+    // SAVE HISTORY
+    // =========================
+    function saveChatToHistory(
+        text,
+        sender,
+        options = null,
+        properti = []
+    ) {
+
         let history = [];
-        const savedChat = sessionStorage.getItem(STORAGE_KEY);
-        
+
+        const savedChat =
+            sessionStorage.getItem(STORAGE_KEY);
+
         if (savedChat) {
+
             history = JSON.parse(savedChat);
         }
 
-        // Simpan data sederhana (text, sender, dan label opsi jika ada)
-        const optionsLabels = options ? options.map(opt => typeof opt === 'object' ? opt.label : opt) : null;
+        const optionsLabels = options
+            ? options.map(opt =>
+                typeof opt === 'object'
+                    ? opt.label
+                    : opt
+            )
+            : null;
 
         history.push({
+
             text: text,
+
             sender: sender,
-            options: optionsLabels
+
+            options: optionsLabels,
+
+            properti: properti
+
         });
 
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        sessionStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(history)
+        );
     }
 
-    // --- 3. FUNGSI UTAMA KIRIM PESAN ---
+
+    // =========================
+    // SEND MESSAGE
+    // =========================
     async function sendMessage() {
-        const text = messageInput.value.trim();
+
+        const text =
+            messageInput.value.trim();
+
         if (!text) return;
 
-        // Tampilkan pesan user & Simpan
-        addMessage(text, 'user');
-        saveChatToHistory(text, 'user');
+        addMessage(
+            text,
+            'user'
+        );
+
+        saveChatToHistory(
+            text,
+            'user'
+        );
+
         messageInput.value = '';
-        
+
         showTyping();
 
         try {
-            // Kirim ke Backend Laravel
-            const response = await fetch('/api/chat/send', { 
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ message: text })
-            });
 
-            const data = await response.json();
+            const response =
+                await fetch(
+                    '/chatbot/kirim',
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+
+                        body: JSON.stringify({
+                            message: text
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            console.log(data);
+            console.log(data.properti);
 
             hideTyping();
-            
-            // Tampilkan balasan bot & Simpan
-            sendBotReply(data.reply, data.options, true); 
+
+            sendBotReply(
+                data.reply,
+                data.options || [],
+                true,
+                data.properti || []
+            );
 
         } catch (error) {
-            console.error('Error:', error);
+
             hideTyping();
-            const errorMsg = "Maaf, terjadi kesalahan koneksi ke server.";
-            addMessage(errorMsg, 'bot');
-            saveChatToHistory(errorMsg, 'bot');
+
+            addMessage(
+                'Maaf kak, terjadi kesalahan koneksi 😥',
+                'bot'
+            );
+
+            console.error(error);
         }
     }
 
-    // --- 4. FUNGSI RENDER PESAN KE LAYAR ---
-    
-    // Fungsi untuk menambah pesan baru (Interaktif + Simpan)
-    function addMessage(text, sender) {
-        const msgElement = createMessageElement(text, sender);
-        messagesArea.appendChild(msgElement);
+
+    // =========================
+    // HAPUS RIWAYAT
+    // =========================
+    window.hapusRiwayatChat = async function () {
+
+        const konfirmasi = confirm(
+            'Hapus semua riwayat chat?'
+        );
+
+        if (!konfirmasi) return;
+
+        try {
+
+            await fetch('/chatbot/hapus-riwayat', {
+
+                method: 'DELETE',
+
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+
+            });
+
+            sessionStorage.removeItem(
+                STORAGE_KEY
+            );
+
+            messagesArea.innerHTML = `
+                <div class="message bot-message">
+
+                    <div class="message-header">
+
+                        <div class="bot-avatar" style="width:30px; height:30px; font-size:14px;">
+                            PH
+                        </div>
+
+                        <div>CaraniBot</div>
+
+                    </div>
+
+                    <div class="message-content">
+                        Halo! Saya CaraniBot. Ada yang bisa dibantu hari ini? 😊<br>
+                        Silakan tanya tentang harga, lokasi, atau KPR.
+                    </div>
+
+                    <div class="message-time">
+                        ${new Date().toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </div>
+
+                    <div class="quick-actions">
+
+                        <button
+                            class="quick-btn"
+                            onclick="handleQuickReplyClick('Cari Properti')">
+
+                            Cari Properti
+
+                        </button>
+
+                        <button
+                            class="quick-btn"
+                            onclick="handleQuickReplyClick('Info Harga')">
+                            Info Harga
+                        </button>
+                    </div>
+                </div>
+            `;
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert('Gagal menghapus chat');
+        }
+    }
+
+
+    // =========================
+    // ADD MESSAGE
+    // =========================
+    function addMessage(
+        text,
+        sender
+    ) {
+
+        const msgElement =
+            createMessageElement(
+                text,
+                sender
+            );
+
+        messagesArea.appendChild(
+            msgElement
+        );
+
         scrollToBottom();
+
         return msgElement;
     }
 
-    // Fungsi khusus untuk render ulang dari History
-    function renderMessageOnly(text, sender, savedOptions) {
-        const msgElement = createMessageElement(text, sender);
-        
-        // Jika ada opsi yang tersimpan, buat tombolnya kembali
-        if (sender === 'bot' && savedOptions && savedOptions.length > 0) {
-            const actionsContainer = msgElement.querySelector('.quick-actions-container');
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'quick-actions';
-            
-            savedOptions.forEach(optLabel => {
-                const btn = document.createElement('button');
-                btn.className = 'quick-btn';
-                btn.textContent = optLabel;
-                btn.onclick = () => handleQuickReplyClick(optLabel);
-                actionsDiv.appendChild(btn);
-            });
-            actionsContainer.appendChild(actionsDiv);
-        }
 
-        messagesArea.appendChild(msgElement);
-    }
+    // =========================
+    // CREATE MESSAGE
+    // =========================
+    function createMessageElement(
+        text,
+        sender
+    ) {
 
-    // Helper membuat elemen HTML pesan
-    function createMessageElement(text, sender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}-message`;
-        
+        const messageDiv =
+            document.createElement('div');
+
+        messageDiv.className =
+            `message ${sender}-message`;
+
         const now = new Date();
-        const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-        
+
+        const timeString =
+            now.getHours()
+                .toString()
+                .padStart(2, '0')
+            +
+            ':' +
+            now.getMinutes()
+                .toString()
+                .padStart(2, '0');
+
         if (sender === 'bot') {
+
             messageDiv.innerHTML = `
                 <div class="message-header">
-                    <div class="bot-avatar">PH</div>
-                    <div>PropertiBot</div>
+
+                    <div class="bot-avatar">
+                        PH
+                    </div>
+
+                    <div>
+                        CaraniBot
+                    </div>
+
                 </div>
-                <div class="message-content">${text}</div>
-                <div class="message-time">${timeString}</div>
-                <div class="quick-actions-container"></div> 
+
+                <div class="message-content">
+                    ${text}
+                </div>
+
+                <div class="message-time">
+                    ${timeString}
+                </div>
+
+                <div class="quick-actions-container"></div>
             `;
+
         } else {
+
             messageDiv.innerHTML = `
-                <div class="message-content">${text}</div>
-                <div class="message-time">${timeString}</div>
+                <div class="message-content">
+                    ${text}
+                </div>
+
+                <div class="message-time">
+                    ${timeString}
+                </div>
             `;
         }
+
         return messageDiv;
     }
 
-    // Fungsi kirim balasan bot (dengan opsi simpan)
-    function sendBotReply(text, options = [], shouldSave = false) {
-        const msgElement = addMessage(text, 'bot');
-        const actionsContainer = msgElement.querySelector('.quick-actions-container');
-        
-        if (options && options.length > 0) {
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'quick-actions';
-            
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'quick-btn';
-                const label = typeof opt === 'object' ? opt.label : opt;
-                btn.textContent = label;
-                
-                btn.onclick = () => handleQuickReplyClick(label);
-                actionsDiv.appendChild(btn);
-            });
-            
-            actionsContainer.appendChild(actionsDiv);
-            scrollToBottom();
+
+    // =========================
+    // PROPERTY CARDS
+    // =========================
+    function renderPropertyCards(
+        propertiList,
+        actionsContainer
+    ) {
+
+        console.log('DATA PROPERTI:', propertiList);
+
+        if (
+            !Array.isArray(propertiList) ||
+            propertiList.length <= 0
+        ) {
+            return;
         }
 
-        if (shouldSave) {
-            const optionsLabels = options.map(opt => typeof opt === 'object' ? opt.label : opt);
-            saveChatToHistory(text, 'bot', optionsLabels);
-        }
-    }
+        const wrapper =
+            document.createElement('div');
 
-    // Handler khusus untuk klik tombol quick reply
-    function handleQuickReplyClick(text) {
-        addMessage(text, 'user');
-        saveChatToHistory(text, 'user');
-        processLocalResponse(text);
-    }
+        wrapper.className =
+            'chat-katalog-wrapper';
 
-    // Helper untuk handle klik tombol (kirim ke backend lagi)
-    function processLocalResponse(text) {
-        showTyping();
-        setTimeout(async () => {
-            try {
-                const response = await fetch('/api/chat/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ message: text })
-                });
-                const data = await response.json();
-                hideTyping();
-                sendBotReply(data.reply, data.options, true);
-            } catch (e) {
-                hideTyping();
-                console.error(e);
+        const cardsContainer =
+            document.createElement('div');
+
+        cardsContainer.className =
+            'properti-cards';
+
+        propertiList.forEach(item => {
+
+            if (
+                !item ||
+                typeof item !== 'object'
+            ) {
+                console.log('INVALID ITEM:', item);
+                return;
             }
-        }, 600);
+
+            const gambar =
+                item.gambar &&
+                item.gambar.length > 0
+                    ? '/storage/' + item.gambar[0].path_gambar
+                    : '/images/no-image.jpg';
+
+            const namaPerumahan =
+                item.perumahan?.nama_perumahan || '-';
+
+            const namaBlok =
+                item.blok?.nama_blok || '-';
+            const kategori =
+                item.kategori_properti || 'properti';
+
+            const kategoriClass =
+                kategori === 'subsidi'
+                    ? 'badge-subsidi'
+                    : 'badge-komersial';
+
+            const nama =
+                item.nama_properti || '-';
+
+            const jenis =
+                item.jenis_properti || '-';
+
+            const luasBangunan =
+                item.luas_bangunan || 0;
+
+            const luasTanah =
+                item.luas_tanah || 0;
+
+            const harga =
+                item.harga_properti || 0;
+
+            const id =
+                item.id_properti || 0;
+
+            const card =
+                document.createElement('div');
+
+            card.className =
+                'properti-card';
+
+            card.innerHTML = `
+            <img
+                src="${gambar}"
+                class="properti-card-image"
+                alt="${nama}"
+            >
+
+            <div class="properti-card-content">
+                <div class="properti-card-header">
+
+                    <div class="properti-card-nama">
+                        ${nama}
+                    </div>
+
+                    <div class="properti-card-badge ${kategoriClass}">
+                        ${kategori}
+                    </div>
+
+                </div>
+
+                <div class="properti-card-lokasi">
+
+                    <div>
+                        <i class="fas fa-city"></i>
+                        ${namaPerumahan}
+                    </div>
+
+                    <div>
+                        <i class="fas fa-map-marker-alt"></i>
+                        Blok ${namaBlok}
+                    </div>
+
+                </div>
+
+                <div class="properti-card-info">
+
+                    <span>
+                        <i class="fas fa-home"></i>
+                        ${jenis}
+                    </span>
+
+                    <span>
+                        <i class="fas fa-ruler-combined"></i>
+                        LB ${luasBangunan} m²
+                    </span>
+
+                    <span>
+                        <i class="fas fa-expand"></i>
+                        LT ${luasTanah} m²
+                    </span>
+
+                </div>
+
+                <div class="properti-card-harga">
+                    Rp ${Number(harga).toLocaleString('id-ID')}
+                </div>
+
+                <a
+                    href="/detail-katalog/${id}"
+                    class="properti-card-btn">
+
+                    Lihat Detail
+                </a>
+            </div>
+        `;
+
+            cardsContainer.appendChild(
+                card
+            );
+
+        });
+
+        wrapper.appendChild(
+            cardsContainer
+        );
+
+        actionsContainer.appendChild(
+            wrapper
+        );
     }
 
-    // --- UTILITIES ---
-    // --- UTILITIES (DIPERBARUI) ---
-    
-    let typingElement = null; // Variabel untuk menyimpan elemen typing
 
-    function showTyping() { 
-        // Jika sudah ada, hapus dulu biar tidak duplikat
-        if (typingElement) typingElement.remove();
+    // =========================
+    // RENDER HISTORY
+    // =========================
+    function renderMessageOnly(
+        text,
+        sender,
+        savedOptions = [],
+        propertiList = []
+    ) {
 
-        // Buat elemen typing baru secara dinamis
-        typingElement = document.createElement('div');
-        typingElement.className = 'typing-indicator';
+        const msgElement =
+            createMessageElement(
+                text,
+                sender
+            );
+
+        const actionsContainer =
+            msgElement.querySelector(
+                '.quick-actions-container'
+            );
+
+        // QUICK BUTTON
+        if (
+            sender === 'bot' &&
+            savedOptions.length > 0
+        ) {
+
+            const actionsDiv =
+                document.createElement('div');
+
+            actionsDiv.className =
+                'quick-actions';
+
+            savedOptions.forEach(label => {
+
+                const btn =
+                    document.createElement('button');
+
+                btn.className =
+                    'quick-btn';
+
+                btn.textContent =
+                    label;
+
+                btn.onclick = function () {
+                    handleQuickReplyClick(label);
+                };
+
+                actionsDiv.appendChild(btn);
+
+            });
+
+            actionsContainer.appendChild(
+                actionsDiv
+            );
+        }
+
+        // PROPERTY CARD
+        if (
+            sender === 'bot' &&
+            propertiList.length > 0
+        ) {
+
+            renderPropertyCards(
+                propertiList,
+                actionsContainer
+            );
+        }
+
+        messagesArea.appendChild(
+            msgElement
+        );
+    }
+
+
+    // =========================
+    // BOT REPLY
+    // =========================
+    function sendBotReply(
+        text,
+        options = [],
+        shouldSave = false,
+        propertiList = []
+    ) {
+
+        const msgElement =
+            addMessage(
+                text,
+                'bot'
+            );
+
+        const actionsContainer =
+            msgElement.querySelector(
+                '.quick-actions-container'
+            );
+
+        // QUICK BUTTON
+        if (options.length > 0) {
+
+            const actionsDiv =
+                document.createElement('div');
+
+            actionsDiv.className =
+                'quick-actions';
+
+            options.forEach(opt => {
+
+                const btn =
+                    document.createElement('button');
+
+                btn.className =
+                    'quick-btn';
+
+                const label =
+                    typeof opt === 'object'
+                        ? opt.label
+                        : opt;
+
+                btn.textContent =
+                    label;
+
+                btn.onclick = function () {
+                    handleQuickReplyClick(label);
+                };
+
+                actionsDiv.appendChild(btn);
+
+            });
+
+            actionsContainer.appendChild(
+                actionsDiv
+            );
+        }
+
+        // PROPERTY CARD
+        if (
+            propertiList &&
+            propertiList.length > 0
+        ) {
+
+            renderPropertyCards(
+                propertiList,
+                actionsContainer
+            );
+        }
+
+        // SAVE HISTORY
+        if (shouldSave) {
+
+            saveChatToHistory(
+                text,
+                'bot',
+                options,
+                propertiList
+            );
+        }
+
+        scrollToBottom();
+    }
+
+
+    // =========================
+    // QUICK REPLY
+    // =========================
+    window.handleQuickReplyClick = function (text) {
+
+        messageInput.value = text;
+
+        sendMessage();
+    }
+
+
+    // =========================
+    // SHOW TYPING
+    // =========================
+    function showTyping() {
+
+        if (typingElement) {
+            typingElement.remove();
+        }
+
+        typingElement =
+            document.createElement('div');
+
+        typingElement.className =
+            'typing-indicator';
+
         typingElement.innerHTML = `
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>
         `;
-        
-        messagesArea.appendChild(typingElement);
-        scrollToBottom(); 
+
+        messagesArea.appendChild(
+            typingElement
+        );
+
+        scrollToBottom();
     }
 
-    function hideTyping() { 
+
+    // =========================
+    // HIDE TYPING
+    // =========================
+    function hideTyping() {
+
         if (typingElement) {
-            typingElement.remove(); // Hapus elemen dari layar
-            typingElement = null;   // Reset variabel
+
+            typingElement.remove();
+
+            typingElement = null;
         }
     }
 
-    function scrollToBottom() { 
-        messagesArea.scrollTop = messagesArea.scrollHeight; 
+
+    // =========================
+    // SCROLL
+    // =========================
+    function scrollToBottom() {
+
+        messagesArea.scrollTop =
+            messagesArea.scrollHeight;
     }
 
 
-    // --- EVENT LISTENERS ---
-    sendBtn.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') sendMessage();
-    });
+    // =========================
+    // EVENTS
+    // =========================
+    sendBtn.addEventListener(
+        'click',
+        sendMessage
+    );
 
-    // Jalankan load history saat DOM siap
+    messageInput.addEventListener(
+        'keypress',
+        function (e) {
+
+            if (e.key === 'Enter') {
+
+                e.preventDefault();
+
+                sendMessage();
+            }
+        }
+    );
+
+
+    // =========================
+    // LOAD CHAT
+    // =========================
     loadChatHistory();
+
+    // =========================
+// AUTO REFRESH PESAN ADMIN
+// =========================
+// let loadedMessageIds = [];
+
+// async function loadNewMessages() {
+
+//     try {
+
+//         const response = await fetch(
+//             '/chatbot/pesan-terbaru'
+//         );
+
+//         const data = await response.json();
+
+//         if (!data.messages) return;
+
+//         data.messages.forEach(msg => {
+//             // HAPUS ENTAR
+//             console.log('PESAN MASUK', msg);
+
+//             if (msg.id_messages <= lastMessageId) return;
+
+//             lastMessageId = msg.id_messages;
+//             // skip jika sudah pernah dimuat
+//             if (
+//                 loadedMessageIds.includes(msg.id)
+//             ) {
+//                 return;
+//             }
+
+//             loadedMessageIds.push(msg.id);
+
+//             let senderType =
+//                 msg.sender === 'user'
+//                     ? 'user'
+//                     : 'bot';
+
+//             let propertiData = [];
+
+//             if (msg.properti_data) {
+
+//                 try {
+
+//                     propertiData =
+//                         typeof msg.properti_data === 'string'
+//                             ? JSON.parse(msg.properti_data)
+//                             : msg.properti_data;
+
+//                 } catch(e) {
+
+//                     propertiData = [];
+//                 }
+//             }
+
+//             renderMessageOnly(
+//                 msg.message,
+//                 senderType,
+//                 [],
+//                 propertiData
+//             );
+
+//         });
+
+//         scrollToBottom();
+
+//     } catch(error) {
+
+//         console.log(error);
+//     }
+// }
+
+
+// // jalankan tiap 3 detik
+// setInterval(loadNewMessages, 3000);
+
 });
     </script>
+
+    <script>
+
+const chatBox =
+    document.querySelector('.messages-area');
+
+</script>
+
 </body>
 </html>
 

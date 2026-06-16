@@ -115,6 +115,48 @@
             overflow: hidden;
         }
 
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-parent {
+            justify-content: space-between;
+        }
+
+        .arrow {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-submenu {
+            display: none;
+            flex-direction: column;
+            padding-left: 40px;
+            transition: all 0.2s ease;
+        }
+        
+
+        /* optional arrow */
+        .nav-group.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-submenu a {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        .nav-submenu a:hover {
+            opacity: 1;
+        }
+
+        /* open state */
+        .nav-group.open .nav-submenu {
+            display: flex;
+        }
+
         .nav-item:hover {
             background: rgba(255,255,255,0.08);
             border-left-color: var(--primary-blue);
@@ -320,6 +362,82 @@
         
         .stat-change i {
             font-size: 14px;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+
+        .chart-subtitle {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .chart-tabs {
+            display: flex;
+            gap: 5px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .chart-tab {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+
+        .chart-tab.active {
+            background: white;
+            color: var(--dark-blue);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-container-sm {
+            position: relative;
+            height: 280px;
         }
         
         /* Recent Activity */
@@ -563,7 +681,7 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar"  id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
                 <i class="fas fa-home"></i>
@@ -578,17 +696,23 @@
                 <span>Dashboard</span>
             </a>
 
-            <a href="{{ route('admin.data_user') }}"
-                class="nav-item {{ request()->routeIs('admin.data_user') ? 'active' : '' }}">
-                <i class="fas fa-users"></i>
-                <span>Data User</span>
-            </a>
+            <div class="nav-group" id="propertiMenu">
+                <div class="nav-item nav-parent" onclick="toggleMenu('propertiMenu')">
+                    <i class="fas fa-house"></i>
+                    <span>Properti</span>
+                    <i class="fas fa-chevron-down arrow"></i>
+                </div>
 
-            <a href="{{ route('admin.data_rumah') }}"
-                class="nav-item {{ request()->routeIs('admin.data_rumah') ? 'active' : '' }}">
-                <i class="fas fa-house"></i>
-                <span>Data Rumah</span>
-            </a>
+                <div class="nav-submenu">
+                    <a href="{{ route('admin.data_rumah') }}" class="nav-subitem">
+                        <span>Data Rumah</span>
+                    </a>
+
+                    <a href="{{ route('admin.perumahan') }}" class="nav-subitem">
+                        <span>Perumahan</span>
+                    </a>
+                </div>
+            </div>
 
             <a href="{{ route('admin.halaman_verifikasi') }}"
                 class="nav-item {{ request()->routeIs('admin.halaman_verifikasi') ? 'active' : '' }}">
@@ -596,10 +720,22 @@
                 <span>Verifikasi Data</span>
             </a>
 
-            <a href="{{ route('admin.halaman_chatbot') }}"
-                class="nav-item {{ request()->routeIs('admin.halaman_chatbot') ? 'active' : '' }}">
+            <a href="{{ route('admin.monitoring-pemesanan') }}"
+                class="nav-item {{ request()->routeIs('admin.monitoring-pemesanan') ? 'active' : '' }}">
+                <i class="fas fa-chart-line"></i>
+                <span>Monitoring</span>
+            </a>
+
+            <a href="{{ route('admin.laporan_penjualan') }}"
+                class="nav-item {{ request()->routeIs('admin.laporan_penjualan') ? 'active' : '' }}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Laporan Penjualan</span>
+            </a>
+
+            <a href="{{ route('admin.pesan_pelanggan') }}"
+                class="nav-item {{ request()->routeIs('admin.pesan_pelanggan') ? 'active' : '' }}">
                 <i class="fas fa-comments"></i>
-                <span>Chatbot</span>
+                <span>Pesan Pelanggan</span>
             </a>
         
             <form method="POST" action="{{ route('logout') }}">
@@ -613,7 +749,7 @@
     </div>
     
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         <!-- Header -->
         <div class="header">
             <h1 class="page-title">Dashboard Admin</h1>
@@ -621,7 +757,7 @@
             <div class="user-profile">
                 <div class="avatar">A</div>
                 <div class="user-info">
-                    <div class="user-name">Admin Utama</div>
+                    <div class="user-name">Admin</div>
                     <div class="user-role">Administrator</div>
                 </div>
             </div>
@@ -631,7 +767,7 @@
         <div class="dashboard-stats">
             <div class="stat-card">
                 <div class="stat-title">Visitor</div>
-                <div class="stat-value">5,200</div>
+                <div class="stat-value">{{ number_format($totalVisitor) }}</div>
                 <div class="stat-change">
                     Pengunjung website
                 </div>
@@ -639,25 +775,74 @@
 
             <div class="stat-card">
                 <div class="stat-title">Leads</div>
-                <div class="stat-value">320</div>
+                <div class="stat-value">{{ number_format($totalLeads) }}</div>
                 <div class="stat-change positive">
-                    Isi email / tertarik
+                    User tertarik / kontak admin
                 </div>
             </div>
 
-            <!-- <div class="stat-card">
-                <div class="stat-title">User Terdaftar</div>
-                <div class="stat-value">180</div>
+            <div class="stat-card">
+                <div class="stat-title">User</div>
+                <div class="stat-value">{{ number_format($totalUser) }}</div>
                 <div class="stat-change positive">
-                    Sudah login akun
+                    Akun terdaftar
                 </div>
-            </div> -->
+            </div>
 
             <div class="stat-card">
                 <div class="stat-title">Transaksi</div>
-                <div class="stat-value">75</div>
+                <div class="stat-value">{{ number_format($totalTransaksi) }}</div>
                 <div class="stat-change positive">
                     Pembelian berhasil
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">
+                            Statistik Penjualan Properti
+                        </div>
+
+                        <div class="chart-subtitle">
+                            Monitoring transaksi & pendapatan properti
+                        </div>
+                    </div>
+
+                    <div class="chart-tabs">
+                        <button class="chart-tab active" id="btnBulanan">
+                            Bulanan
+                        </button>
+
+                        <button class="chart-tab" id="btnTahunan">
+                            Tahunan
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">
+                            Status Pemesanan Properti
+                        </div>
+
+                        <div class="chart-subtitle">
+                            Persentase status transaksi
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container-sm">
+                    <canvas id="statusChart"></canvas>
                 </div>
             </div>
         </div>
@@ -665,100 +850,35 @@
         <!-- Recent Activity -->
         <div class="recent-activity">
             <div class="activity-header">
-                <h2 class="activity-title">Aktivitas Terbaru</h2>
-                <a href="#" class="view-all">Lihat Semua</a>
+                <h2 class="activity-title">
+                    Aktivitas Terbaru
+                </h2>
+                <a href="{{ route('admin.aktivitas') }}" class="view-all">
+                    Lihat Semua
+                </a>
             </div>
-            
+
             <ul class="activity-list">
+                @forelse($recentActivities as $activity)
                 <li class="activity-item">
                     <div class="activity-icon">
-                        <i class="fas fa-user-plus"></i>
+                        <i class="fas {{ $activity['icon'] }}"></i>
                     </div>
+
                     <div class="activity-content">
-                        <div class="activity-text">Pengguna baru mendaftar: Nayla Putri Wijaya</div>
-                        <div class="activity-time">10 menit yang lalu</div>
+                        <div class="activity-text">
+                            {{ $activity['text'] }}
+                        </div>
+                        <div class="activity-time">
+                            {{ \Carbon\Carbon::parse($activity['time'])->diffForHumans() }}
+                        </div>
                     </div>
                 </li>
-                
-                <li class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-text">Properti baru ditambahkan: Kelapa Gading Regency</div>
-                        <div class="activity-time">2 jam yang lalu</div>
-                    </div>
-                </li>
-                
-                <li class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-file-upload"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-text">Dokumen verifikasi dikirim oleh Alfin Rahman</div>
-                        <div class="activity-time">5 jam yang lalu</div>
-                    </div>
-                </li>
-                
-                <li class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-text">Transaksi baru: Rizky Saputra membeli Green City</div>
-                        <div class="activity-time">Kemarin</div>
-                    </div>
-                </li>
-                
-                <li class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-comment"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-text">Pesan ChatBot baru dari Siti Nurhaliza</div>
-                        <div class="activity-time">Kemarin</div>
-                    </div>
-                </li>
+            @empty
+                <li>Belum ada aktivitas</li>
+            @endforelse
             </ul>
         </div>
-        
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <div class="actions-header">
-                <h2 class="actions-title">Aksi Cepat</h2>
-            </div>
-            
-            <div class="actions-grid">
-                <div class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <div class="action-title">Tambah User</div>
-                </div>
-                
-                <div class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <div class="action-title">Tambah Properti</div>
-                </div>
-                
-                <div class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="action-title">Verifikasi Dokumen</div>
-                </div>
-                
-                <div class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="action-title">Lihat Laporan</div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -795,30 +915,298 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            
-            if (isCollapsed) {
-                sidebar.classList.add('collapsed');
-                mainContent.classList.add('expanded');
-            }
-            
-            // Hover effect untuk sidebar (opsional - untuk expand temporary)
-            sidebar.addEventListener('mouseenter', function() {
-                if (this.classList.contains('collapsed')) {
-                    this.style.width = 'var(--sidebar-width-expanded)';
-                }
-            });
-            
-            sidebar.addEventListener('mouseleave', function() {
-                if (this.classList.contains('collapsed')) {
-                    this.style.width = 'var(--sidebar-width-collapsed)';
-                }
-            });
-        });
+        
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | SALES CHART
+    |--------------------------------------------------------------------------
+    */
+
+    const salesCtx = document.getElementById('salesChart');
+
+if (salesCtx) {
+
+    let salesChart;
+
+    // DATA BULANAN
+    const bulananData = {
+
+        labels: @json($labelBulanan),
+
+        transaksi: @json($dataTransaksi),
+
+        pendapatan: @json($dataPendapatan)
+    };
+
+    // DATA TAHUNAN
+    const tahunanData = {
+
+        labels: @json($labelTahunan),
+
+        transaksi: @json($dataTahunanTransaksi),
+
+        pendapatan: @json($dataTahunanPendapatan)
+    };
+
+    // FUNCTION RENDER CHART
+    function renderChart(data) {
+
+        if (salesChart) {
+            salesChart.destroy();
+        }
+
+        salesChart = new Chart(salesCtx, {
+
+            type: 'bar',
+
+            data: {
+
+                labels: data.labels,
+
+                datasets: [
+
+                    {
+                        label: 'Total Transaksi',
+
+                        data: data.transaksi,
+
+                        backgroundColor: '#3B82F6',
+
+                        borderRadius: 8,
+
+                        yAxisID: 'y'
+                    },
+
+                    {
+                        label: 'Pendapatan',
+
+                        data: data.pendapatan,
+
+                        type: 'line',
+
+                        borderColor: '#10B981',
+
+                        backgroundColor: '#10B981',
+
+                        tension: 0.4,
+
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+
+            options: {
+
+                responsive: true,
+                maintainAspectRatio: false,
+
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+
+                plugins: {
+
+                    legend: {
+                        position: 'top'
+                    }
+                },
+
+                scales: {
+
+                    y: {
+                        beginAtZero: true
+                    },
+
+                    y1: {
+
+                        beginAtZero: true,
+
+                        position: 'right',
+
+                        grid: {
+                            drawOnChartArea: false
+                        },
+
+                        ticks: {
+
+                            callback: function(value) {
+
+                                return 'Rp ' +
+                                    new Intl.NumberFormat('id-ID')
+                                    .format(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // DEFAULT CHART
+    renderChart(bulananData);
+
+    // BUTTON BULANAN
+    document.getElementById('btnBulanan')
+        .addEventListener('click', function() {
+
+            renderChart(bulananData);
+
+            this.classList.add('active');
+
+            document.getElementById('btnTahunan')
+                .classList.remove('active');
+        });
+
+    // BUTTON TAHUNAN
+    document.getElementById('btnTahunan')
+        .addEventListener('click', function() {
+
+            renderChart(tahunanData);
+
+            this.classList.add('active');
+
+            document.getElementById('btnBulanan')
+                .classList.remove('active');
+        });
+}
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | STATUS CHART
+    |--------------------------------------------------------------------------
+    */
+
+    const statusCtx = document.getElementById('statusChart');
+
+    if (statusCtx) {
+
+        new Chart(statusCtx, {
+
+            type: 'doughnut',
+
+            data: {
+
+                labels: [
+                    'Berhasil',
+                    'Menunggu Pembayaran',
+                    'Menunggu Verifikasi',
+                    'Upload Ulang',
+                    'Ditolak'
+                ],
+
+                datasets: [{
+
+                    data: [
+
+                        {{ $chartStatus['berhasil'] }},
+                        {{ $chartStatus['menunggu_pembayaran'] }},
+                        {{ $chartStatus['menunggu_verifikasi'] }},
+                        {{ $chartStatus['perlu_upload_ulang'] }},
+                        {{ $chartStatus['ditolak'] }}
+
+                    ],
+
+                    backgroundColor: [
+
+                        '#10B981',
+                        '#F59E0B',
+                        '#3B82F6',
+                        '#8B5CF6',
+                        '#EF4444'
+
+                    ],
+
+                    borderWidth: 0
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+});
+</script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    if (!sidebar || !mainContent) {
+        console.error("sidebar / mainContent tidak ditemukan");
+        return;
+    }
+
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+    function closeAllDropdowns() {
+        document.querySelectorAll('.nav-group.open').forEach(el => {
+            el.classList.remove('open');
+        });
+    }
+
+    // INIT STATE
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+        mainContent.classList.add('expanded');
+        closeAllDropdowns();
+    }
+
+    // HOVER IN
+    sidebar.addEventListener('mouseenter', function () {
+        if (this.classList.contains('collapsed')) {
+            this.classList.add('hovering');
+        }
+    });
+
+    // HOVER OUT
+    sidebar.addEventListener('mouseleave', function () {
+        this.classList.remove('hovering');
+        closeAllDropdowns();
+    });
+});
+
+
+/* ===================================================
+   TOGGLE DROPDOWN (INI WAJIB GLOBAL BIAR onclick WORK)
+=================================================== */
+window.toggleMenu = function (id) {
+
+    const sidebar = document.getElementById('sidebar');
+    const el = document.getElementById(id);
+
+    if (!el || !sidebar) return;
+
+    // kalau sidebar collapsed DAN tidak hover → blok
+    const isBlocked =
+        sidebar.classList.contains('collapsed') &&
+        !sidebar.classList.contains('hovering');
+
+    if (isBlocked) return;
+
+    el.classList.toggle('open');
+};
+</script>
 </body>
 </html>
 

@@ -115,6 +115,48 @@
             overflow: hidden;
         }
 
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-parent {
+            justify-content: space-between;
+        }
+
+        .arrow {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-submenu {
+            display: none;
+            flex-direction: column;
+            padding-left: 40px;
+            transition: all 0.2s ease;
+        }
+        
+
+        /* optional arrow */
+        .nav-group.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-submenu a {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        .nav-submenu a:hover {
+            opacity: 1;
+        }
+
+        /* open state */
+        .nav-group.open .nav-submenu {
+            display: flex;
+        }
+
         .nav-item:hover {
             background: rgba(255,255,255,0.08);
             border-left-color: var(--primary-blue);
@@ -156,6 +198,7 @@
             margin-top: auto;
             white-space: nowrap;
             overflow: hidden;
+            color: #ffff;
         }
 
         .logout-btn:hover {
@@ -310,7 +353,7 @@
         
         .form-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
         
@@ -408,6 +451,74 @@
             color: var(--primary-blue);
             font-weight: 500;
         }
+
+        /* PREVIEW GAMBAR */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .preview-item {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .preview-item button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+
+            width: 24px;
+            height: 24px;
+
+            border-radius: 50%;
+            border: none;
+
+            background: transparent;
+            color: white;
+
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: 0.2s;
+        }
+
+        .preview-img:hover {
+            transform: scale(1.05);
+            border-color: #4a90b7;
+        }
+
+        .img-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .img-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+        }
         
         /* Action buttons */
         .form-actions {
@@ -446,6 +557,7 @@
         .btn-cancel {
             background: #e2e8f0;
             color: #4a5568;
+            text-decoration: none;
         }
         
         .btn-cancel:hover {
@@ -571,12 +683,12 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar"  id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
                 <i class="fas fa-home"></i>
             </div>
-            <div class="company-name">PT. Properti Harmoni</div>
+            <div class="company-name">PT. Carani Bhanu Balakosa</div>
         </div>
         
         <div class="nav-menu" id="navMenu">
@@ -586,17 +698,23 @@
                 <span>Dashboard</span>
             </a>
 
-            <a href="{{ route('admin.data_user') }}"
-                class="nav-item {{ request()->routeIs('admin.data_user') ? 'active' : '' }}">
-                <i class="fas fa-users"></i>
-                <span>Data User</span>
-            </a>
+            <div class="nav-group" id="propertiMenu">
+                <div class="nav-item nav-parent" onclick="toggleMenu('propertiMenu')">
+                    <i class="fas fa-house"></i>
+                    <span>Properti</span>
+                    <i class="fas fa-chevron-down arrow"></i>
+                </div>
 
-            <a href="{{ route('admin.data_rumah') }}"
-                class="nav-item {{ request()->routeIs('admin.data_rumah') ? 'active' : '' }}">
-                <i class="fas fa-house"></i>
-                <span>Data Rumah</span>
-            </a>
+                <div class="nav-submenu">
+                    <a href="{{ route('admin.data_rumah') }}" class="nav-subitem">
+                        <span>Data Rumah</span>
+                    </a>
+
+                    <a href="{{ route('admin.perumahan') }}" class="nav-subitem">
+                        <span>Perumahan</span>
+                    </a>
+                </div>
+            </div>
 
             <a href="{{ route('admin.halaman_verifikasi') }}"
                 class="nav-item {{ request()->routeIs('admin.halaman_verifikasi') ? 'active' : '' }}">
@@ -604,16 +722,31 @@
                 <span>Verifikasi Data</span>
             </a>
 
-            <a href="{{ route('admin.halaman_chatbot') }}"
-                class="nav-item {{ request()->routeIs('admin.halaman_chatbot') ? 'active' : '' }}">
+            <a href="{{ route('admin.monitoring-pemesanan') }}"
+                class="nav-item {{ request()->routeIs('admin.monitoring-pemesanan') ? 'active' : '' }}">
+                <i class="fas fa-chart-line"></i>
+                <span>Monitoring</span>
+            </a>
+
+            <a href="{{ route('admin.laporan_penjualan') }}"
+                class="nav-item {{ request()->routeIs('admin.laporan_penjualan') ? 'active' : '' }}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Laporan Penjualan</span>
+            </a>
+
+            <a href="{{ route('admin.pesan_pelanggan') }}"
+                class="nav-item {{ request()->routeIs('admin.pesan_pelanggan') ? 'active' : '' }}">
                 <i class="fas fa-comments"></i>
-                <span>Chatbot</span>
+                <span>Pesan Pelanggan</span>
             </a>
         
-            <div class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="logout-btn" style="width:100%; background:none; border:none; cursor:pointer; text-align:left;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </div>
     
@@ -626,7 +759,7 @@
                 <div class="breadcrumb">
                     <a href="dashboard.html" class="breadcrumb-link">Dashboard</a>
                     <i class="fas fa-chevron-right"></i>
-                    <a href="data-rumah.html" class="breadcrumb-link">Data Rumah</a>
+                    <a href="{{ route('admin.data_rumah') }}" class="breadcrumb-link">Data Rumah</a>
                     <i class="fas fa-chevron-right"></i>
                     <span>Tambah Data Rumah</span>
                 </div>
@@ -635,168 +768,332 @@
             <div class="user-profile">
                 <div class="avatar">A</div>
                 <div class="user-info">
-                    <div class="user-name">Admin Utama</div>
+                    <div class="user-name">Admin</div>
                     <div class="user-role">Administrator</div>
                 </div>
             </div>
         </div>
-        
-        <!-- Add Property Form -->
-        <div class="add-property-container">
-            <div class="form-header">
-                <h2 class="form-title">Form Tambah Properti</h2>
-                <p class="form-subtitle">Isi data properti baru dengan lengkap dan valid</p>
-            </div>
             
-            <form id="addPropertyForm">
-                <!-- Property Information Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-home"></i> Informasi Dasar Properti
-                    </h3>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="namaProperti" class="form-label">Nama Properti <span class="required">*</span></label>
-                            <input type="text" class="form-control" id="namaProperti" placeholder="Contoh: Kelapa Gading Regency" required>
+            <!-- Add Property Form -->
+            <div class="add-property-container">
+                <div class="form-header">
+                    <h2 class="form-title">Form Tambah Properti</h2>
+                    <p class="form-subtitle">
+                        Isi data properti baru dengan lengkap dan valid
+                    </p>
+                </div>
+
+                <form method="POST" action="{{ route('admin.simpan-rumah') }}" enctype="multipart/form-data">
+
+                    @csrf
+
+                    <!-- Property Information -->
+                    <div class="form-section">
+
+                        <h3 class="section-title">
+                            <i class="fas fa-home"></i>
+                            Informasi Dasar Properti
+                        </h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Perumahan</label>
+                                <select name="id_perumahan" id="perumahanSelect" class="form-control" required>
+                                    <option value="">Pilih Perumahan</option>
+                                    @foreach($perumahan as $p)
+                                        <option value="{{ $p->id_perumahan }}">
+                                            {{ $p->nama_perumahan }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Nama Properti
+                                </label>
+
+                                <input type="text"
+                                    name="nama_properti"
+                                    class="form-control"
+                                    placeholder="Contoh: Ruko Kelapa Gading"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Jenis Properti
+                                </label>
+
+                                <select name="jenis_properti"
+                                        class="form-control"
+                                        placeholder="Contoh: Ruko"
+                                        required>
+
+                                    <option value="">Pilih</option>
+                                    <option value="rumah">Rumah</option>
+                                    <option value="ruko">Ruko</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Kategori Properti
+                                </label>
+
+                                <select name="kategori_properti"
+                                        class="form-control"
+                                        placeholder="Contoh: Komersial"
+                                        required>
+
+                                    <option value="">Pilih</option>
+                                    <option value="subsidi">Subsidi</option>
+                                    <option value="komersial">Komersial</option>
+                                </select>
+                            </div>
                         </div>
-                        
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Tipe Properti
+                                </label>
+                                <select name="tipe_properti"
+                                        class="form-control"
+                                        required>
+                                    <option value="">Pilih</option>
+                                    <option value="30/60">30/60</option>
+                                    <option value="36/72">36/72</option>
+                                    <option value="45/84">45/84</option>
+                                    <option value="60/135">60/135</option>
+                                    <option value="ruko">Ruko</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Blok</label>
+                                <select name="id_blok" id="blokSelect" class="form-control" required>
+                                    <option value="">Pilih Blok</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="form-group">
-                            <label for="jenisProperti" class="form-label">Jenis Properti <span class="required">*</span></label>
-                            <select class="form-control" id="jenisProperti" required>
-                                <option value="">Pilih Jenis Properti</option>
-                                <option value="rumah">Rumah</option>
-                                <option value="ruko">Ruko</option>
+                                <label>Stok Unit</label>
+                                <input type="number" name="stok_unit" class="form-control" placeholder="Contoh: 1,2,3" required>
+                            </div>
+                    </div>
+
+                    <!-- Harga -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-tag"></i>
+                            Detail Harga & Ukuran
+                        </h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Harga Properti</label>
+                                <input type="number"
+                                    name="harga_properti"
+                                    class="form-control"
+                                    placeholder="Contoh: 700000000"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Booking Fee</label>
+                                <input type="number" class="form-control"placeholder="Contoh: 100000000" name="bookingFee">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Luas Bangunan</label>
+                                <input type="number"
+                                    name="luas_bangunan"
+                                    class="form-control"
+                                    placeholder="Contoh: 36"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Luas Tanah</label>
+                                <input type="number"
+                                    name="luas_tanah"
+                                    class="form-control"
+                                    placeholder="Contoh: 72"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Status -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-boxes"></i>
+                            Status Unit
+                        </h3>
+                        <div class="form-group">
+                            <select name="status_unit"
+                                    class="form-control"
+                                    required>
+                                <option value="">Pilih</option>
+                                <option value="tersedia">Tersedia</option>
+                                <option value="dipesan">Dipesan</option>
+                                <option value="terjual">Terjual</option>
                             </select>
                         </div>
                     </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="kategoriProperti" class="form-label">Kategori Properti <span class="required">*</span></label>
-                            <select class="form-control" id="kategoriProperti" required>
-                                <option value="">Pilih Kategori</option>
-                                <option value="subsidi">Subsidi</option>
-                                <option value="komersial">Komersial</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="tipeProperti" class="form-label">Tipe Properti <span class="required">*</span></label>
-                            <select class="form-control" id="tipeProperti" required>
-                                <option value="">Pilih Tipe</option>
-                                <option value="30/60">30/60</option>
-                                <option value="36/72">36/72</option>
-                                <option value="45/84">45/84</option>
-                                <option value="60/135">60/135</option>
-                                <option value="ruko">Ruko</option>
-                            </select>
-                        </div>
+
+
+                    <!-- Upload -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-image"></i>
+                            Gambar Properti
+                        </h3>
+                        <div id="previewContainer" class="preview-grid"></div>
+                        <input type="file"
+                        id="gambar"
+                        name="gambar[]"
+                        class="form-control"
+                        accept="image/*"
+                        multiple>
                     </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label for="blokRumah" class="form-label">Blok Rumah (Opsional)</label>
-                            <input type="text" class="form-control" id="blokRumah" placeholder="Contoh: Blok A, Cluster Bunga">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Price & Size Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-tag"></i> Detail Harga & Ukuran
-                    </h3>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="hargaProperti" class="form-label">Harga Properti (Rp) <span class="required">*</span></label>
-                            <input type="number" class="form-control" id="hargaProperti" placeholder="Contoh: 450000000" min="0" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="luasBangunan" class="form-label">Luas Bangunan (m²) <span class="required">*</span></label>
-                            <input type="number" class="form-control" id="luasBangunan" placeholder="Contoh: 36" min="0" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="luasTanah" class="form-label">Luas Tanah (m²) <span class="required">*</span></label>
-                            <input type="number" class="form-control" id="luasTanah" placeholder="Contoh: 72" min="0" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="stokUnit" class="form-label">Stok Unit <span class="required">*</span></label>
-                            <input type="number" class="form-control" id="stokUnit" placeholder="Contoh: 8" min="0" required>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Status Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-boxes"></i> Status Unit
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label for="statusUnit" class="form-label">Status Unit <span class="required">*</span></label>
-                        <select class="form-control" id="statusUnit" required>
-                            <option value="">Pilih Status</option>
-                            <option value="tersedia">Tersedia</option>
-                            <option value="dipesan">Dipesan</option>
-                            <option value="terjual">Terjual</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Image Upload Section -->
-                <div class="image-upload-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-image"></i> Gambar Properti
-                    </h3>
-                    <p class="form-subtitle">Upload gambar properti (opsional, maksimal 5 file)</p>
-                    
-                    <div class="upload-area" id="imageUpload">
-                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                        <p class="upload-text">Klik atau drag file gambar ke sini</p>
-                        <p class="upload-hint">Format: JPG, PNG | Max: 5MB per file</p>
-                        <input type="file" class="file-input" id="propertyImage" accept=".jpg,.jpeg,.png" multiple>
-                        <div class="file-name" id="imageName">Belum ada file yang dipilih</div>
-                    </div>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="form-actions">
-                    <button type="button" class="btn-action btn-cancel" id="cancelBtn">
-                        <i class="fas fa-times"></i> Batal
+
+                    <button type="button" onclick="cekFile()">
+                        Cek File
                     </button>
-                    <button type="submit" class="btn-action btn-save">
-                        <i class="fas fa-home"></i> Tambah Properti
-                    </button>
-                </div>
-            </form>
-        </div>
+
+                    <!-- Tombol -->
+                    <div class="form-actions">
+                        <a href="{{ route('admin.data_rumah') }}"
+                        class="btn-action btn-cancel">
+                            Batal
+                        </a>
+
+                        <button type="submit"
+                                class="btn-action btn-save">
+                            Tambah Properti
+                        </button>
+                    </div>
+                </form>
+            </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle sidebar on small screens
-            const sidebar = document.querySelector('.sidebar');
-            const mainContent = document.querySelector('.main-content');
-            
-            // Add hover effect for desktop
-            if (window.innerWidth > 992) {
-                sidebar.addEventListener('mouseenter', function() {
-                    this.style.width = '300px';
-                    mainContent.style.marginLeft = '300px';
-                });
-                
-                sidebar.addEventListener('mouseleave', function() {
-                    this.style.width = 'var(--sidebar-width)';
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+function cekFile() {
+    console.log(
+        document.getElementById('gambar').files
+    );
+}
+</script>
+
+    <!-- JS GAMBAR -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let fileBuffer = [];
+            const fileInput = document.querySelector('input[name="gambar[]"]');
+            const container = document.getElementById('previewContainer');
+
+            if (!fileInput || !container) return;
+            fileInput.addEventListener('change', function (event) {
+                const files = Array.from(event.target.files);
+                fileBuffer = fileBuffer.concat(files);
+                renderPreview();
+                // fileInput.value = '';
+            });
+
+            function renderPreview() {
+                container.innerHTML = '';
+                fileBuffer.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const wrapper = document.createElement('div');
+                        wrapper.classList.add('preview-item');
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.classList.add('preview-img');
+
+                        img.onclick = () => openModal(e.target.result);
+
+                        const delBtn = document.createElement('button');
+                        delBtn.innerText = '×';
+
+                        delBtn.onclick = () => {
+                            fileBuffer.splice(index, 1);
+                            renderPreview();
+                        };
+
+                        wrapper.appendChild(img);
+                        wrapper.appendChild(delBtn);
+
+                        container.appendChild(wrapper);
+                    };
+
+                    reader.readAsDataURL(file);
                 });
             }
+
+            window.openModal = function (src) {
+                const modal = document.getElementById('imgModal');
+                const img = document.getElementById('imgModalSrc');
+
+                if (!modal || !img) return;
+
+                modal.style.display = 'flex';
+                img.src = src;
+            };
+
+            window.closeModal = function () {
+                const modal = document.getElementById('imgModal');
+                if (modal) modal.style.display = 'none';
+            };
+
+        });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+                const perumahan = document.getElementById('perumahanSelect');
+                const blok = document.getElementById('blokSelect');
+
+                if (!perumahan || !blok) return;
+
+                perumahan.addEventListener('change', function () {
+
+                    let id = this.value;
+
+                    if (!id) {
+                        blok.innerHTML = '<option value="">Pilih Blok</option>';
+                        return;
+                    }
+
+                    fetch('/admin/get-blok/' + id)
+                        .then(res => res.json())
+                        .then(data => {
+
+                            blok.innerHTML = '<option value="">Pilih Blok</option>';
+
+                            data.forEach(b => {
+                                blok.innerHTML += `
+                                    <option value="${b.id_blok}">
+                                        ${b.nama_blok}
+                                    </option>
+                                `;
+                            });
+
+                        })
+                        .catch(err => {
+                            console.log('error blok:', err);
+                        });
+
+                });
+
+            });
+            </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             
             // Add active state to nav items
             const navItems = document.querySelectorAll('.nav-item');
@@ -807,112 +1104,6 @@
                 });
             });
             
-            // Image upload handling
-            const uploadArea = document.getElementById('imageUpload');
-            const fileInput = document.getElementById('propertyImage');
-            const fileName = document.getElementById('imageName');
-            
-            uploadArea.addEventListener('click', () => {
-                fileInput.click();
-            });
-            
-            fileInput.addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    if (this.files.length > 1) {
-                        fileName.textContent = `${this.files.length} file dipilih`;
-                    } else {
-                        fileName.textContent = this.files[0].name;
-                    }
-                    fileName.style.color = 'var(--primary-blue)';
-                } else {
-                    fileName.textContent = 'Belum ada file yang dipilih';
-                    fileName.style.color = '#94a3b8';
-                }
-            });
-            
-            // Form submission
-            document.getElementById('addPropertyForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Get form values
-                const namaProperti = document.getElementById('namaProperti').value.trim();
-                const jenisProperti = document.getElementById('jenisProperti').value;
-                const kategoriProperti = document.getElementById('kategoriProperti').value;
-                const tipeProperti = document.getElementById('tipeProperti').value;
-                const blokRumah = document.getElementById('blokRumah').value.trim();
-                const hargaProperti = document.getElementById('hargaProperti').value.trim();
-                const luasBangunan = document.getElementById('luasBangunan').value.trim();
-                const luasTanah = document.getElementById('luasTanah').value.trim();
-                const stokUnit = document.getElementById('stokUnit').value.trim();
-                const statusUnit = document.getElementById('statusUnit').value;
-                
-                // Simple validation
-                if (!namaProperti) {
-                    alert('Nama properti harus diisi');
-                    document.getElementById('namaProperti').focus();
-                    return;
-                }
-                
-                if (!jenisProperti) {
-                    alert('Jenis properti harus dipilih');
-                    document.getElementById('jenisProperti').focus();
-                    return;
-                }
-                
-                if (!kategoriProperti) {
-                    alert('Kategori properti harus dipilih');
-                    document.getElementById('kategoriProperti').focus();
-                    return;
-                }
-                
-                if (!tipeProperti) {
-                    alert('Tipe properti harus dipilih');
-                    document.getElementById('tipeProperti').focus();
-                    return;
-                }
-                
-                if (!hargaProperti || isNaN(hargaProperti) || parseInt(hargaProperti) <= 0) {
-                    alert('Harga properti harus diisi dan berupa angka positif');
-                    document.getElementById('hargaProperti').focus();
-                    return;
-                }
-                
-                if (!luasBangunan || isNaN(luasBangunan) || parseInt(luasBangunan) <= 0) {
-                    alert('Luas bangunan harus diisi dan berupa angka positif');
-                    document.getElementById('luasBangunan').focus();
-                    return;
-                }
-                
-                if (!luasTanah || isNaN(luasTanah) || parseInt(luasTanah) <= 0) {
-                    alert('Luas tanah harus diisi dan berupa angka positif');
-                    document.getElementById('luasTanah').focus();
-                    return;
-                }
-                
-                if (!stokUnit || isNaN(stokUnit) || parseInt(stokUnit) < 0) {
-                    alert('Stok unit harus diisi dan berupa angka non-negatif');
-                    document.getElementById('stokUnit').focus();
-                    return;
-                }
-                
-                if (!statusUnit) {
-                    alert('Status unit harus dipilih');
-                    document.getElementById('statusUnit').focus();
-                    return;
-                }
-                
-                // Success message
-                alert(`Properti "${namaProperti}" berhasil ditambahkan!\n\nDetail:\n- Jenis: ${jenisProperti}\n- Kategori: ${kategoriProperti}\n- Tipe: ${tipeProperti}\n- Harga: Rp ${parseInt(hargaProperti).toLocaleString('id-ID')}\n- Status: ${statusUnit}`);
-                
-                // Reset form
-                this.reset();
-                fileName.textContent = 'Belum ada file yang dipilih';
-                fileName.style.color = '#94a3b8';
-                
-                // In a real Laravel application, you would submit the form data to the server here
-                // window.location.href = 'data-rumah.html';
-            });
-            
             // Cancel button
             document.getElementById('cancelBtn').addEventListener('click', function() {
                 if (confirm('Apakah Anda yakin ingin membatalkan penambahan properti? Semua data yang telah diisi akan hilang.')) {
@@ -920,8 +1111,74 @@
                     window.location.href = 'data-rumah.html';
                 }
             });
-        });
+        });  
     </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    if (!sidebar || !mainContent) {
+        console.error("sidebar / mainContent tidak ditemukan");
+        return;
+    }
+
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+    function closeAllDropdowns() {
+        document.querySelectorAll('.nav-group.open').forEach(el => {
+            el.classList.remove('open');
+        });
+    }
+
+    // INIT STATE
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+        mainContent.classList.add('expanded');
+        closeAllDropdowns();
+    }
+
+    // HOVER IN
+    sidebar.addEventListener('mouseenter', function () {
+        if (this.classList.contains('collapsed')) {
+            this.classList.add('hovering');
+        }
+    });
+
+    // HOVER OUT
+    sidebar.addEventListener('mouseleave', function () {
+        this.classList.remove('hovering');
+        closeAllDropdowns();
+    });
+});
+
+
+/* ===================================================
+   TOGGLE DROPDOWN (INI WAJIB GLOBAL BIAR onclick WORK)
+=================================================== */
+window.toggleMenu = function (id) {
+
+    const sidebar = document.getElementById('sidebar');
+    const el = document.getElementById(id);
+
+    if (!el || !sidebar) return;
+
+    // kalau sidebar collapsed DAN tidak hover → blok
+    const isBlocked =
+        sidebar.classList.contains('collapsed') &&
+        !sidebar.classList.contains('hovering');
+
+    if (isBlocked) return;
+
+    el.classList.toggle('open');
+};
+</script>
+
+<div id="imgModal" class="img-modal" onclick="closeModal()">
+    <img id="imgModalSrc">
+</div>
 </body>
 </html>
 

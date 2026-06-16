@@ -5,47 +5,45 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
+use App\Models\LogAktivitas;
 
 class AuthController extends Controller
 {
-    // Tampilkan form login
+    // =========================
+    // HALAMAN LOGIN
+    // =========================
     public function index()
     {
         return view('login');
     }
 
-    // Proses login
-    // AuthController.php
-
+    // =========================
+    // LOGIN MANUAL
+    // =========================
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
+            'email' => 'required|email',
             'password' => 'required',
-        ], [
-            'email.required' => 'Email wajib diisi',
-            'email.email' => 'Format email tidak valid',
-            'password.required' => 'Password wajib diisi',
         ]);
 
         $user = User::where('email_user', $request->email)->first();
 
-        // AuthController.php - method login()
-
         if ($user && Hash::check($request->password, $user->password_user)) {
-            
+
             Auth::login($user);
             $request->session()->regenerate();
 
-            // 🔥 AMBIL PARAMETER 'redirect' (pakai input() lebih reliable)
-            $redirectUrl = $request->input('redirect');
+            // LOG AKTIVITAS LOGIN
+            LogAktivitas::create([
+                'id_user' => $user->id_user,
+                'aktivitas' => 'Login ke sistem',
+                'icon' => 'fa-right-to-bracket',
+                'tipe' => 'login'
+            ]);
 
-            if ($redirectUrl && str_starts_with($redirectUrl, '/')) {
-                return redirect($redirectUrl);
-            }
-
-            // Fallback jika redirect tidak valid / tidak ada
             if ($user->role_user === 'admin') {
                 return redirect()->route('admin.welcome');
             }
@@ -54,92 +52,156 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'Email atau password yang Anda masukkan salah.',
+            'email' => 'Email atau password salah.'
         ])->withInput($request->except('password'));
     }
 
-    // Tampilkan form ganti password
+    // =========================
+    // GOOGLE LOGIN
+    // =========================
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+
+            $googleUser = Socialite::driver('google')->user();
+
+            $user = User::where('email_user', $googleUser->email)->first();
+
+            if (!$user) {
+
+                $user = User::create([
+                    'nama_user' => $googleUser->name,
+                    'email_user' => $googleUser->email,
+                    'password_user' => bcrypt('google-login'),
+                    'role_user' => 'customer',
+                    'google_id' => $googleUser->id,
+                    'google_avatar' => $googleUser->avatar,
+                ]);
+
+            } else {
+
+                $user->update([
+                    'google_id' => $googleUser->id,
+                    'google_avatar' => $googleUser->avatar,
+                ]);
+            }
+
+            Auth::login($user);
+            request()->session()->regenerate();
+
+            // LOG AKTIVITAS GOOGLE LOGIN
+            LogAktivitas::create([
+                'id_user' => $user->id_user,
+                'aktivitas' => 'Login menggunakan Google',
+                'icon' => 'fa-google',
+                'tipe' => 'login'
+            ]);
+
+            return redirect()->route('halaman-katalog');
+
+        } catch (\Exception $e) {
+
+            return redirect()->route('login')->with('error', 'Login Google gagal.');
+        }
+    }
+
+    // =========================
+    // FORM GANTI PASSWORD
+    // =========================
     public function formGantiPassword(Request $request)
     {
         $email = $request->query('email');
+
         return view('gantipass', compact('email'));
     }
 
-    // Proses update password
+    // =========================
+    // UPDATE PASSWORD
+    // =========================
     public function updatePassword(Request $request)
     {
         $request->validate([
-            'email'               => 'required|email|exists:users,email_user',
-            'password_baru'       => 'required|min:8|confirmed',
-        ], [
-            'email.exists' => 'Email tidak terdaftar dalam sistem.',
-            'password_baru.min' => 'Password minimal 8 karakter.',
-            'password_baru.confirmed' => 'Konfirmasi password tidak cocok.',
+            'email' => 'required|email|exists:user,email_user',
+            'password_baru' => 'required|min:8|confirmed',
         ]);
 
         $user = User::where('email_user', $request->email)->first();
 
         if ($user) {
+
             $user->update([
                 'password_user' => Hash::make($request->password_baru)
             ]);
         }
 
-        return redirect()->route('login')
-            ->with('success', 'Password berhasil diubah! Silakan login dengan password baru.');
+        return redirect()->route('login')->with('success', 'Password berhasil diubah.');
     }
 
-    // Logout
+    // =========================
+    // LOGOUT
+    // =========================
     public function logout(Request $request)
     {
-        $role = Auth::user()->role_user; // ← cek role sebelum logout
-        
+        $user = Auth::user();
+
+        // LOG SEBELUM LOGOUT
+        if ($user) {
+            LogAktivitas::create([
+                'id_user' => $user->id_user,
+                'aktivitas' => 'Logout dari sistem',
+                'icon' => 'fa-right-from-bracket',
+                'tipe' => 'logout'
+            ]);
+        }
+
+        $role = $user->role_user ?? null;
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
-        // Redirect berdasarkan role
+
         if ($role === 'admin') {
-            return redirect()->route('login'); // ← admin ke login
+            return redirect()->route('login');
         }
-        
-        return redirect()->route('welcome'); // ← pengguna ke welcome
+
+        return redirect()->route('welcome');
     }
 
+    // =========================
     // REGISTER
+    // =========================
     public function register(Request $request)
     {
-        // 🔥 1. VALIDASI INPUT
-        $validated = $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'email_user' => 'required|email|unique:users,email_user',
-            'no_hp' => 'required|string|max:20',
-            'pekerjaan' => 'nullable|string|max:100',
+        $request->validate([
+            'nama_user' => 'required',
+            'email_user' => 'required|email|unique:user,email_user',
+            'no_hp' => 'required',
             'password_user' => 'required|min:8|confirmed',
-        ], [
-            // Custom error messages (opsional tapi disarankan)
-            'nama_lengkap.required' => 'Nama lengkap wajib diisi',
-            'email_user.required' => 'Email wajib diisi',
-            'email_user.email' => 'Format email tidak valid',
-            'email_user.unique' => 'Email sudah terdaftar',
-            'no_hp.required' => 'Nomor HP wajib diisi',
-            'password_user.required' => 'Password wajib diisi',
-            'password_user.min' => 'Password minimal 8 karakter',
-            'password_user.confirmed' => 'Konfirmasi password tidak cocok',
         ]);
 
-        // 🔥 2. SIMPAN USER KE DATABASE
+        $role = ($request->email_user === 'admin@gmail.com') ? 'admin' : 'customer';
+
         $user = User::create([
-            'nama_user' => $validated['nama_lengkap'],
-            'email_user' => $validated['email_user'],
-            'no_hp' => $validated['no_hp'],
-            'pekerjaan' => $validated['pekerjaan'] ?? null,
-            'password_user' => Hash::make($validated['password_user']),
-            'role_user' => 'user', // default role
+            'nama_user' => $request->nama_user,
+            'email_user' => $request->email_user,
+            'no_hp' => $request->no_hp,
+            'password_user' => bcrypt($request->password_user),
+            'role_user' => $role,
         ]);
 
-        // 🔥 3. REDIRECT KE WELCOME DENGAN PESAN SUKSES
-        return redirect()->route('welcome')
-            ->with('success', 'Akun berhasil dibuat! Silakan login.');
+        // LOG REGISTER
+        LogAktivitas::create([
+            'id_user' => $user->id_user,
+            'aktivitas' => 'Mendaftar akun baru',
+            'icon' => 'fa-user-plus',
+            'tipe' => 'register'
+        ]);
+
+        return redirect()->route('login')->with('success', 'Register berhasil.');
     }
 }

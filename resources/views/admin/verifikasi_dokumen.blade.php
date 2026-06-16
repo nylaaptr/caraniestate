@@ -115,6 +115,48 @@
             overflow: hidden;
         }
 
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-parent {
+            justify-content: space-between;
+        }
+
+        .arrow {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-submenu {
+            display: none;
+            flex-direction: column;
+            padding-left: 40px;
+            transition: all 0.2s ease;
+        }
+        
+
+        /* optional arrow */
+        .nav-group.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-submenu a {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        .nav-submenu a:hover {
+            opacity: 1;
+        }
+
+        /* open state */
+        .nav-group.open .nav-submenu {
+            display: flex;
+        }
+
         .nav-item:hover {
             background: rgba(255,255,255,0.08);
             border-left-color: var(--primary-blue);
@@ -156,6 +198,7 @@
             margin-top: auto;
             white-space: nowrap;
             overflow: hidden;
+            color: #ffff;
         }
 
         .logout-btn:hover {
@@ -426,6 +469,7 @@
         .doc-actions {
             display: flex;
             gap: 10px;
+            text-decoration: none;
         }
         
         .action-btn {
@@ -438,16 +482,22 @@
             font-size: 16px;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .view-btn {
             background: #e2e8f0;
             color: #4a5568;
+            text-decoration: none;
         }
         
         .view-btn:hover {
             background: #cbd5e0;
             color: #1a365d;
+        }
+
+        a {
+            text-decoration: none;
         }
         
         .reject-btn {
@@ -850,7 +900,7 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar"  id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
                 <i class="fas fa-home"></i>
@@ -865,17 +915,23 @@
                 <span>Dashboard</span>
             </a>
 
-            <a href="{{ route('admin.data_user') }}"
-                class="nav-item {{ request()->routeIs('admin.data_user') ? 'active' : '' }}">
-                <i class="fas fa-users"></i>
-                <span>Data User</span>
-            </a>
+            <div class="nav-group" id="propertiMenu">
+                <div class="nav-item nav-parent" onclick="toggleMenu('propertiMenu')">
+                    <i class="fas fa-house"></i>
+                    <span>Properti</span>
+                    <i class="fas fa-chevron-down arrow"></i>
+                </div>
 
-            <a href="{{ route('admin.data_rumah') }}"
-                class="nav-item {{ request()->routeIs('admin.data_rumah') ? 'active' : '' }}">
-                <i class="fas fa-house"></i>
-                <span>Data Rumah</span>
-            </a>
+                <div class="nav-submenu">
+                    <a href="{{ route('admin.data_rumah') }}" class="nav-subitem">
+                        <span>Data Rumah</span>
+                    </a>
+
+                    <a href="{{ route('admin.perumahan') }}" class="nav-subitem">
+                        <span>Perumahan</span>
+                    </a>
+                </div>
+            </div>
 
             <a href="{{ route('admin.halaman_verifikasi') }}"
                 class="nav-item {{ request()->routeIs('admin.halaman_verifikasi') ? 'active' : '' }}">
@@ -883,16 +939,31 @@
                 <span>Verifikasi Data</span>
             </a>
 
-            <a href="{{ route('admin.halaman_chatbot') }}"
-                class="nav-item {{ request()->routeIs('admin.halaman_chatbot') ? 'active' : '' }}">
+            <a href="{{ route('admin.monitoring-pemesanan') }}"
+                class="nav-item {{ request()->routeIs('admin.monitoring-pemesanan') ? 'active' : '' }}">
+                <i class="fas fa-chart-line"></i>
+                <span>Monitoring</span>
+            </a>
+
+            <a href="{{ route('admin.laporan_penjualan') }}"
+                class="nav-item {{ request()->routeIs('admin.laporan_penjualan') ? 'active' : '' }}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Laporan Penjualan</span>
+            </a>
+
+            <a href="{{ route('admin.pesan_pelanggan') }}"
+                class="nav-item {{ request()->routeIs('admin.pesan_pelanggan') ? 'active' : '' }}">
                 <i class="fas fa-comments"></i>
-                <span>Chatbot</span>
+                <span>Pesan Pelanggan</span>
             </a>
         
-            <div class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="logout-btn" style="width:100%; background:none; border:none; cursor:pointer; text-align:left;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </div>
     
@@ -905,31 +976,24 @@
             <div class="user-profile">
                 <div class="avatar">A</div>
                 <div class="user-info">
-                    <div class="user-name">Admin Utama</div>
+                    <div class="user-name">Admin</div>
                     <div class="user-role">Administrator</div>
                 </div>
             </div>
         </div>
         
         <!-- Verification Container -->
-        <div class="verification-container">
+        {{-- Header: Tampilkan info transaksi --}}
             <div class="verification-header">
                 <h2 class="verification-title">
                     Verifikasi Dokumen - {{ $user->nama_user }}
+                    <small>{{ \Carbon\Carbon::parse($transaksi->tanggal_transaksi)->format('d/m/Y H:i') }}</small>
                 </h2>
             </div>
-            
-            <div class="user-info-card">
-                <div class="user-avatar">N</div>
-                <div class="user-details">
-                    <div class="user-name-large">{{ $user->nama_user }}</div>
-                    <!-- <div class="user-id">ID: {{ $user->id_user }}</div> -->
-                    <div class="user-status pending">Status: Belum Diverifikasi</div>
-                </div>
-            </div>
-            
+
+            {{-- List Dokumen --}}
             <div class="document-list">
-                @foreach ($user->dokumen as $dok)
+                @forelse ($dokumen as $dok)  {{-- ✅ Loop dari $dokumen, bukan $user->dokumen --}}
                 <div class="document-item">
                     <div class="doc-info">
                         <div class="doc-icon 
@@ -956,42 +1020,72 @@
 
                     <div class="doc-actions">
 
-                        {{-- 👁 VIEW → buka tab baru --}}
+                        {{-- VIEW --}}
                         <a href="{{ asset('storage/' . $dok->path_file) }}" target="_blank">
                             <div class="action-btn view-btn">
                                 <i class="fas fa-eye"></i>
                             </div>
                         </a>
 
-                        {{-- ❌ TOLAK (hilang kalau sudah diterima) --}}
+
+                        {{-- TOLAK --}}
                         @if($dok->status_verifikasi != 'diterima')
-                        <form method="POST" action="{{ route('admin.verifikasi.tolak', $dok->id_dokumen) }}">
+
+                        <!-- TOLAK -->
+                        <form method="POST"
+                            action="{{ route('admin.verifikasi.tolak', $dok->id_dokumen) }}"
+                            class="reject-form"
+                            style="display:inline;">
+
                             @csrf
-                            <button class="action-btn reject-btn">
+
+                            <input 
+                                type="hidden"
+                                name="catatan"
+                                class="catatan-input">
+
+                            <button type="button" class="action-btn reject-btn btn-tolak">
                                 <i class="fas fa-times"></i>
                             </button>
+
                         </form>
                         @endif
 
-                        {{-- ✅ APPROVE --}}
+
+                        {{-- APPROVE --}}
                         @if($dok->status_verifikasi != 'diterima')
-                        <form method="POST" action="{{ route('admin.verifikasi.approve', $dok->id_dokumen) }}">
+
+                        <form method="POST"
+                            action="{{ route('admin.verifikasi.approve', $dok->id_dokumen) }}"
+                            style="display:inline;">
+
                             @csrf
-                            <button class="action-btn approve-btn">
+
+                            <button
+                                type="submit"
+                                class="action-btn approve-btn"
+                                onclick="return confirm('Setujui dokumen ini?')">
+
                                 <i class="fas fa-check"></i>
+
                             </button>
+
                         </form>
+
                         @else
-                        {{-- kalau sudah disetujui, cuma tampil centang --}}
+
                         <div class="action-btn approve-btn">
                             <i class="fas fa-check"></i>
                         </div>
+
                         @endif
 
                     </div>
                 </div>
-                @endforeach
-                </div>
+                @empty
+                <p style="text-align:center; color:#64748b;">Tidak ada dokumen untuk diverifikasi.</p>
+                @endforelse
+            </div>
             
             <form method="POST" action="{{ route('admin.verifikasi.selesai', $user->id_user) }}">
                 @csrf
@@ -1034,168 +1128,209 @@
     </div> -->
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // Document action buttons
-            // document.querySelectorAll('.view-btn').forEach(btn => {
-            //     btn.addEventListener('click', function() {
-            //         const docType = this.getAttribute('data-doc');
-            //         document.getElementById('previewModal').classList.add('show');
-                    
-            //         // Update modal title based on document type
-            //         const modalTitle = document.querySelector('.modal-title');
-            //         let docName = '';
-            //         switch(docType) {
-            //             case 'ktp':
-            //                 docName = 'Kartu Tanda Penduduk (KTP)';
-            //                 break;
-            //             case 'kk':
-            //                 docName = 'Kartu Keluarga (KK)';
-            //                 break;
-            //             case 'slip-gaji':
-            //                 docName = 'Slip Gaji 3 Bulan Terakhir';
-            //                 break;
-            //             case 'npwp':
-            //                 docName = 'NPWP';
-            //                 break;
-            //             case 'sk-kerja':
-            //                 docName = 'Surat Keterangan Kerja';
-            //                 break;
-            //             case 'rekening-koran':
-            //                 docName = 'Rekening Koran 6 Bulan';
-            //                 break;
-            //             default:
-            //                 docName = 'Dokumen';
-            //         }
-            //         modalTitle.textContent = `Preview Dokumen: ${docName}`;
-            //     });
-            // });
-            
-            // Approve button functionality
-            document.querySelectorAll('.approve-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const docItem = this.closest('.document-item');
-                    const docIcon = docItem.querySelector('.doc-icon');
-                    const docStatus = docItem.querySelector('.doc-status');
-                    
-                    docIcon.className = 'doc-icon complete';
-                    docStatus.className = 'doc-status complete';
-                    docStatus.textContent = 'Lengkap & Valid';
-                    
-                    // Show success message
-                    alert(`Dokumen telah diverifikasi dan disetujui.`);
-                });
+document.addEventListener('DOMContentLoaded', function() {
+
+    console.log("JS aktif");
+
+    /*
+    ==========================================
+    DOCUMENT ITEM SELECT
+    ==========================================
+    */
+    document.querySelectorAll('.document-item').forEach(item => {
+
+        item.addEventListener('click', function(e) {
+
+            if (e.target.closest('.action-btn')) return;
+
+            document.querySelectorAll('.document-item').forEach(el => {
+                el.classList.remove('selected');
             });
-            
-            // Reject button functionality
-            document.querySelectorAll('.reject-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const docItem = this.closest('.document-item');
-                    const docIcon = docItem.querySelector('.doc-icon');
-                    const docStatus = docItem.querySelector('.doc-status');
-                    
-                    docIcon.className = 'doc-icon rejected';
-                    docStatus.className = 'doc-status rejected';
-                    docStatus.textContent = 'Tidak Valid';
-                    
-                    // Show prompt for rejection reason
-                    const reason = prompt('Masukkan alasan penolakan dokumen ini:');
-                    if (reason) {
-                        alert(`Dokumen ditolak dengan alasan: ${reason}`);
-                    } else {
-                        // Revert if no reason provided
-                        docIcon.className = 'doc-icon pending';
-                        docStatus.className = 'doc-status pending';
-                        docStatus.textContent = 'Menunggu Verifikasi';
-                    }
-                });
-            });
-            
-            // Document selection
-            document.querySelectorAll('.document-item').forEach(item => {
-                item.addEventListener('click', function(e) {
-                    // Don't select if clicking on action buttons
-                    if (e.target.closest('.action-btn')) return;
-                    
-                    // Remove selected class from all items
-                    document.querySelectorAll('.document-item').forEach(i => {
-                        i.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked item
-                    this.classList.add('selected');
-                });
-            });
-            
-            // Preview modal functionality
-            const previewModal = document.getElementById('previewModal');
-            const closePreviewModal = document.getElementById('closePreviewModal');
-            
-            closePreviewModal.addEventListener('click', function() {
-                previewModal.classList.remove('show');
-            });
-            
-            previewModal.addEventListener('click', function(e) {
-                if (e.target === previewModal) {
-                    previewModal.classList.remove('show');
-                }
-            });
-            
-            // Complete button functionality
-            document.querySelector('.btn-complete').addEventListener('click', function() {
-                // Check if all required documents are verified
-                const pendingDocs = document.querySelectorAll('.doc-status.pending');
-                const missingDocs = document.querySelectorAll('.doc-status.missing');
-                
-                if (pendingDocs.length > 0 || missingDocs.length > 0) {
-                    if (confirm('Ada dokumen yang belum diverifikasi. Apakah Anda yakin ingin menyelesaikan proses verifikasi?')) {
-                        alert('Proses verifikasi selesai. Beberapa dokumen masih memerlukan verifikasi.');
-                        // Here you would typically save the verification status
-                        window.location.href = 'verifikasi.html'; // Redirect to verification page
-                    }
-                } else {
-                    alert('Semua dokumen telah diverifikasi. Proses verifikasi selesai.');
-                    // Here you would typically save the verification status
-                    window.location.href = 'verifikasi.html'; // Redirect to verification page
-                }
-            });
-            
-            // Back button functionality
-            document.querySelector('.btn-back').addEventListener('click', function() {
-                window.location.href = 'dashboard.html'; // Redirect to dashboard
-            });
-            
-            // Keyboard support for modal
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && previewModal.classList.contains('show')) {
-                    previewModal.classList.remove('show');
-                }
-            });
+
+            this.classList.add('selected');
+
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            
-            if (isCollapsed) {
-                sidebar.classList.add('collapsed');
-                mainContent.classList.add('expanded');
-            }
-            
-            // Hover effect untuk sidebar (opsional - untuk expand temporary)
-            sidebar.addEventListener('mouseenter', function() {
-                if (this.classList.contains('collapsed')) {
-                    this.style.width = 'var(--sidebar-width-expanded)';
-                }
-            });
-            
-            sidebar.addEventListener('mouseleave', function() {
-                if (this.classList.contains('collapsed')) {
-                    this.style.width = 'var(--sidebar-width-collapsed)';
-                }
-            });
+    });
+
+
+
+    /*
+    ==========================================
+    PREVIEW MODAL
+    ==========================================
+    */
+    const previewModal = document.getElementById('previewModal');
+    const closePreviewModal = document.getElementById('closePreviewModal');
+
+    if(previewModal && closePreviewModal){
+
+        closePreviewModal.addEventListener('click', function() {
+            previewModal.classList.remove('show');
         });
-    </script>
+
+        previewModal.addEventListener('click', function(e) {
+            if(e.target === previewModal){
+                previewModal.classList.remove('show');
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (
+                e.key === 'Escape' &&
+                previewModal.classList.contains('show')
+            ) {
+                previewModal.classList.remove('show');
+            }
+        });
+
+    }
+
+
+
+    /*
+    ==========================================
+    TOLAK DOKUMEN
+    ==========================================
+    */
+    document.querySelectorAll('.btn-tolak').forEach(button => {
+
+        button.addEventListener('click', function() {
+
+            const alasan = prompt(
+                "Masukkan alasan penolakan dokumen:"
+            );
+
+            // cancel
+            if(alasan === null){
+                return;
+            }
+
+            // kosong
+            if(alasan.trim() === ''){
+                alert("Catatan penolakan wajib diisi.");
+                return;
+            }
+
+            const form = this.closest('.reject-form');
+
+            if(!form){
+                console.error("Form reject tidak ditemukan");
+                return;
+            }
+
+            const inputCatatan = form.querySelector('.catatan-input');
+
+            if(!inputCatatan){
+                console.error("Input catatan tidak ditemukan");
+                return;
+            }
+
+            inputCatatan.value = alasan;
+
+            console.log("Catatan terkirim:", alasan);
+
+            form.submit();
+
+        });
+
+    });
+
+
+
+    /*
+    ==========================================
+    BUTTON SELESAI
+    ==========================================
+    */
+    const completeBtn = document.querySelector('.btn-complete');
+
+    if(completeBtn){
+
+        completeBtn.addEventListener('click', function(e) {
+
+            const pendingDocs =
+                document.querySelectorAll('.doc-status.pending');
+
+            if(pendingDocs.length > 0){
+
+                const lanjut = confirm(
+                    'Masih ada dokumen yang belum diverifikasi. Lanjutkan?'
+                );
+
+                if(!lanjut){
+                    e.preventDefault();
+                    return false;
+                }
+
+            }
+
+        });
+
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    if (!sidebar || !mainContent) {
+        console.error("sidebar / mainContent tidak ditemukan");
+        return;
+    }
+
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+    function closeAllDropdowns() {
+        document.querySelectorAll('.nav-group.open').forEach(el => {
+            el.classList.remove('open');
+        });
+    }
+
+    // INIT STATE
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+        mainContent.classList.add('expanded');
+        closeAllDropdowns();
+    }
+
+    // HOVER IN
+    sidebar.addEventListener('mouseenter', function () {
+        if (this.classList.contains('collapsed')) {
+            this.classList.add('hovering');
+        }
+    });
+
+    // HOVER OUT
+    sidebar.addEventListener('mouseleave', function () {
+        this.classList.remove('hovering');
+        closeAllDropdowns();
+    });
+});
+
+
+/* ===================================================
+   TOGGLE DROPDOWN (INI WAJIB GLOBAL BIAR onclick WORK)
+=================================================== */
+window.toggleMenu = function (id) {
+
+    const sidebar = document.getElementById('sidebar');
+    const el = document.getElementById(id);
+
+    if (!el || !sidebar) return;
+
+    // kalau sidebar collapsed DAN tidak hover → blok
+    const isBlocked =
+        sidebar.classList.contains('collapsed') &&
+        !sidebar.classList.contains('hovering');
+
+    if (isBlocked) return;
+
+    el.classList.toggle('open');
+};
+</script>
 </body>
 </html>

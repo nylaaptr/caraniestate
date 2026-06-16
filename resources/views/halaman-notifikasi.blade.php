@@ -147,6 +147,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .profile-icon:hover {
@@ -359,6 +360,24 @@
             color: #64748b;
             font-size: 0.9rem;
         }
+
+        /* Profilll */
+            .profile-avatar,
+            .profile-avatar-default {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .profile-avatar-default {
+                background: #7AB2D3;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+            }
         
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -473,6 +492,7 @@
     </style>
 </head>
 <body>
+    {{ Auth::check() ? 'LOGIN BERHASIL' : 'BELUM LOGIN' }}
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -540,16 +560,41 @@
 
                 {{-- Guest --}}
                 @guest
-                    <a href="{{ route('login') }}" class="nav-item login-link">
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
                     {{-- HANYA ICON PROFILE --}}
                     <a href="{{ route('halaman-profil') }}" class="profile-icon">
-                        <img src="{{ Auth::user()->profile_photo 
-                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
-                            : asset('default-avatar.png') }}" 
-                            alt="Profile" class="profile-img">
+                        @php
+                            $user = Auth::user();
+                        @endphp
+
+                        {{-- Prioritas 1: Foto upload user --}}
+                        @if($user->profile_photo)
+
+                            <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
+                                class="profile-avatar"
+                                alt="Profile Photo">
+
+                        {{-- Prioritas 2: Foto Google --}}
+                        @elseif($user->google_avatar)
+
+                            <img src="{{ $user->google_avatar }}"
+                                class="profile-avatar"
+                                referrerpolicy="no-referrer"
+                                alt="Google Photo"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}'">
+
+                        {{-- Prioritas 3: Inisial --}}
+                        @else
+
+                            <div class="profile-avatar-default">
+                                {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                            </div>
+
+                        @endif
+
                     </a>
                 @endguest
             </div>
@@ -577,36 +622,123 @@
             @forelse($notifikasi ?? [] as $n)
             {{-- ✅ Mapping tipe notifikasi ke icon & style yang sudah ada --}}
             @php
-                // Tentukan icon & class berdasarkan tipe notifikasi
-                switch($n->tipe) {
-                    case 'pemesanan':
-                    case 'transaksi':
-                        $icon = 'fa-shopping-cart';
-                        $iconClass = 'mail'; // pakai class existing
-                        break;
-                    case 'dokumen':
-                    case 'verifikasi':
-                        $icon = 'fa-file-check';
-                        $iconClass = 'info';
-                        break;
-                    case 'peringatan':
-                    case 'tagihan':
-                        $icon = 'fa-exclamation-triangle';
-                        $iconClass = 'warning';
-                        break;
-                    default:
-                        $icon = 'fa-bell';
-                        $iconClass = 'mail';
-                }
-                
-                // Tentukan link tujuan berdasarkan referensi
-                $link = '#';
-                if($n->referensi_tipe == 'transaksi' && $n->referensi_id) {
-                    $link = route('detail-pemesanan', $n->referensi_id);
-                } elseif($n->referensi_tipe == 'dokumen' && $n->referensi_id) {
-                    $link = route('admin.halaman_verifikasi'); // atau route dokumen
-                }
-            @endphp
+
+switch($n->tipe) {
+    case 'pemesanan':
+    case 'transaksi':
+        $icon = 'fa-shopping-cart';
+        $iconClass = 'mail';
+        break;
+
+    case 'dokumen':
+    case 'verifikasi':
+        $icon = 'fa-file-check';
+        $iconClass = 'info';
+        break;
+
+    case 'peringatan':
+    case 'tagihan':
+        $icon = 'fa-exclamation-triangle';
+        $iconClass = 'warning';
+        break;
+
+    case 'pelunasan':
+        $icon = 'fa-money-bill-wave';
+        $iconClass = 'warning';
+        break;
+
+    default:
+        $icon = 'fa-bell';
+        $iconClass = 'mail';
+}
+
+/* =========================
+   RESET SEMUA VAR
+========================= */
+$transaksi = null;
+$pemesanan = null;
+$dokumen = null;
+
+/* =========================
+   RESOLVE DATA SESUAI TIPE
+========================= */
+if ($n->tipe == 'pelunasan') {
+
+    $transaksi = \App\Models\Transaksi::find($n->referensi_id);
+
+}
+
+elseif ($n->tipe == 'monitoring') {
+
+    $pemesanan = \App\Models\Pemesanan::find($n->referensi_id);
+
+    if ($pemesanan) {
+        $transaksi = $pemesanan->transaksi;
+    }
+
+}
+
+elseif ($n->tipe == 'verifikasi') {
+
+    $dokumen = \App\Models\Dokumen::find($n->referensi_id);
+
+}
+
+$link = '#';
+
+/* =====================================================
+   AMBIL DATA DASAR
+===================================================== */
+$transaksi = null;
+$pemesanan = null;
+$dokumen = null;
+
+if ($n->tipe == 'pelunasan') {
+
+    $transaksi = \App\Models\Transaksi::find($n->referensi_id);
+
+} elseif ($n->tipe == 'verfikasi') {
+
+    $dokumen = \App\Models\Dokumen::find($n->referensi_id);
+
+} else {
+
+    $pemesanan = \App\Models\Pemesanan::find($n->referensi_id);
+}
+
+/* =====================================================
+   LOGIC PELUNASAN → INVOICE
+===================================================== */
+if ($n->tipe == 'pelunasan' && $transaksi) {
+
+    $link = route('invoice', $transaksi->id_transaksi);
+
+/* =====================================================
+   LOGIC DOKUMEN
+===================================================== */
+} elseif ($n->tipe == 'dokumen' && $dokumen) {
+
+    $pemesanan = \App\Models\Pemesanan::find($dokumen->id_pemesanan);
+
+    if ($dokumen->status_verifikasi == 'ditolak') {
+
+        $link = route('form-pemesanan', $dokumen->id_pemesanan);
+
+    } else {
+
+        $link = route('detail-pemesanan', $dokumen->id_pemesanan);
+    }
+
+/* =====================================================
+   MONITORING / TAHAP LAIN → DETAIL PEMESANAN
+===================================================== */
+} elseif ($pemesanan) {
+    $link = route('detail-pemesanan', $pemesanan->id_pemesanan);
+} elseif ($n->tipe == 'transaksi') {
+    $link = route('pemesanan.terima-kasih', $n->referensi_id);
+}
+
+@endphp
             
             <a href="{{ $link }}" style="text-decoration:none; color:inherit; display:block;">
                 <div class="notification-item {{ $n->status_baca == 0 ? 'unread' : '' }}">
@@ -661,13 +793,6 @@
     </div>
 
     <script>
-        // Add click event to notification items
-        document.querySelectorAll('.notification-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const title = this.querySelector('.notification-title').textContent;
-                alert(`Notifikasi: ${title}`);
-            });
-        });
         
         // Add hover effect for desktop
         if (window.innerWidth > 768) {

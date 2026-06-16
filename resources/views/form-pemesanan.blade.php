@@ -147,6 +147,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .profile-icon:hover {
@@ -426,7 +427,7 @@
             border-left: 4px solid #10b981;
             padding: 20px;
             border-radius: 12px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
         .payment-title {
@@ -458,6 +459,94 @@
         .payment-label {
             color: #64748b;
         }
+
+        .payment-detail-box{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    padding:22px;
+    margin-top:10px;
+    margin-bottom:20px;
+}
+
+.payment-detail-title{
+    font-size:1rem;
+    font-weight:700;
+    color:#1e293b;
+    margin-bottom:18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.payment-detail-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 0;
+    border-bottom:1px dashed #e2e8f0;
+    gap:15px;
+}
+
+.payment-detail-row:last-child{
+    border-bottom:none;
+    padding-bottom:0;
+}
+
+.payment-detail-label{
+    color:#64748b;
+    font-size:0.92rem;
+}
+
+.payment-detail-value{
+    font-weight:700;
+    color:#0f172a;
+    text-align:right;
+}
+
+.rekening-highlight{
+    font-size:1.05rem;
+    letter-spacing:0.5px;
+}
+
+.nominal-highlight{
+    color:#059669;
+    font-size:1.1rem;
+}
+
+.copy-btn{
+    background:var(--primary-blue);
+    color:white;
+    border:none;
+    padding:6px 12px;
+    border-radius:8px;
+    font-size:0.75rem;
+    font-weight:600;
+    cursor:pointer;
+    margin-left:10px;
+    transition:0.3s ease;
+}
+
+.copy-btn:hover{
+    background:var(--dark-blue);
+    transform:translateY(-1px);
+}
+
+.copy-btn.copied{
+    background:#10b981;
+}
+
+@media(max-width:768px){
+
+    .payment-detail-row{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .payment-detail-value{
+        text-align:left;
+    }
+}
         
         /* Action Buttons */
         .form-actions {
@@ -499,6 +588,24 @@
             background: #cbd5e0;
             transform: translateY(-2px);
         }
+
+        /* Profilll */
+            .profile-avatar,
+            .profile-avatar-default {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .profile-avatar-default {
+                background: #7AB2D3;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+            }
         
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -568,6 +675,7 @@
     </style>
 </head>
 <body>
+    {{ Auth::check() ? 'LOGIN BERHASIL' : 'BELUM LOGIN' }}
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -635,16 +743,41 @@
 
                 {{-- Guest --}}
                 @guest
-                    <a href="{{ route('login') }}" class="nav-item login-link">
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
                     {{-- HANYA ICON PROFILE --}}
                     <a href="{{ route('halaman-profil') }}" class="profile-icon">
-                        <img src="{{ Auth::user()->profile_photo 
-                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
-                            : asset('default-avatar.png') }}" 
-                            alt="Profile" class="profile-img">
+                        @php
+                            $user = Auth::user();
+                        @endphp
+
+                        {{-- Prioritas 1: Foto upload user --}}
+                        @if($user->profile_photo)
+
+                            <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
+                                class="profile-avatar"
+                                alt="Profile Photo">
+
+                        {{-- Prioritas 2: Foto Google --}}
+                        @elseif($user->google_avatar)
+
+                            <img src="{{ $user->google_avatar }}"
+                                class="profile-avatar"
+                                referrerpolicy="no-referrer"
+                                alt="Google Photo"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}'">
+
+                        {{-- Prioritas 3: Inisial --}}
+                        @else
+
+                            <div class="profile-avatar-default">
+                                {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                            </div>
+
+                        @endif
+
                     </a>
                 @endguest
             </div>
@@ -661,22 +794,19 @@
             <!-- Property Preview - DINAMIS -->
             <div class="property-preview">
                 <div class="property-image">
-                    @php
-                        // Ambil gambar pertama dari properti (sesuaikan dengan modelmu)
-                        $gambar = $properti->gambar_properti 
-                            ? (filter_var($properti->gambar_properti, FILTER_VALIDATE_URL) 
-                                ? $properti->gambar_properti 
-                                : asset('storage/' . $properti->gambar_properti))
-                            : asset('images/placeholder-properti.jpg');
-                    @endphp
-                    <img src="{{ $gambar }}" alt="{{ $properti->nama_properti }}" 
-                        onerror="this.src='{{ asset('images/placeholder-properti.jpg') }}'">
+                    <img
+                        src="{{ $properti->gambar->first()
+                            ? asset('storage/images/' . $properti->gambar->first()->path_gambar)
+                            : asset('images/placeholder-properti.png')
+                        }}"
+                        alt="{{ $properti->nama_properti }}"
+                        onerror="this.src='{{ asset('images/placeholder-properti.png') }}'">
                 </div>
                 <div class="property-info">
                     <h2 class="property-name">{{ $properti->nama_properti }}</h2>
                     <div class="property-location">
                         <i class="fas fa-map-marker-alt"></i>
-                        <span>{{ $properti->lokasi_properti ?? 'Lokasi tidak tersedia' }}</span>
+                        <span>{{ $properti->perumahan->lokasi_perumahan ?? 'Lokasi tidak tersedia' }}</span>
                     </div>
                     <div class="property-price">Rp {{ number_format($properti->harga_properti, 0, ',', '.') }}</div>
                     <span class="property-type">
@@ -740,18 +870,29 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="downPayment" class="form-label">Uang Muka <span class="required">*</span></label>
+                            <label for="downPayment" class="form-label">
+                                Uang Muka <span class="required">*</span>
+                            </label>
+
                             @php
-                                // Hitung DP: 15% untuk subsidi, 20% untuk komersil (sesuaikan kebijakan)
-                                $harga = $properti->harga_properti ?? 0;
-                                $kategori = $properti->kategori_properti ?? 'komersil';
-                                $persenDP = ($kategori == 'subsidi') ? 0.15 : 0.20;
-                                $dp = $harga * $persenDP;
+                                $bookingFee = $properti->bookingFee ?? 0;
                             @endphp
-                            <input type="text" class="form-control" id="downPayment" name="uang_muka" 
-                                value="Rp {{ number_format($dp, 0, ',', '.') }}" readonly>
-                            <!-- Hidden input untuk kirim nilai angka ke backend -->
-                            <input type="hidden" name="uang_muka_value" value="{{ $dp }}">
+
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="downPayment" 
+                                name="uang_muka"
+                                value="Rp {{ number_format($bookingFee, 0, ',', '.') }}"
+                                readonly
+                            >
+
+                            <!-- nilai asli untuk backend -->
+                            <input 
+                                type="hidden" 
+                                name="uang_muka_value" 
+                                value="{{ $bookingFee }}"
+                            >
                         </div>
                     </div>
                 </div>
@@ -765,10 +906,11 @@
                             <option value="">Pilih Metode Pembayaran</option>
                             <option value="kredit">KPR (Kredit Pemilikan Rumah)</option>
                             <option value="lunas">Lunas</option>
-                            <!-- <option value="kredit">Cicilan Tanpa Bunga</option> -->
                         </select>
                     </div>
                 </div>
+
+                
                 
                 <!-- Employment Type -->
                 <div class="form-section">
@@ -809,7 +951,7 @@
                                     <i class="fas fa-users upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="kkFile" name="kk" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="kkFile" name="kk[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="kkFileName"></div>
                                 </div>
                             </div>
@@ -820,7 +962,7 @@
                                     <i class="fas fa-ring upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="marriageFile" name="surat_nikah" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="marriageFile" name="surat_nikah[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="marriageFileName"></div>
                                 </div>
                             </div>
@@ -831,18 +973,19 @@
                                     <i class="fas fa-file-alt upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="npwpFile" name="npwp" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="npwpFile" name="npwp[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="npwpFileName"></div>
                                 </div>
                             </div>
                             
+                            <!-- FOTO 3X4 PNS -->
                             <div class="upload-item">
                                 <label class="upload-label">Foto Berwarna 3x4 (Suami & Istri) <span class="required">*</span></label>
                                 <div class="upload-area" id="photoUpload">
                                     <i class="fas fa-camera upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 2MB</p>
-                                    <input type="file" class="file-input" id="photoFile" name="foto_3x4" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="photoFile" name="foto_3x4[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="photoFileName"></div>
                                 </div>
                             </div>
@@ -853,7 +996,7 @@
                                     <i class="fas fa-briefcase upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="workCertFile" name="surat_kerja" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="workCertFile" name="surat_kerja[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="workCertFileName"></div>
                                 </div>
                             </div>
@@ -886,7 +1029,7 @@
                                     <i class="fas fa-user upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 3MB</p>
-                                    <input type="file" class="file-input" id="selfieFile" name="selfie" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="selfieFile" name="selfie[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="selfieFileName"></div>
                                 </div>
                             </div>
@@ -897,7 +1040,7 @@
                                     <i class="fas fa-building upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 3MB</p>
-                                    <input type="file" class="file-input" id="workplaceFile" name="foto_tempat_kerja" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="workplaceFile" name="foto_tempat_kerja[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="workplaceFileName"></div>
                                 </div>
                             </div>
@@ -927,7 +1070,7 @@
                                     <i class="fas fa-users upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="kkFileW" name="kk" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="kkFileW" name="kk[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="kkFileNameW"></div>
                                 </div>
                             </div>
@@ -938,7 +1081,7 @@
                                     <i class="fas fa-ring upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="marriageFileW" name="surat_nikah" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="marriageFileW" name="surat_nikah[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="marriageFileNameW"></div>
                                 </div>
                             </div>
@@ -949,7 +1092,7 @@
                                     <i class="fas fa-file-alt upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="npwpFileW" name="npwp" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="npwpFileW" name="npwp[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="npwpFileNameW"></div>
                                 </div>
                             </div>
@@ -960,7 +1103,7 @@
                                     <i class="fas fa-file-invoice upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="sptFile" name="spt_pajak" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="sptFile" name="spt_pajak[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="sptFileName"></div>
                                 </div>
                             </div>
@@ -971,7 +1114,8 @@
                                     <i class="fas fa-camera upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 2MB</p>
-                                    <input type="file" class="file-input" id="marriageFile" name="surat_nikah" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="photoFileW" name="foto_3x4[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <div class="file-name" id="photoFileNameW"></div>
                                 </div>
                             </div>
                             
@@ -981,7 +1125,7 @@
                                     <i class="fas fa-file-contract upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="businessCertFile" name="surat_ket_usaha" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="businessCertFile" name="surat_ket_usaha[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="businessCertFileName"></div>
                                 </div>
                             </div>
@@ -992,7 +1136,7 @@
                                     <i class="fas fa-file-signature upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="incomeCertFile" name="surat_penghasilan_usaha" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="incomeCertFile" name="surat_penghasilan_usaha[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="incomeCertFileName"></div>
                                 </div>
                             </div>
@@ -1003,7 +1147,7 @@
                                     <i class="fas fa-book upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-                                    <input type="file" class="file-input" id="businessRecordFile" name="pembukuan_usaha" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="businessRecordFile" name="pembukuan_usaha[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="businessRecordFileName"></div>
                                 </div>
                             </div>
@@ -1025,7 +1169,7 @@
                                     <i class="fas fa-user upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 3MB</p>
-                                    <input type="file" class="file-input" id="selfieFile" name="selfie" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="selfieFileW" name="selfie[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="selfieFileNameW"></div>
                                 </div>
                             </div>
@@ -1036,7 +1180,7 @@
                                     <i class="fas fa-store upload-icon"></i>
                                     <p class="upload-text">Klik atau drag file</p>
                                     <p class="upload-hint">JPG/PNG | Max 3MB</p>
-                                    <input type="file" class="file-input" id="businessPlaceFile" name="foto_tempat_usaha" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                                    <input type="file" class="file-input" id="businessPlaceFile" name="foto_tempat_usaha[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                     <div class="file-name" id="businessPlaceFileName"></div>
                                 </div>
                             </div>
@@ -1047,29 +1191,125 @@
                 <!-- Payment Information -->
                 <div class="form-section">
                     <h3 class="section-title">Informasi Pembayaran</h3>
+
+                    @php
+                        $harga = $properti->harga_properti ?? 0;
+
+                        // ambil booking fee dari database
+                        $bookingFee = (int) ($properti->bookingFee ?? 0);
+
+                        // total pembayaran = booking fee saja
+                        $totalPembayaran = $harga + $bookingFee;
+                    @endphp
+
                     <div class="payment-info">
                         <div class="payment-title">Rincian Biaya</div>
+
                         <div class="payment-details">
+
                             <div class="payment-item">
                                 <span class="payment-label">Harga Properti</span>
-                                <span class="payment-value">Rp 285.000.000</span>
+                                <span class="payment-value">
+                                    Rp {{ number_format($harga, 0, ',', '.') }}
+                                </span>
                             </div>
+
                             <div class="payment-item">
-                                <span class="payment-label">Uang Muka</span>
-                                <span class="payment-value">Rp 45.000.000</span>
+                                <span class="payment-label">Booking Fee</span>
+                                <span class="payment-value">
+                                    Rp {{ number_format($bookingFee, 0, ',', '.') }}
+                                </span>
                             </div>
-                            <div class="payment-item">
-                                <span class="payment-label">Biaya Booking</span>
-                                <span class="payment-value">Rp 2.000.000</span>
-                            </div>
+
                             <div class="payment-item">
                                 <span class="payment-label">Total Pembayaran</span>
-                                <span class="payment-value">Rp 47.000.000</span>
+                                <span class="payment-value">
+                                    Rp {{ number_format($totalPembayaran, 0, ',', '.') }}
+                                </span>
                             </div>
+
                         </div>
+
                         <p style="margin-top: 15px; font-size: 0.9rem; color: #64748b;">
-                            <strong>Catatan:</strong> Biaya booking akan dikembalikan jika KPR disetujui bank. Pembayaran dapat dilakukan melalui transfer bank atau datang langsung ke kantor pemasaran.
+                            <strong>Catatan:</strong> Booking fee mengikuti unit properti yang dipilih.
                         </p>
+                    </div>
+                </div>
+
+                <!-- Informasi Rekening -->
+                <div class="payment-detail-box">
+                    <div class="payment-detail-title">
+                        <i class="fas fa-university"></i>
+                        Informasi Transfer Booking Fee
+                    </div>
+
+                    <div class="payment-detail-row">
+                        <span class="payment-detail-label">Bank</span>
+                        <span class="payment-detail-value">
+                            Bank BCA
+                        </span>
+                    </div>
+
+                    <div class="payment-detail-row">
+                        <span class="payment-detail-label">Nomor Rekening</span>
+
+                        <span class="payment-detail-value rekening-highlight">
+                            1234567890
+
+                            <button type="button"
+                                class="copy-btn"
+                                onclick="copyRekening('1234567890')">
+
+                                Salin
+                            </button>
+                        </span>
+                    </div>
+
+                    <div class="payment-detail-row">
+                        <span class="payment-detail-label">Atas Nama</span>
+
+                        <span class="payment-detail-value">
+                            PT Carani Bhanu Balakosa
+                        </span>
+                    </div>
+
+                    <div class="payment-detail-row">
+                        <span class="payment-detail-label">
+                            Total Transfer
+                        </span>
+
+                        <span class="payment-detail-value nominal-highlight">
+                            Rp {{ number_format($bookingFee,0,',','.') }}
+                        </span>
+                    </div>
+
+                </div>
+
+                <!-- Upload Bukti Booking Fee (KHUSUS LUNAS) -->
+                <div class="form-section" id="booking-proof-section" style="display: none;">
+                    <h3 class="section-title">Upload Bukti Booking Fee</h3>
+
+                    <div class="upload-item">
+                        <label class="upload-label">
+                            Bukti Pembayaran Booking Fee <span class="required">*</span>
+                        </label>
+
+                        <div class="upload-area" id="buktiBookingUpload">
+                            <i class="fas fa-receipt upload-icon"></i>
+                            <p class="upload-text">Klik atau drag file</p>
+                            <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
+
+                            <input 
+                                type="file" 
+                                class="file-input" 
+                                name="bukti_booking" 
+                                id="buktiBooking"
+                                accept=".jpg,.jpeg,.png,.pdf"
+                            >
+
+                            <!-- TAMBAHAN -->
+                            <div class="file-name" id="buktiBookingName"></div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1083,31 +1323,6 @@
                         </button>
                     </div>
 
-                    <!-- Upload Bukti Booking Fee (KHUSUS LUNAS) -->
-                        <div class="form-section" id="booking-proof-section" style="display: none;">
-                            <h3 class="section-title">Upload Bukti Booking Fee</h3>
-
-                            <div class="upload-item">
-                                <label class="upload-label">
-                                    Bukti Pembayaran Booking Fee <span class="required">*</span>
-                                </label>
-
-                                <div class="upload-area">
-                                    <i class="fas fa-receipt upload-icon"></i>
-                                    <p class="upload-text">Klik atau drag file</p>
-                                    <p class="upload-hint">JPG/PNG/PDF | Max 5MB</p>
-
-                                    <input 
-                                        type="file" 
-                                        class="file-input" 
-                                        name="bukti_booking" 
-                                        id="buktiBooking"
-                                        accept=".jpg,.jpeg,.png,.pdf"
-                                    >
-                                </div>
-                            </div>
-                        </div>
-
                 </form>{{-- tutup form --}}
             </div>
         </div>
@@ -1117,53 +1332,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Payment method dropdown change handler
             // ========== MODAL PREVIEW ==========
-            const modal = document.createElement('div');
-            modal.id = 'previewModal';
-            modal.style.cssText = `
-                display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75);
-                z-index:9999; align-items:center; justify-content:center; padding:20px;
-            `;
-            modal.innerHTML = `
-                <div style="background:#fff; border-radius:12px; max-width:90vw; max-height:90vh;
-                            overflow:auto; padding:20px; position:relative; min-width:300px;">
-                    <button id="previewClose" style="position:absolute; top:10px; right:14px;
-                        background:none; border:none; font-size:24px; cursor:pointer; color:#333; line-height:1;">&times;</button>
-                    <p id="previewTitle" style="font-weight:600; margin:0 32px 12px 0; font-size:13px; color:#555; word-break:break-all;"></p>
-                    <div id="previewContent"></div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-
-            modal.addEventListener('click', e => { if (e.target === modal) closePreview(); });
-            document.getElementById('previewClose').addEventListener('click', closePreview);
-            document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
-
-            function closePreview() {
-                modal.style.display = 'none';
-                document.getElementById('previewContent').innerHTML = '';
-            }
-
             function openPreview(file) {
-                document.getElementById('previewTitle').textContent = file.name;
-                const content = document.getElementById('previewContent');
-                content.innerHTML = '';
-
                 const url = URL.createObjectURL(file);
+                // buka di tab baru
+                window.open(url, '_blank');
 
-                if (file.type.startsWith('image/')) {
-                    const img = document.createElement('img');
-                    img.style.cssText = 'max-width:100%; max-height:75vh; display:block; border-radius:6px;';
-                    img.src = url;
-                    img.onload = () => URL.revokeObjectURL(url);
-                    content.appendChild(img);
-                } else if (file.type === 'application/pdf') {
-                    const iframe = document.createElement('iframe');
-                    iframe.src = url;
-                    iframe.style.cssText = 'width:75vw; height:75vh; border:none; border-radius:6px;';
-                    content.appendChild(iframe);
-                }
-
-                modal.style.display = 'flex';
             }
 
             // ========== FILE UPLOAD HANDLER (GANTI YANG LAMA) ==========
@@ -1197,12 +1370,30 @@
                         const btnLihat = document.createElement('button');
                         btnLihat.type = 'button';
                         btnLihat.setAttribute('data-preview', '1');
-                        btnLihat.textContent = '👁 Lihat';
+
+                        btnLihat.innerHTML = '<i class="fas fa-eye"></i>';
+
                         btnLihat.style.cssText = `
-                            font-size:11px; padding:2px 8px; border-radius:4px; cursor:pointer;
-                            background:#e8f0fe; border:1px solid #7AB2D3; color:#1E3A5F;
-                            white-space:nowrap; flex-shrink:0;
+                            width:30px;
+                            height:30px;
+                            border:none;
+                            border-radius:8px;
+                            cursor:pointer;
+                            background:#e8f0fe;
+                            color:#1E3A5F;
+                            transition:0.2s;
+                            flex-shrink:0;
                         `;
+
+                        btnLihat.onmouseenter = () => {
+                            btnLihat.style.background = '#7AB2D3';
+                            btnLihat.style.color = '#fff';
+                        };
+
+                        btnLihat.onmouseleave = () => {
+                            btnLihat.style.background = '#e8f0fe';
+                            btnLihat.style.color = '#1E3A5F';
+                        };
                         btnLihat.addEventListener('click', (e) => {
                             e.stopPropagation(); // supaya tidak trigger uploadArea click
                             openPreview(file);
@@ -1241,6 +1432,8 @@
             setupFileUpload('selfieUploadW', 'selfieFileW', 'selfieFileNameW');
             setupFileUpload('businessPlaceUpload', 'businessPlaceFile', 'businessPlaceFileName');
 
+            setupFileUpload('buktiBookingUpload', 'buktiBooking', 'buktiBookingName');
+
             // ========== SISA SCRIPT LAMA (payment, employment toggle, submit, cancel) ==========
             const paymentMethodSelect = document.getElementById('paymentMethod');
             const downPaymentInput = document.getElementById('downPayment');
@@ -1265,42 +1458,84 @@
             // Cancel button
             document.getElementById('cancelBtn').addEventListener('click', function() {
                 if (confirm('Apakah Anda yakin ingin membatalkan pemesanan? Semua data yang telah diisi akan hilang.')) {
-                    window.location.href = 'katalog.html';
+                    window.location.href = '{{ route("halaman-katalog") }}';
                 }
             });
         });
     </script>
 
     <script>
-        document.getElementById('paymentMethod').addEventListener('change', function() {
-            let metode = this.value;
-            let dpField = document.getElementById('downPayment').closest('.form-group');
+document.addEventListener('DOMContentLoaded', function(){
 
-            if (metode === 'lunas') {
-                dpField.style.display = 'none';
-            } else {
-                dpField.style.display = 'block';
-            }
-        });
+    const paymentMethod = document.getElementById('paymentMethod');
+
+    // section uang muka
+    const downPaymentSection = document
+        .getElementById('downPayment')
+        .closest('.form-group');
+
+    // upload booking
+    const bookingProofSection = document.getElementById('booking-proof-section');
+
+
+    function updatePaymentUI(){
+
+        const metode = paymentMethod.value;
+
+        // uang muka SELALU tampil
+        downPaymentSection.style.display = 'block';
+
+        // upload booking tampil untuk KPR maupun Lunas
+        if(metode === 'kredit' || metode === 'lunas'){
+            bookingProofSection.style.display = 'block';
+        }else{
+            bookingProofSection.style.display = 'none';
+        }
+    }
+
+    paymentMethod.addEventListener('change', updatePaymentUI);
+
+    // jalankan saat halaman load
+    updatePaymentUI();
+
+});
 </script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('paymentMethod').addEventListener('change', function() {
-        let metode = this.value;
 
-        let bookingSection = document.getElementById('booking-proof-section');
-        let buktiInput = document.getElementById('buktiBooking');
+    const paymentMethod = document.getElementById('paymentMethod');
+    const bookingSection = document.getElementById('booking-proof-section');
+    const buktiBooking = document.getElementById('buktiBooking');
+    const buktiBookingName = document.getElementById('buktiBookingName');
 
-        if (metode === 'lunas') {
+    // tampil/sembunyikan upload booking fee
+    paymentMethod.addEventListener('change', function () {
+
+        const selected = this.value;
+
+        // booking fee muncul untuk KPR maupun Lunas
+        if (selected === 'kredit' || selected === 'lunas') {
             bookingSection.style.display = 'block';
-            buktiInput.setAttribute('required', 'required');
         } else {
             bookingSection.style.display = 'none';
-            buktiInput.removeAttribute('required');
+            buktiBooking.value = '';
+            buktiBookingName.innerHTML = '';
         }
     });
+
+    
+
 });
+</script>
+
+<script>
+function copyRekening(noRek){
+
+    navigator.clipboard.writeText(noRek);
+
+    alert('Nomor rekening berhasil disalin');
+}
 </script>
 </body>
 </html>

@@ -148,6 +148,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .profile-icon:hover {
@@ -692,6 +693,24 @@
             font-size: 0.9rem;
             color: #cbd5e0;
         }
+
+        /* Profilll */
+            .profile-avatar,
+            .profile-avatar-default {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .profile-avatar-default {
+                background: #7AB2D3;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+            }
         
         /* Responsive Design */
         @media (max-width: 992px) {
@@ -846,6 +865,7 @@
     </style>
 </head>
 <body>
+    {{ Auth::check() ? 'LOGIN BERHASIL' : 'BELUM LOGIN' }}
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -913,16 +933,41 @@
 
                 {{-- Guest --}}
                 @guest
-                    <a href="{{ route('login') }}" class="nav-item login-link">
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="nav-item login-link">
                         <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 @else
                     {{-- HANYA ICON PROFILE --}}
                     <a href="{{ route('halaman-profil') }}" class="profile-icon">
-                        <img src="{{ Auth::user()->profile_photo 
-                            ? asset('storage/profile_photos/' . Auth::user()->profile_photo) 
-                            : asset('default-avatar.png') }}" 
-                            alt="Profile" class="profile-img">
+                        @php
+                            $user = Auth::user();
+                        @endphp
+
+                        {{-- Prioritas 1: Foto upload user --}}
+                        @if($user->profile_photo)
+
+                            <img src="{{ asset('storage/profile_photos/' . $user->profile_photo) }}"
+                                class="profile-avatar"
+                                alt="Profile Photo">
+
+                        {{-- Prioritas 2: Foto Google --}}
+                        @elseif($user->google_avatar)
+
+                            <img src="{{ $user->google_avatar }}"
+                                class="profile-avatar"
+                                referrerpolicy="no-referrer"
+                                alt="Google Photo"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}'">
+
+                        {{-- Prioritas 3: Inisial --}}
+                        @else
+
+                            <div class="profile-avatar-default">
+                                {{ strtoupper(substr($user->nama_user, 0, 1)) }}
+                            </div>
+
+                        @endif
+
                     </a>
                 @endguest
             </div>
@@ -1005,7 +1050,13 @@
 
         <div class="property-card">
             <div class="property-image">
-            <img src="img/tipe36.jpg" alt="{{ $p->nama_properti }}">
+            <img 
+            src="{{ $p->gambar->first()
+                ? asset('storage/images/' . $p->gambar->first()->path_gambar)
+                : asset('images/placeholder-properti.png')
+            }}"
+            alt="{{ $p->nama_properti }}">
+            
             {{-- Badge tersedia pindah ke sini --}}
             <div class="property-badge" style="background:{{ $bgStatus }}; color:white;">
                 {{ $labelStatus }}
@@ -1066,7 +1117,6 @@
     </div>
 </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -1084,38 +1134,29 @@
                 <div class="footer-column">
                     <h3>Tautan Cepat</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Beranda</a></li>
-                        <li><a href="#">Katalog Properti</a></li>
-                        <li><a href="#">ChatBot</a></li>
-                        <li><a href="#">Riwayat Pemesanan</a></li>
-                        <li><a href="#">Tentang Kami</a></li>
+                        <li><a href="{{ route('welcome') }}">Beranda</a></li>
+                        <li><a href="{{ route('halaman-katalog') }}">Katalog Properti</a></li>
+                        <li><a href="{{ route('halaman-chatbot') }}">ChatBot</a></li>
+                        <li><a href="{{ route('halaman-katalog') }}">Kontak</a></li>
+                        <li><a href="{{ route('tentang-kami') }}">Tentang Kami</a></li>
                     </ul>
                 </div>
                 
-                <div class="footer-column">
-                    <h3>Layanan</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Pembelian Properti</a></li>
-                        <li><a href="#">Penjualan Properti</a></li>
-                        <li><a href="#">Sewa Properti</a></li>
-                        <li><a href="#">Konsultasi Properti</a></li>
-                        <li><a href="#">Finansial & KPR</a></li>
-                    </ul>
-                </div>
+                
                 
                 <div class="footer-column">
                     <h3>Kontak Kami</h3>
                     <div class="footer-contact">
-                        <p><i class="fas fa-map-marker-alt"></i> Jl. Melati No. 45, Jakarta Selatan</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Jl. Raya Pakisan, Bunduh, Bataan, Kec. Tenggarang, Kabupaten Bondowoso, Jawa Timur 68271</p>
                         <p><i class="fas fa-phone"></i> 0812-3456-7890</p>
-                        <p><i class="fas fa-envelope"></i> info@propertiharmoni.com</p>
+                        <p><i class="fas fa-envelope"></i> caranibhanubalakosa@gmail.com</p>
                         <p><i class="fas fa-clock"></i> Senin - Sabtu: 08:00 - 17:00</p>
                     </div>
                 </div>
             </div>
             
             <div class="copyright">
-                &copy; 2025 PropertiHarmoni. Semua hak dilindungi.
+                &copy; 2025 CaraniEstate. Semua hak dilindungi.
             </div>
         </div>
     </footer>

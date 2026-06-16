@@ -115,6 +115,48 @@
             overflow: hidden;
         }
 
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-parent {
+            justify-content: space-between;
+        }
+
+        .arrow {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-submenu {
+            display: none;
+            flex-direction: column;
+            padding-left: 40px;
+            transition: all 0.2s ease;
+        }
+        
+
+        /* optional arrow */
+        .nav-group.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-submenu a {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        .nav-submenu a:hover {
+            opacity: 1;
+        }
+
+        /* open state */
+        .nav-group.open .nav-submenu {
+            display: flex;
+        }
+
         .nav-item:hover {
             background: rgba(255,255,255,0.08);
             border-left-color: var(--primary-blue);
@@ -156,6 +198,7 @@
             margin-top: auto;
             white-space: nowrap;
             overflow: hidden;
+            color: #ffff;
         }
 
         .logout-btn:hover {
@@ -413,6 +456,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
         }
         
         .btn-save {
@@ -545,7 +589,7 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar"  id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
                 <i class="fas fa-home"></i>
@@ -560,17 +604,23 @@
                 <span>Dashboard</span>
             </a>
 
-            <a href="{{ route('admin.data_user') }}"
-                class="nav-item {{ request()->routeIs('admin.data_user') ? 'active' : '' }}">
-                <i class="fas fa-users"></i>
-                <span>Data User</span>
-            </a>
+            <div class="nav-group" id="propertiMenu">
+                <div class="nav-item nav-parent" onclick="toggleMenu('propertiMenu')">
+                    <i class="fas fa-house"></i>
+                    <span>Properti</span>
+                    <i class="fas fa-chevron-down arrow"></i>
+                </div>
 
-            <a href="{{ route('admin.data_rumah') }}"
-                class="nav-item {{ request()->routeIs('admin.data_rumah') ? 'active' : '' }}">
-                <i class="fas fa-house"></i>
-                <span>Data Rumah</span>
-            </a>
+                <div class="nav-submenu">
+                    <a href="{{ route('admin.data_rumah') }}" class="nav-subitem">
+                        <span>Data Rumah</span>
+                    </a>
+
+                    <a href="{{ route('admin.perumahan') }}" class="nav-subitem">
+                        <span>Perumahan</span>
+                    </a>
+                </div>
+            </div>
 
             <a href="{{ route('admin.halaman_verifikasi') }}"
                 class="nav-item {{ request()->routeIs('admin.halaman_verifikasi') ? 'active' : '' }}">
@@ -578,16 +628,31 @@
                 <span>Verifikasi Data</span>
             </a>
 
-            <a href="{{ route('admin.halaman_chatbot') }}"
-                class="nav-item {{ request()->routeIs('admin.halaman_chatbot') ? 'active' : '' }}">
+            <a href="{{ route('admin.monitoring-pemesanan') }}"
+                class="nav-item {{ request()->routeIs('admin.monitoring-pemesanan') ? 'active' : '' }}">
+                <i class="fas fa-chart-line"></i>
+                <span>Monitoring</span>
+            </a>
+
+            <a href="{{ route('admin.laporan_penjualan') }}"
+                class="nav-item {{ request()->routeIs('admin.laporan_penjualan') ? 'active' : '' }}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Laporan Penjualan</span>
+            </a>
+
+            <a href="{{ route('admin.pesan_pelanggan') }}"
+                class="nav-item {{ request()->routeIs('admin.pesan_pelanggan') ? 'active' : '' }}">
                 <i class="fas fa-comments"></i>
-                <span>Chatbot</span>
+                <span>Pesan Pelanggan</span>
             </a>
         
-            <div class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="logout-btn" style="width:100%; background:none; border:none; cursor:pointer; text-align:left;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </div>
     
@@ -598,9 +663,9 @@
             <div>
                 <h1 class="page-title">Edit Data User</h1>
                 <div class="breadcrumb">
-                    <a href="#" class="breadcrumb-link">Dashboard</a>
+                    <a href="{{ route('admin.welcome') }}" class="breadcrumb-link">Dashboard</a>
                     <i class="fas fa-chevron-right"></i>
-                    <a href="#" class="breadcrumb-link">Data User</a>
+                    <a href="{{ route('admin.data_user') }}" class="breadcrumb-link">Data User</a>
                     <i class="fas fa-chevron-right"></i>
                     <span>Edit Data User</span>
                 </div>
@@ -609,7 +674,7 @@
             <div class="user-profile">
                 <div class="avatar">A</div>
                 <div class="user-info">
-                    <div class="user-name">Admin Utama</div>
+                    <div class="user-name">Admin</div>
                     <div class="user-role">Administrator</div>
                 </div>
             </div>
@@ -628,7 +693,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('edit_user.update', $user->id_user) }}">
+            <form method="POST" action="{{ route('admin.edit_user.update', $user->id_user) }}">
                 @csrf
                 <div class="form-section">
                     <h3 class="section-title">
@@ -692,7 +757,7 @@
 
                 <!-- Action Buttons -->
                 <div class="form-actions">
-                    <a href="{{ route('data_user') }}" class="btn-action btn-cancel">
+                    <a href="{{ route('admin.data_user') }}" class="btn-action btn-cancel">
                         <i class="fas fa-times"></i> Batal
                     </a>
                     <button type="submit" class="btn-action btn-save">
@@ -716,32 +781,68 @@
             icon.classList.replace('fa-eye-slash', 'fa-eye');
         }
     });
+</script>
 
-    // Sidebar collapse
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-        
-        if (!sidebar || !mainContent) return;
-        
-        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-        if (isCollapsed) {
-            sidebar.classList.add('collapsed');
-            mainContent.classList.add('expanded');
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    if (!sidebar || !mainContent) {
+        console.error("sidebar / mainContent tidak ditemukan");
+        return;
+    }
+
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+    function closeAllDropdowns() {
+        document.querySelectorAll('.nav-group.open').forEach(el => {
+            el.classList.remove('open');
+        });
+    }
+
+    // INIT STATE
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+        mainContent.classList.add('expanded');
+        closeAllDropdowns();
+    }
+
+    // HOVER IN
+    sidebar.addEventListener('mouseenter', function () {
+        if (this.classList.contains('collapsed')) {
+            this.classList.add('hovering');
         }
-
-        sidebar.addEventListener('mouseenter', function() {
-            if (this.classList.contains('collapsed')) {
-                this.style.width = 'var(--sidebar-width-expanded)';
-            }
-        });
-
-        sidebar.addEventListener('mouseleave', function() {
-            if (this.classList.contains('collapsed')) {
-                this.style.width = 'var(--sidebar-width-collapsed)';
-            }
-        });
     });
+
+    // HOVER OUT
+    sidebar.addEventListener('mouseleave', function () {
+        this.classList.remove('hovering');
+        closeAllDropdowns();
+    });
+});
+
+
+/* ===================================================
+   TOGGLE DROPDOWN (INI WAJIB GLOBAL BIAR onclick WORK)
+=================================================== */
+window.toggleMenu = function (id) {
+
+    const sidebar = document.getElementById('sidebar');
+    const el = document.getElementById(id);
+
+    if (!el || !sidebar) return;
+
+    // kalau sidebar collapsed DAN tidak hover → blok
+    const isBlocked =
+        sidebar.classList.contains('collapsed') &&
+        !sidebar.classList.contains('hovering');
+
+    if (isBlocked) return;
+
+    el.classList.toggle('open');
+};
 </script>
 </body>
 </html>
