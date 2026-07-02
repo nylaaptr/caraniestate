@@ -301,6 +301,8 @@ Route::get('/invoice/{id}/pdf', [TransaksiController::class, 'downloadPdf'])
 //     [TransaksiController::class, 'storePembayaranLunas']
 // )->name('pembayaran.lunas.store');
 
+
+// YANG LAMA INI 
 Route::get(
     '/pembayaran-lunas/berhasil/{id}',
     function ($id) {

@@ -779,13 +779,6 @@
                             <span class="info-label">Alamat</span>
                             <textarea name="alamat" class="form-input">{{ $user->alamat }}</textarea>
                         </div>
-
-                        <div class="info-item">
-                            <span class="info-label">Pekerjaan</span>
-                            <input type="text" name="pekerjaan" 
-                                value="{{ $user->pekerjaan }}" class="form-input">
-                        </div>
-
                     </div>
                 </div>
 

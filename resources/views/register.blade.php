@@ -405,7 +405,7 @@
                 <p class="form-subtitle">Daftar sekarang untuk mengakses semua fitur layanan kami</p>
             </div>
             
-            <form method="POST" action="{{ route('register.proses') }}">
+            <form id="registerForm" method="POST" action="{{ route('register.proses') }}">
                 @csrf
 
                 <div class="form-group">
@@ -416,6 +416,7 @@
                         </span>
                         <input type="text" 
                             name="nama_user"
+                            id="fullName"
                             class="form-control" 
                             placeholder="Masukkan nama lengkap Anda" 
                             required>
@@ -430,6 +431,7 @@
                         </span>
                         <input type="email" 
                             name="email_user"
+                            id="email"
                             class="form-control" 
                             placeholder="Masukkan email Anda" 
                             required>
@@ -444,6 +446,7 @@
                         </span>
                         <input type="text" 
                             name="no_hp"
+                            id="phone"
                             class="form-control" 
                             placeholder="Contoh: 081234567890" 
                             required>
@@ -499,6 +502,11 @@
         </div>
     </div>
 
+    <small id="passwordError"
+    style="color:red; display:none;">
+        Password tidak sama.
+    </small>
+
     <script>
         // Toggle password visibility
         function setupPasswordToggle(toggleId, passwordId) {
@@ -524,7 +532,6 @@
         
         // Form submission
         document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
             
             const fullName = document.getElementById('fullName').value;
             const email = document.getElementById('email').value;
@@ -552,7 +559,7 @@
             console.log('Register attempt:', { fullName, email, phone, password });
             
             alert('Pendaftaran berhasil! Silakan login dengan akun Anda.');
-            window.location.href = 'login.html';
+            window.location.href = "{{ route('login') }}";
         });
         
         // Add subtle animation on page load
@@ -566,6 +573,28 @@
                 registerContainer.style.opacity = '1';
                 registerContainer.style.transform = 'translateY(0)';
             }, 100);
+        });
+
+        document.getElementById("registerForm").addEventListener("submit", function(e){
+            if(password.value !== confirmPassword.value){
+                e.preventDefault();
+                error.style.display = "block";
+                confirmPassword.focus();
+            }
+        });
+
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirmPassword");
+        const error = document.getElementById("passwordError");
+
+        confirmPassword.addEventListener("input", function () {
+
+            if (password.value !== confirmPassword.value) {
+                error.style.display = "block";
+            } else {
+                error.style.display = "none";
+            }
+
         });
     </script>
 </body>

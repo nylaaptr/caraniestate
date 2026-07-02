@@ -264,11 +264,34 @@ class MonitoringController extends Controller
 
             // KHUSUS PELUNASAN
             if (
-                strtolower($request->progres) == 'pelunasan' ||
-                strtolower($request->tahap_saat_ini) == 'pelunasan pembayaran'
+                strtolower($request->progres) == 'pelunasan' &&
+                $request->status != 'Selesai'
             ) {
+
                 $judul = 'Tagihan Pelunasan';
                 $pesan = 'Silakan melakukan pelunasan pembayaran rumah Anda. Klik notifikasi ini untuk melihat invoice dan detail tagihan.';
+
+                Notifikasi::create([
+                    'id_user' => $pemesanan->id_user,
+                    'judul' => $judul,
+                    'pesan' => $pesan,
+                    'tipe' => 'pelunasan',
+                    'status_baca' => 0,
+                    'status_kirim' => 'terkirim',
+                    'channel' => 'in_app',
+                    'referensi_id' => $transaksi->id_transaksi,
+                    'referensi_tipe' => 'invoice',
+                ]);
+
+            }
+            elseif (
+                strtolower($request->tahap_saat_ini) == 'pelunasan pembayaran' &&
+                $request->status == 'Selesai'
+            ) {
+
+                $judul = 'Pelunasan Berhasil';
+                $pesan = 'Pembayaran Anda telah berhasil diverifikasi. Klik notifikasi ini untuk melihat invoice.';
+
                 Notifikasi::create([
                     'id_user' => $pemesanan->id_user,
                     'judul' => $judul,

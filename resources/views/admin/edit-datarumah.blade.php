@@ -654,6 +654,12 @@
                 <span>Dashboard</span>
             </a>
 
+            <a href="{{ route('admin.data_user') }}"
+                class="nav-item {{ request()->routeIs('admin.data_user') ? 'active' : '' }}">
+                <i class="fas fa-user"></i>
+                <span>Data User</span>
+            </a>
+
             <div class="nav-group" id="propertiMenu">
                 <div class="nav-item nav-parent" onclick="toggleMenu('propertiMenu')">
                     <i class="fas fa-house"></i>
@@ -675,7 +681,7 @@
             <a href="{{ route('admin.halaman_verifikasi') }}"
                 class="nav-item {{ request()->routeIs('admin.halaman_verifikasi') ? 'active' : '' }}">
                 <i class="fas fa-check-circle"></i>
-                <span>Verifikasi Data</span>
+                <span>Verifikasi Dokumen</span>
             </a>
 
             <a href="{{ route('admin.monitoring-pemesanan') }}"

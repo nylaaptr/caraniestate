@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\ChatSession;
 use App\Models\ChatbotMessage;
 
@@ -44,6 +45,34 @@ class ChatbotController extends Controller
     public function kirim(Request $request)
     {
         $pesanUser = $request->input('message');
+        $pesanLower = strtolower($pesanUser);
+
+        $keywordProperti = [
+            'rumah',
+            'properti',
+            'katalog',
+            'ruko',
+            'subsidi',
+            'tipe',
+            'cluster',
+            'unit',
+            'harga',
+            'beli rumah',
+            'cari rumah',
+            'lihat rumah',
+            'lihat katalog',
+            'show katalog',
+            'perumahan'
+        ];
+
+        $perluTampilkanKatalog = false;
+
+        foreach ($keywordProperti as $keyword) {
+            if (str_contains($pesanLower, $keyword)) {
+                $perluTampilkanKatalog = true;
+                break;
+            }
+        }
 
         $userId = Auth::id();
 
@@ -189,9 +218,16 @@ $propertiJson
 Jika ingin merekomendasikan properti, gunakan format:
 [REKOMENDASI:id]
 
+Jika pengguna meminta melihat rumah, properti, ruko, katalog, unit, atau mencari rumah berdasarkan budget, lokasi, tipe, maupun kategori, WAJIB sertakan tag:
+[REKOMENDASI:id]
+
 Contoh:
 [REKOMENDASI:1,2]
 ";
+
+
+
+
 
 
         try {
@@ -210,22 +246,17 @@ Contoh:
                     ],
 
                     'json' => [
-
                         'model' => 'llama-3.1-8b-instant',
-
                         'max_tokens' => 500,
-
                         'messages' => [
 
                             [
                                 'role' => 'system',
-
                                 'content' => $systemPrompt
                             ],
 
                             [
                                 'role' => 'user',
-
                                 'content' => $pesanUser
                             ]
                         ]
@@ -242,6 +273,7 @@ Contoh:
             $balasan =
                 $result['choices'][0]['message']['content']
                 ?? 'Tidak ada balasan';
+                Log::info($balasan);
 
 
             // =========================
@@ -279,7 +311,7 @@ Contoh:
                         'luas_tanah',
                         'stok_unit'
                     )
-                    ->get()
+                    ->get(1)
                     ->toArray();
 
                 // hapus tag dari chat
@@ -304,15 +336,10 @@ Contoh:
         // SIMPAN BALASAN BOT
         // =========================
         DB::table('chat_messages')->insert([
-
             'id_sessions' => $sessionId,
-
             'sender' => 'bot',
-
             'message' => $balasan,
-
             'properti_data' => json_encode($rekomendasiProperti),
-
             'created_at' => now()
         ]);
 

@@ -763,7 +763,7 @@
                 <div class="rekening-box">
 
                     <span id="nomorRekening">
-                        1234567890
+                        1430033363555
                     </span>
 
                     <button
@@ -989,7 +989,7 @@
         </div>
         <div class="action-buttons">
 
-            <a href="{{ route('halaman-notifikasi') }}"
+            <a href="{{ route('detail-pemesanan', $transaksi->pemesanan->id_pemesanan) }}"
             class="btn btn-outline">
                 <i class="fas fa-arrow-left"></i>
                 Kembali

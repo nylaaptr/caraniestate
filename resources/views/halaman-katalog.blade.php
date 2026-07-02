@@ -1104,7 +1104,11 @@
                         </a>
                     @endauth
                     
-                    <button class="action-btn btn-contact">Hubungi</button>
+                    <button
+                        class="action-btn btn-contact"
+                        onclick="window.location.href='{{ route('halaman-kontak') }}'">
+                        Hubungi
+                    </button>
                 </div>
             </div>
         </div>

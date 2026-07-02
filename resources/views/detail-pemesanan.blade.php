@@ -302,6 +302,26 @@
         .step-desc { font-size: 0.88rem; color: #475569; margin-bottom: 3px; line-height: 1.4; background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
         .step-date { font-size: 0.78rem; color: #94a3b8; margin-top: 4px; }
 
+        /* BUTTON INVOICE */
+        .btn-invoice{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            margin-top:8px;
+            padding:6px 12px;
+            background:#1E3A5F;
+            color:#fff;
+            text-decoration:none;
+            border-radius:6px;
+            font-size:13px;
+            font-weight:600;
+            transition:.2s;
+        }
+
+        .btn-invoice:hover{
+            background:#7AB2D3;
+        }
+
         /* Document Lists */
         .doc-list { display: flex; flex-direction: column; gap: 10px; }
         .doc-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; transition: 0.2s; }
@@ -614,11 +634,6 @@
                 ],
 
                 [
-                    'title' => 'Proses Bank',
-                    'desc'  => 'Pelanggan sedang mengurus pengajuan KPR ke bank'
-                ],
-
-                [
                     'title' => 'KPR Disetujui Bank',
                     'desc'  => 'Pelanggan telah mendapat persetujuan dari bank'
                 ],
@@ -818,20 +833,27 @@
 
                         <!-- DESKRIPSI -->
                         <div class="step-desc">
-
                             @if(
                                 $index == $currentIndex &&
                                 $pemesanan->catatan_admin
                             )
-
                                 {{ $pemesanan->catatan_admin }}
 
                             @else
-
                                 {{ $step['desc'] }}
-
                             @endif
 
+                            {{-- Tombol Invoice --}}
+                            @if($step['title'] == 'Pelunasan Pembayaran')
+
+                                <div style="margin-top:10px;">
+                                    <a href="{{ route('invoice', $pemesanan->transaksi->id_transaksi) }}"
+                                    class="btn-invoice">
+                                        <i class="fas fa-file-invoice"></i>
+                                        Lihat Invoice
+                                    </a>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- TANGGAL / STATUS -->
@@ -1106,7 +1128,6 @@
 
                         <!-- Action -->
                         <div class="doc-actions">
-
                             <!-- Lihat -->
                             <a href="{{ asset('storage/' . $dokumen->path_file) }}"
                             target="_blank"
@@ -1124,9 +1145,7 @@
                                 <i class="fas fa-download"></i>
                                 Unduh
                             </a>
-
                         </div>
-
                     </div>
 
                 @empty
@@ -1146,7 +1165,6 @@
                         </div>
 
                         <div class="doc-actions">
-
                             <button class="doc-btn"
                                     style="opacity:0.5; cursor:not-allowed;"
                                     disabled>
@@ -1154,17 +1172,11 @@
                                 <i class="fas fa-clock"></i>
                                 Menunggu
                             </button>
-
                         </div>
-
                     </div>
-
                 @endforelse
-
             </div>
-        </div>
-
-        
+        </div>        
     </main>
 
     <script>

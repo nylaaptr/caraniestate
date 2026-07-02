@@ -1246,7 +1246,7 @@
                     <div class="payment-detail-row">
                         <span class="payment-detail-label">Bank</span>
                         <span class="payment-detail-value">
-                            Bank BCA
+                            Bank Mandiri
                         </span>
                     </div>
 
