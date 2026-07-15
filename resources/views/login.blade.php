@@ -542,7 +542,7 @@
                     <span>atau</span>
                 </div>
 
-                <a href="{{ route('google.login') }}" class="btn btn-light w-100"
+                <a href="{{ route('google.welcome') }}" class="btn btn-light w-100"
                 style="
                     border:2px solid #e2e8f0;
                     padding:14px;

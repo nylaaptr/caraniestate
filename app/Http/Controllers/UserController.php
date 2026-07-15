@@ -54,14 +54,21 @@ class UserController extends Controller
     public function updateProfile(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255'
+            'nama_user'     => 'required|string|max:255',
+            'email_user'    => 'required|email|max:255',
+            'no_hp'         => 'nullable|string|max:20',
+            'password_user' => 'nullable|min:8',
         ]);
 
         $user = Auth::user();
 
-        $user->name = $request->name;
-        $user->email = $request->email;
+        $user->nama_user = $request->nama_user;
+        $user->email_user = $request->email_user;
+        $user->no_hp = $request->no_hp;
+
+        if ($request->filled('password_user')) {
+            $user->password_user = Hash::make($request->password_user);
+        }
 
         $user->save();
 

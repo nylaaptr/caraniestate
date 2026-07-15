@@ -501,6 +501,24 @@
             border-color: #4a90b7;
         }
 
+
+        .btn-delete-preview{
+            position:absolute;
+            top:8px;
+            right:8px;
+            width:30px;
+            height:30px;
+            border:none;
+            border-radius:50%;
+            background:#dc3545;
+            color:#fff;
+            cursor:pointer;
+        }
+
+        .btn-delete-preview:hover{
+            background:#bb2d3b;
+        }
+
         .img-modal {
             display: none;
             position: fixed;
@@ -965,9 +983,9 @@
                         multiple>
                     </div>
 
-                    <button type="button" onclick="cekFile()">
+                    <!-- <button type="button" onclick="cekFile()">
                         Cek File
-                    </button>
+                    </button> -->
 
                     <!-- Tombol -->
                     <div class="form-actions">
@@ -1010,22 +1028,34 @@ function cekFile() {
 
             function renderPreview() {
                 container.innerHTML = '';
+
+                // Update isi input file
+                const dataTransfer = new DataTransfer();
+
+                fileBuffer.forEach(file => {
+                    dataTransfer.items.add(file);
+                });
+
+                fileInput.files = dataTransfer.files;
                 fileBuffer.forEach((file, index) => {
                     const reader = new FileReader();
-                    reader.onload = function (e) {
+                    reader.onload = function(e){
+
                         const wrapper = document.createElement('div');
                         wrapper.classList.add('preview-item');
+
                         const img = document.createElement('img');
                         img.src = e.target.result;
                         img.classList.add('preview-img');
-
                         img.onclick = () => openModal(e.target.result);
 
                         const delBtn = document.createElement('button');
-                        delBtn.innerText = '×';
+                        delBtn.type = 'button';
+                        delBtn.classList.add('btn-delete-preview');
+                        delBtn.innerHTML = '<i class="fas fa-trash"></i>';
 
                         delBtn.onclick = () => {
-                            fileBuffer.splice(index, 1);
+                            fileBuffer.splice(index,1);
                             renderPreview();
                         };
 
@@ -1033,6 +1063,7 @@ function cekFile() {
                         wrapper.appendChild(delBtn);
 
                         container.appendChild(wrapper);
+
                     };
 
                     reader.readAsDataURL(file);

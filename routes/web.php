@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use App\Mail\NotifikasiEmail;
 use App\Models\LeadEmail;
-use App\Http\Controllers\Auth\GoogleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -198,10 +197,6 @@ Route::get('/chatbot/pesan-terbaru', function(Request $request) {
 |--------------------------------------------------------------------------
 */
 
-// LOGIN GOOGLE
-Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.login');
-Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
-
 Route::get('/login', [AuthController::class, 'index'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.proses');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -322,7 +317,7 @@ Route::post('/upload-bukti', [DokumenController::class, 'uploadBuktiPembayaran']
 
 // EMAILLL
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])
-    ->name('google.login');
+    ->name('google.welcome');
 
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])
     ->name('google.callback');
@@ -1694,9 +1689,5 @@ Route::post('/admin/pembayaran_lunas/{id_transaksi}', function ($id_transaksi) {
                 'pesan' => 'Ini email dari sistem 🚀'
             ])
         );
-
         return 'Email terkirim!';
-
     });
-
-

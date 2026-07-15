@@ -48,7 +48,7 @@ class AuthController extends Controller
                 return redirect()->route('admin.welcome');
             }
 
-            return redirect()->route('halaman-katalog');
+            return redirect()->route('welcome');
         }
 
         return back()->withErrors([
@@ -67,16 +67,14 @@ class AuthController extends Controller
     public function handleGoogleCallback()
     {
         try {
-
             $googleUser = Socialite::driver('google')->user();
-
             $user = User::where('email_user', $googleUser->email)->first();
-
             if (!$user) {
 
                 $user = User::create([
                     'nama_user' => $googleUser->name,
                     'email_user' => $googleUser->email,
+                    'no_hp' => null,
                     'password_user' => bcrypt('google-login'),
                     'role_user' => 'customer',
                     'google_id' => $googleUser->id,
@@ -102,12 +100,11 @@ class AuthController extends Controller
                 'tipe' => 'login'
             ]);
 
-            return redirect()->route('halaman-katalog');
+            return redirect()->route('welcome');
 
         } catch (\Exception $e) {
-
-            return redirect()->route('login')->with('error', 'Login Google gagal.');
-        }
+    dd($e->getMessage());
+}
     }
 
     // =========================

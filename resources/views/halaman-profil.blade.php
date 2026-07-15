@@ -775,9 +775,12 @@
                                 value="{{ $user->email_user }}" class="form-input">
                         </div>
 
-                        <div class="info-item full">
-                            <span class="info-label">Alamat</span>
-                            <textarea name="alamat" class="form-input">{{ $user->alamat }}</textarea>
+                        <div class="info-item">
+                            <span class="info-label">Password</span>
+                            <input type="password"
+                                value="********"
+                                class="form-input"
+                                disabled>
                         </div>
                     </div>
                 </div>

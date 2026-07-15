@@ -684,7 +684,7 @@ elseif ($n->tipe == 'verifikasi') {
 
 }
 
-$link = '#';
+$link = '';
 
 /* =====================================================
    AMBIL DATA DASAR
@@ -721,13 +721,12 @@ if ($n->tipe == 'pelunasan' && $transaksi) {
     $pemesanan = \App\Models\Pemesanan::find($dokumen->id_pemesanan);
 
     if ($dokumen->status_verifikasi == 'ditolak') {
-
         $link = route('form-pemesanan', $dokumen->id_pemesanan);
 
     } else {
-
         $link = route('detail-pemesanan', $dokumen->id_pemesanan);
     }
+    
 
 /* =====================================================
    MONITORING / TAHAP LAIN → DETAIL PEMESANAN

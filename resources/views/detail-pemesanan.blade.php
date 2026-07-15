@@ -778,23 +778,15 @@
                         elseif ($index == $currentIndex) {
 
                             if ($pemesanan->status == 'Selesai') {
-
                                 $class = 'done';
-
                             }
                             elseif ($pemesanan->status == 'Ditolak') {
-
                                 $class = 'rejected';
-
                             }
                             else {
-
                                 $class = 'active';
-
                             }
-
                         }
-
                     @endphp
 
                     <div class="timeline-step {{ $class }}">
@@ -844,8 +836,10 @@
                             @endif
 
                             {{-- Tombol Invoice --}}
-                            @if($step['title'] == 'Pelunasan Pembayaran')
-
+                            @if(
+                                $step['title'] == 'Pelunasan Pembayaran'
+                                && $currentIndex >= $index
+                            )
                                 <div style="margin-top:10px;">
                                     <a href="{{ route('invoice', $pemesanan->transaksi->id_transaksi) }}"
                                     class="btn-invoice">
@@ -854,6 +848,16 @@
                                     </a>
                                 </div>
                             @endif
+                            <!-- @if($step['title'] == 'Pelunasan Pembayaran')
+
+                                <div style="margin-top:10px;">
+                                    <a href="{{ route('invoice', $pemesanan->transaksi->id_transaksi) }}"
+                                    class="btn-invoice">
+                                        <i class="fas fa-file-invoice"></i>
+                                        Lihat Invoice
+                                    </a>
+                                </div>
+                            @endif -->
                         </div>
 
                         <!-- TANGGAL / STATUS -->

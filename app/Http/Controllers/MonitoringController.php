@@ -264,7 +264,7 @@ class MonitoringController extends Controller
 
             // KHUSUS PELUNASAN
             if (
-                strtolower($request->progres) == 'pelunasan' &&
+                strtolower($request->tahap_saat_ini) == 'pelunasan' &&
                 $request->status != 'Selesai'
             ) {
 

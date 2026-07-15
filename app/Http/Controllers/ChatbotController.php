@@ -131,13 +131,9 @@ class ChatbotController extends Controller
         $apiKey = env('GROQ_API_KEY');
 
         if (!$apiKey) {
-
             return response()->json([
-
                 'reply' => 'API key tidak ditemukan!',
-
                 'options' => [],
-
                 'properti' => []
             ]);
         }

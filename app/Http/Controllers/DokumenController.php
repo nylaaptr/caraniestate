@@ -141,7 +141,7 @@ class DokumenController extends Controller
 
     /**
      * ======================================
-     * ADMIN - TOLAK BUKTI
+     * ADMIN - TOLAK BUKTI PEMBAYARAN
      * ======================================
      */
     public function rejectBukti($id)

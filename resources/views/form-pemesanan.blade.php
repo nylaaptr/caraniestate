@@ -1254,7 +1254,7 @@
                         <span class="payment-detail-label">Nomor Rekening</span>
 
                         <span class="payment-detail-value rekening-highlight">
-                            1234567890
+                            1430033363555
 
                             <button type="button"
                                 class="copy-btn"
