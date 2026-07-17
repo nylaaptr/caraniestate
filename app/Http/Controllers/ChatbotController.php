@@ -186,9 +186,12 @@ ATURAN PENTING:
 - Gunakan kalimat natural dan mengalir.
 - Jangan terlalu panjang.
 
-Jika user baru menyebut ingin cari rumah/properti:
-- Jangan langsung memberi rekomendasi properti.
-- Tanya kebutuhan user dulu secara natural.
+
+Jika pengguna sudah memberikan informasi seperti budget, lokasi, tipe rumah, kategori, atau kebutuhan lainnya:
+- Langsung berikan rekomendasi properti yang paling sesuai.
+- Jangan mengulang pertanyaan yang sudah dijawab pengguna.
+- Sertakan tag [REKOMENDASI:id].
+- Jelaskan alasan singkat mengapa properti tersebut direkomendasikan.
 
 Contoh gaya yang BENAR:
 'Siap kak 😊
@@ -277,7 +280,7 @@ Contoh:
             // =========================
             if (
                 preg_match(
-                    '/\[REKOMENDASI:([\d,]+)\]/',
+                    '/\[REKOMENDASI:\s*([\d,\s]+)\]/',
                     $balasan,
                     $matches
                 )
@@ -307,7 +310,8 @@ Contoh:
                         'luas_tanah',
                         'stok_unit'
                     )
-                    ->get(1)
+                    ->limit(2)
+                    ->get()
                     ->toArray();
 
                 // hapus tag dari chat

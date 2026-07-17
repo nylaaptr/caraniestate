@@ -264,7 +264,7 @@ class MonitoringController extends Controller
 
             // KHUSUS PELUNASAN
             if (
-                strtolower($request->tahap_saat_ini) == 'pelunasan' &&
+                strtolower($request->tahap_saat_ini) == 'pelunasan pembayaran' &&
                 $request->status != 'Selesai'
             ) {
 
