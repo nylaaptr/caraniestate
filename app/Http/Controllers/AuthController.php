@@ -103,7 +103,6 @@ class AuthController extends Controller
             return redirect()->route('welcome');
 
         } catch (\Exception $e) {
-    dd($e->getMessage());
 }
     }
 
