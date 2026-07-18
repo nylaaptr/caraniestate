@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('visitor_logs', function (Blueprint $table) {
@@ -20,15 +17,11 @@ return new class extends Migration
             $table->string('page')->nullable();
 
             $table->timestamps();
-
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('visitor_logs_');
+        Schema::dropIfExists('visitor_logs');
     }
 };
