@@ -74,7 +74,7 @@ class AuthController extends Controller
                 $user = User::create([
                     'nama_user' => $googleUser->name,
                     'email_user' => $googleUser->email,
-                    'no_hp' => null,
+                    'no_hp' => '-',
                     'password_user' => bcrypt('google-login'),
                     'role_user' => 'customer',
                     'google_id' => $googleUser->id,

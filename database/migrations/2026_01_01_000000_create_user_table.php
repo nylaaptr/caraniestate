@@ -16,7 +16,7 @@ return new class extends Migration
             $table->increments('id_user');
 
             $table->string('nama_user');
-            $table->string('no_hp', 15);
+            $table->string('no_hp', 15)->nullable();
 
             $table->string('email_user')->unique();
 
